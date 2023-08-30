@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\vendor;
 
 use App\Http\Controllers\Controller;
+use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Http\Request;
 
 class vendorEndpoint extends Controller
@@ -35,7 +36,11 @@ class vendorEndpoint extends Controller
         $data = json_decode(json_encode($request->all()));
         $app = Lib::load($apps, $accountId);
 
-        unlink( public_path().'/data/'.$accountId.'.json');
+        try {
+            unlink( public_path().'/data/'.$accountId.'.json');
+        } catch (BadResponseException) {
+
+        }
 
         if (!$app->getStatusName()) {
             http_response_code(404);
