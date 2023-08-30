@@ -5,6 +5,7 @@ namespace App\Http\Controllers\vendor;
 use App\Http\Controllers\Controller;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 
 class vendorEndpoint extends Controller
 {
@@ -26,8 +27,9 @@ class vendorEndpoint extends Controller
         if (!$app->getStatusName()) {
             http_response_code(404);
         } else {
-            header("Content-Type: application/json");
-            echo '{"status": "' . $app->getStatusName() . '"}';
+            return Response::json([
+                'status' => $app->getStatusName()
+            ]);
         }
     }
 
