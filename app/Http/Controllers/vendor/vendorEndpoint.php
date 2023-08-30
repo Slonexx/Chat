@@ -7,12 +7,11 @@ use Illuminate\Http\Request;
 
 class vendorEndpoint extends Controller
 {
-    public function Put(Request $request, $apps, $accountId){
+    public function put(Request $request, $apps, $accountId){
 
         $data = json_decode(json_encode($request->all()));
         $app = Lib::load($apps, $accountId);
 
-        $appUid = $data->appUid;
         $accessToken = $data->access[0]->access_token;
 
         if (!$app->getStatusName()) {
@@ -22,7 +21,25 @@ class vendorEndpoint extends Controller
 
         }
 
-        return response('',200);
+
+        if (!$app->getStatusName()) {
+            http_response_code(404);
+        } else {
+            header("Content-Type: application/json");
+            echo '{"status": "' . $app->getStatusName() . '"}';
+        }
+    }
+
+    public function delete(Request $request, $apps, $accountId){
+
+        $data = json_decode(json_encode($request->all()));
+        $app = Lib::load($apps, $accountId);
+
+        unlink( public_path().'/data/'.$accountId.'.json');
+
+        if (!$app->getStatusName()) {
+            http_response_code(404);
+        }
     }
 
 }

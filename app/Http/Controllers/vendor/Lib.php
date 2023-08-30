@@ -41,7 +41,7 @@ class Lib extends Controller
     function persist(): void
     {
         @mkdir('data');
-        file_put_contents($this->filename(), serialize($this));
+        file_put_contents($this->filename(),  serialize($this));
     }
 
     private function filename(): string
@@ -54,23 +54,19 @@ class Lib extends Controller
         return "data/$accountId.json";
     }
 
-    static function loadApp($accountId): Lib {
-        return self::load(self::cfg()->appId, $accountId);
-    }
-
-    static function load($appId, $accountId): Lib {
+    static function load($appId, $accountId): Lib
+    {
+        $App = new Lib($appId, $accountId);
         $data = @file_get_contents(self::buildFilename($accountId));
         if ($data === false) {
-            $app = new Lib($appId, $accountId);
+            return $App ;
         } else {
-            $unser = json_encode( unserialize($data) );
-            $app =  json_decode($unser);
+            $app = json_decode(json_encode( unserialize($data) ));
         }
 
-        $AppInstance = new Lib($app->appId, $app->accountId);
-        $AppInstance->parsing($app);
+        $App->parsing($app);
 
-        return $AppInstance;
+        return $App;
     }
 
     public function parsing($json): void
