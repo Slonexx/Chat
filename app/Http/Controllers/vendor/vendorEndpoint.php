@@ -36,11 +36,11 @@ class vendorEndpoint extends Controller
         $data = json_decode(json_encode($request->all()));
         $app = Lib::load($apps, $accountId);
 
-        try {
+        if (file_exists(public_path().'/data/'.$accountId.'.json')) {
             unlink( public_path().'/data/'.$accountId.'.json');
-        } catch (BadResponseException) {
-
         }
+
+
 
         if (!$app->getStatusName()) {
             http_response_code(404);
