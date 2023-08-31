@@ -16,6 +16,16 @@ return new class extends Migration
         Schema::create('setting_models', function (Blueprint $table) {
             $table->string('accountId')->unique()->primary();
             $table->string('tokenMs');
+
+            $table->string('email');
+            $table->string('password');
+            $table->string('appId');
+
+
+
+            $table->string('accessToken');
+            $table->string('refreshToken');
+
             $table->timestamps();
         });
     }

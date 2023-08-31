@@ -2,7 +2,7 @@
 
 namespace App\Clients;
 
-use App\Http\Controllers\BD\getMainSettingBD;
+use App\Http\Controllers\getBaseTableByAccountId\getMainSettingBD;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -24,6 +24,7 @@ class newClient
         $this->client = new Client([
             'base_uri' => $this->URL_->url_,
             'headers' => [
+                'Authorization' => $this->Setting->accessToken,
                 'Content-Type' => 'application/json',
             ]
         ]);
@@ -31,7 +32,15 @@ class newClient
 
     public function createTokenMake(string $email, string $password, string $appId): \Psr\Http\Message\ResponseInterface
     {
-        return $this->client->post($this->URL_->url_.'v1/tokens',[
+
+        $client = new Client([
+            'base_uri' => $this->URL_->url_,
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+
+        return $client->post($this->URL_->url_.'v1/tokens',[
             'body' => json_encode([
                 'email' => $email,
                 'password' => $password,
@@ -39,5 +48,25 @@ class newClient
             ]),
         ]);
     }
+
+    public function checkToken(): \Psr\Http\Message\ResponseInterface
+    {
+        return $this->client->post($this->URL_->url_.'v1/tokens',[
+            'headers' => [
+                'Authorization' => $this->Setting->accessToken
+            ]
+        ]);
+    }
+
+    public function licenses(): \Psr\Http\Message\ResponseInterface
+    {
+        return $this->client->get($this->URL_->url_.'v1/licenses',[
+            'headers' => [
+                'Authorization' => $this->Setting->accessToken
+            ]
+        ]);
+    }
+
+
 
 }
