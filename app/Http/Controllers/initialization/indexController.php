@@ -16,14 +16,18 @@ class indexController extends Controller
         }
         $vendorAPI = new VendorApiController();
         $employee = $vendorAPI->context($contextKey);
-        dd($vendorAPI, $employee);
+
         $accountId = $employee->accountId;
+        $fullName = $employee->fullName;
+        $uid = $employee->uid;
 
         $isAdmin = $employee->permissions->admin->view;
 
         return to_route('main', [
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
+            'fullName' => $fullName,
+            'uid' => $uid,
         ]);
     }
 
@@ -33,10 +37,14 @@ class indexController extends Controller
 
 
         $isAdmin = $request->isAdmin;
+        $fullName = $request->fullName;
+        $uid = $request->uid;
 
         return view("main.index" , [
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
+            'fullName' => $fullName,
+            'uid' => $uid,
         ] );
 
     }

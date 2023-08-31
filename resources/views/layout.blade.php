@@ -9,7 +9,10 @@
                         <img src="{{  ( Config::get("Global") )['url'].'client.svg' }}" width="40px" height="40px"  alt="">
                         &nbsp;
                         <img class="mt-2" src="{{  ( Config::get("Global") )['url'].'client2.svg' }}" width="120px" height="100%"  alt="">
+                        <div>{{ request()->fullName }}</div>
+                        <div>{{ request()->uid }}</div>
                     </div>
+
                     <br>
                     <a id="link_1" href="/{{$accountId}}?isAdmin={{ request()->isAdmin }}">Главная </a>
                     @if ( request()->isAdmin == null )
