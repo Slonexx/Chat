@@ -62,13 +62,13 @@ function makeHttpRequest(string $method, string $url, string $bearerToken, $body
 function buildJWT(): string
 {
 
-    $cfg = new cfg();
+
 
     $token = array(
-        "sub" => $cfg->appUid,
+        "sub" =>  Config::get("Global.appUid"),
         "iat" => time(),
         "exp" => time() + 300,
         "jti" => bin2hex(random_bytes(32))
     );
-    return JWT::encode($token, $cfg->secretKey);
+    return JWT::encode($token,  Config::get("Global.secretKey"));
 }
