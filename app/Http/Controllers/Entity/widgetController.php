@@ -22,6 +22,8 @@ class widgetController extends Controller
         $vendorAPI = new VendorApiController();
         $employee = $vendorAPI->context($request->contextKey);
 
+        dd($employee);
+
         if (isset($employee['errors'])) {
             return view('widget.Error', [
                 'status' => false,
