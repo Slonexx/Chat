@@ -28,10 +28,6 @@
         let accountId = "{{$accountId}}"
         let Global_object_Id
         let entity_type = "{{$entity}}"
-        let employee = "{{$employee}}"
-
-        console.log(employee)
-
 
 
 

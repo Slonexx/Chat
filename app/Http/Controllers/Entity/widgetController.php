@@ -18,19 +18,19 @@ class widgetController extends Controller
     public function widgetObject(Request $request, $object): Factory|View|Application
     {
 
-
-        $vendorAPI = new VendorApiController();
-        $employee = $vendorAPI->context($request->contextKey);
-
-        dd($employee);
-
-        if (isset($employee['errors'])) {
+        try {
+            $vendorAPI = new VendorApiController();
+            $employee = $vendorAPI->context($request->contextKey);
+        } catch (\Throwable) {
             return view('widget.Error', [
                 'status' => false,
                 'code' => 400,
                 'message' => "Проблема с получением данных виджета, просьба срочно сообщить разработчиком ",
             ]);
         }
+
+
+
 
         $employeeModel = employeeModel::where('employeeId', $employee->id)->get();
         $accountId = $employee->accountId;
@@ -49,7 +49,6 @@ class widgetController extends Controller
         return view('widget.object', [
             'accountId' => $accountId,
             'entity' => $object,
-            'employee' => $employee,
         ]);
 
 
