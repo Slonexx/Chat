@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Setting;
 
 
+use App\Clients\MsClient;
+use App\Clients\newClient;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\getBaseTableByAccountId\getMainSettingBD;
+use App\Models\employeeModel;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -22,114 +25,215 @@ class CreateAuthTokenController extends Controller
     public function getCreateAuthToken(Request $request, $accountId): Factory|View|Application
     {
         $isAdmin = $request->isAdmin;
-        $SettingBD = new getMainSettingBD($accountId);
+        $fullName = $request->fullName ?? "Имя аккаунта";
+        $uid = $request->uid ?? "логин аккаунта";
 
+        $existingRecords = employeeModel::where('accountId', $accountId)->get();
+        $Employee = [];
+        if (!$existingRecords->isEmpty()) {
+            foreach ($existingRecords as $record) {
+                $Employee[] = [
+                    'accountId' => $record->accountId,
+                    'employeeId' => $record->employeeId,
+                    'employeeName' => $record->employeeName,
+
+                    'email' => $record->email,
+                    'password' => $record->password,
+                    'appId' => $record->appId,
+
+                    'access' => $record->access,
+
+                    'cabinetUserId' => $record->cabinetUserId,
+                    'accessToken' => $record->accessToken,
+                    'refreshToken' => $record->refreshToken,
+                ];
+            }
+        }
+
+        $ms = new MsClient($accountId);
+        try {
+            $E = $ms->get('https://online.moysklad.ru/api/remap/1.2/entity/employee')->rows;
+        } catch (BadResponseException $e) {
+            return view('setting.error', [
+                'message' => json_decode($e->getResponse()->getBody()->getContents()),
+
+                'accountId' => $accountId,
+                'isAdmin' => $isAdmin,
+                'fullName' => $fullName,
+                'uid' => $uid,
+            ]);
+        }
 
         return view('setting.mainSetting.authToken', [
+            'MsEmployee' => $E,
+            'MyEmployee' => $Employee,
+
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
+            'fullName' => $fullName,
+            'uid' => $uid,
         ]);
     }
 
     public function postCreateAuthToken(Request $request, $accountId): View|Factory|RedirectResponse|Application
     {
-        $Setting = new getSettingVendorController($accountId);
-        $SettingBD = new getMainSettingBD($accountId);
-        $Client = new KassClient($accountId);
+        $isAdmin = $request->isAdmin;
+        $fullName = $request->fullName ?? "Имя аккаунта";
+        $uid = $request->uid ?? "логин аккаунта";
 
-        try {
-            $body = $Client->testCheck([
-                'Token' => $request->token,
-                'CashboxUniqueNumber' => $request->CashboxUniqueNumber,
-                'OperationType' => "2",
-                'Positions' => [0=>[
-                    "Count"=> 1,
-                    "Price"=> 0,
-                    "TaxPercent"=> 0,
-                    "PositionName"=>"Проверка Токена и Заводского номера",
-                    "Tax"=> 0,
-                    "TaxType"=> 0,
-                    "UnitCode"=> 796,
-                ]],
-                'Payments' => [
-                    0 => [
-                        "sum"=>0,
-                        "PaymentType"=>1
-                    ]
-                ],
-                "Roundtype" => 2,
-                "ExternalCheckNumber" => Str::uuid()->toString(),
-            ]);
-
-            $result = json_decode($body->getBody()->getContents());
-            if (property_exists($result, 'Errors')){
-                $message = "Неверный токен или Заводской номер кассы";
-                if ($result->Errors[0]->Text == "Продолжительность смены превышает 24 часа. Произведите закрытие смены.") {
-                    $message = $result->Errors[0]->Text;
-                }
-                return view('setting.authToken', [
-                    'accountId' => $accountId,
-                    'isAdmin' => $request->isAdmin,
-
-                    'message' => $message,
-                    'CashboxUniqueNumber'=> $request->CashboxUniqueNumber,
-                    'token' => "",
-                ]);
-            }
-
-            if ($SettingBD->tokenMs == null) {
-                DataBaseService::createMainSetting($accountId, $Setting->TokenMoySklad, $request->token, $request->CashboxUniqueNumber);
-            } else {
-                DataBaseService::updateMainSetting($accountId, $Setting->TokenMoySklad, $request->token, $request->CashboxUniqueNumber);
-            }
-            $cfg = new cfg();
-            $app = AppInstanceContoller::loadApp($cfg->appId, $accountId);
+          /*  $app = AppInstanceContoller::loadApp($cfg->appId, $accountId);
             $app->status = AppInstanceContoller::ACTIVATED;
             $vendorAPI = new VendorApiController();
             $vendorAPI->updateAppStatus($cfg->appId, $accountId, $app->getStatusName());
-            $app->persist();
+            $app->persist();*/
 
-            return to_route('getDocument', ['accountId' => $accountId, 'isAdmin' => $request->isAdmin]);
-        } catch (BadResponseException $e){
-            return view('setting.authToken', [
+            return to_route('main', [
                 'accountId' => $accountId,
-                'isAdmin' => $request->isAdmin,
-
-                'message' => 'ошибка: ' . $e->getCode(),
-                'CashboxUniqueNumber'=> $request->CashboxUniqueNumber,
-                'token' => $request->token,
+                'isAdmin' => $isAdmin,
+                'fullName' => $fullName,
+                'uid' => $uid,
             ]);
-        }
     }
 
 
-    /**
-     * @throws GuzzleException
-     */
-    public function createAuthToken(Request $request): JsonResponse
+    public function getEmployee(Request $request, $accountId): JsonResponse
     {
-        $URL_WEBKASSA = Config::get("Global");
-        $url = $URL_WEBKASSA['webkassa'].'api/Authorize';
+        $employeeId = $request->employee ?? "";
 
-        $client = new Client();
-        try {
-            $post = $client->post($url, [
-                'form_params' => [
-                    'login' => $request->email,
-                    'password' => $request->password,
-                ],
-            ]);
-            $result = [
-                'status' => $post->getStatusCode(),
-                'auth_token' => json_decode($post->getBody())->Data->Token,
-            ];
-        } catch (BadResponseException $e){
-            $result = [
-                'status' => $e->getCode(),
-                'auth_token' => null,
-            ];
+        $existingRecords = employeeModel::where('employeeId', $employeeId)->first();
+
+        if ($existingRecords != null) {
+                return response()->json([
+                    'accountId' => $existingRecords->accountId,
+                    'employeeId' => $existingRecords->employeeId,
+                    'employeeName' => $existingRecords->employeeName,
+
+                    'email' => $existingRecords->email,
+                    'password' => $existingRecords->password,
+                    'appId' => $existingRecords->appId,
+
+                    'access' => $existingRecords->access,
+
+                    'cabinetUserId' => $existingRecords->cabinetUserId,
+                    'accessToken' => $existingRecords->accessToken,
+                    'refreshToken' => $existingRecords->refreshToken,
+                ]);
         }
 
-        return response()->json($result);
-}
+
+        return response()->json([
+        'status' => 500,
+        'message' => 'Ошибка с индикатором контрагента, проблема поиска',
+    ]);
+
+    }
+    public function createEmployee(Request $request, $accountId): JsonResponse
+    {
+        $employeeId = $request->employee ?? "";
+        $employeeName = $request->employeeName ?? "";
+        $email = $request->email ?? "";
+        $password = $request->password ?? "";
+        $appId = $request->appId ?? "";
+        $access = $request->access ?? "";
+
+        $Client = new newClient($accountId);
+
+        if ($email != "" and $password != "" and $appId != null and $access != "" and $employeeName != "") {
+            try {
+                $body = json_decode(($Client->createTokenMake($email, $password, $appId))->getBody()->getContents());
+                $model = new employeeModel();
+                $existingRecords = employeeModel::where('employeeId', $employeeId)->get();
+
+                if (!$existingRecords->isEmpty()) {
+                    foreach ($existingRecords as $record) {
+                        $record->delete();
+                    }
+                }
+
+                $model->accountId = $accountId;
+
+                $model->employeeId = $employeeId;
+                $model->employeeName = $employeeName;
+
+                $model->email = $email;
+                $model->password = $password;
+                $model->appId = $appId;
+
+                $model->access = $access;
+
+                $model->cabinetUserId = $body->data->cabinetUserId;
+                $model->accessToken = $body->data->accessToken;
+                $model->refreshToken = $body->data->refreshToken;
+
+                $model->save();
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Данный аккаунт есть в ChatApp, вы можете нажимать на кнопку "Добавить"',
+                ]);
+
+            } catch (BadResponseException $e) {
+                $getContents = json_decode($e->getResponse()->getBody()->getContents());
+
+                if ($getContents->error->message == 'The email must be a valid email address.') {
+                    return response()->json([
+                        'status' => 500,
+                        'message' => 'Электронная почта должна быть действительным адресом электронной почты.',
+                    ]);
+                }
+                elseif ($getContents->error->message == 'User does not exist') {
+                    return  response()->json([
+                        'status' => 500,
+                        'message' => 'Пользователь не существует',
+                    ]);
+                }
+                elseif ($getContents->error->message == 'User password is incorrect') {
+                    return response()->json([
+                        'status' => 500,
+                        'message' => 'Пароль пользователя неверен',
+                    ]);
+                }
+                elseif ($getContents->error->message == 'APP ID is incorrect') {
+                    return response()->json([
+                        'status' => 500,
+                        'message' => 'Идентификатор приложения неверен (APP ID)',
+                    ]);
+                }
+                else return response()->json([
+                    'status' => 500,
+                    'message' => $getContents->error->message,
+                ]);
+            }
+
+        } else return response()->json([
+            'status' => 500,
+            'message' => 'Ошибка ввода данных, пожалуйста введите данные',
+        ]);
+
+
+    }
+    public function deleteEmployee(Request $request, $accountId): JsonResponse
+    {
+        $employeeId = $request->employee ?? "";
+
+        $existingRecords = employeeModel::where('employeeId', $employeeId)->get();
+
+        if (!$existingRecords->isEmpty()) {
+            foreach ($existingRecords as $record) {
+                $record->delete();
+            }
+            return response()->json([
+                'status' => 200,
+                'message' => 'данные удалены',
+            ]);
+        } else {
+            return response()->json([
+                'status' => 200,
+                'message' => 'Данных нету',
+            ]);
+        }
+
+
+    }
+
 }

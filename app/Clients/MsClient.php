@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Clients;
-use App\Http\Controllers\BD\getMainSettingBD;
+use App\Http\Controllers\getBaseTableByAccountId\getMainSettingBD;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\Pool;
@@ -22,7 +22,7 @@ class MsClient{
 
         $this->client = new Client([
             'headers' => [
-                'Authorization' =>  $this->Setting->tokenMS,
+                'Authorization' =>  $this->Setting->tokenMs,
                 'Content-Type' => 'application/json',
             ]
         ]);
@@ -58,26 +58,5 @@ class MsClient{
         ]);
         return json_decode($res->getBody());
     }
-
-/*    public function multiPost($url,$bodyArr)
-    {
-        try {
-
-            //$responses =
-                Http::pool(function (Pool $pool) use ($url, $bodyArr){
-                foreach ($bodyArr as $body){
-                    $pool->contentType('application/json')
-                        ->withToken($this->apiKey)
-                        ->post($url,$body);
-                }
-            });
-
-
-
-        } catch (RequestException $e){
-
-        }
-
-    }*/
 
 }

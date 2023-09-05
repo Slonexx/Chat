@@ -11,12 +11,8 @@ class getMainSettingBD extends Controller
 {
     public mixed $accountId;
     public mixed $tokenMs;
-    public mixed $accessToken;
 
 
-    /**
-     * @param $accountId
-     */
     public function __construct($accountId)
     {
         $this->accountId = $accountId;

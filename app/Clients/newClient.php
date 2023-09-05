@@ -24,7 +24,6 @@ class newClient
         $this->client = new Client([
             'base_uri' => $this->URL_->url_,
             'headers' => [
-                'Authorization' => $this->Setting->accessToken,
                 'Content-Type' => 'application/json',
             ]
         ]);
@@ -33,20 +32,20 @@ class newClient
     public function createTokenMake(string $email, string $password, string $appId): \Psr\Http\Message\ResponseInterface
     {
 
-        $client = new Client([
-            'base_uri' => $this->URL_->url_,
+        $client = new Client();
+
+        $options = [
             'headers' => [
                 'Content-Type' => 'application/json',
             ],
-        ]);
-
-        return $client->post($this->URL_->url_.'v1/tokens',[
-            'body' => json_encode([
+            'json' => [
                 'email' => $email,
                 'password' => $password,
                 'appId' => $appId,
-            ]),
-        ]);
+            ],
+        ];
+
+        return $client->post($this->URL_->url_.'v1/tokens',$options);
     }
 
     public function checkToken(): \Psr\Http\Message\ResponseInterface

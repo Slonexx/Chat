@@ -1,5 +1,26 @@
 
 <script>
+    if ('{{$isAdmin}}' === 'ALL') {
+        window.document.getElementById('setting').style.display = 'block'
+    }
+
+    let item = '@yield('item')'
+
+    window.document.getElementById(item).classList.add('active_sprint')
+    if (item.replace(/[^+\d]/g, '') > 1 && item.replace(/[^+\d]/g, '') <= 6) {
+        this_click(window.document.getElementById('btn_1'))
+    }
+
+    function this_click(btn) {
+        btn.classList.toggle("active");
+        let dropdownContent = btn.nextElementSibling;
+        if (dropdownContent.style.display === "block") {
+            dropdownContent.style.display = "none";
+        } else {
+            dropdownContent.style.display = "block";
+        }
+    }
+
     let dropdown = document.getElementsByClassName("dropdown-btn");
     let i;
 

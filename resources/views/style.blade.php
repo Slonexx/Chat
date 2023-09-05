@@ -82,7 +82,7 @@
     /* Выпадающий контейнер (по умолчанию скрыт). Необязательно: добавьте более светлый цвет фона и некоторые левые отступы, чтобы изменить дизайн выпадающего содержимого */
     .dropdown-container {
         display: none;
-        background-color: #d5d5d5;
+        background-color: rgb(220, 220, 220);
         padding: 5px;
     }
 
@@ -90,5 +90,25 @@
     .fa-caret-down {
         float: right;
         padding-right: 8px;
+    }
+</style>
+{{--BTN NEW STILE--}}
+<style>
+    .gradient_focus:hover{
+        color: white;
+        border: 0px;
+        background: rgb(26, 183, 183);
+        background-image: linear-gradient(147deg, #17e18a 0%, #1ab7b7 74%);
+    }
+
+    .gradient_focus:active, .gradient_focus:focus{
+        background-color: rgb(26, 183, 183);
+        background-image: linear-gradient(147deg, #17e18a 0%, #1ab7b7 74%);
+        border: 0px;
+        background-size: 100%;
+        -webkit-background-clip: text;
+        -moz-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        -moz-text-fill-color: transparent;
     }
 </style>

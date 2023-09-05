@@ -10,7 +10,7 @@ class Lib extends Controller
 
     private const UNKNOWN = 0;
     public const SETTINGS_REQUIRED = 1;
-    private const ACTIVATED = 100;
+    public const ACTIVATED = 100;
 
     public mixed $accountId;
     public mixed $TokenMoySklad;
@@ -22,11 +22,6 @@ class Lib extends Controller
     {
         $this->appId = $appId;
         $this->accountId = $accountId;
-    }
-
-    private static function cfg()
-    {
-        return (json_decode(json_encode(Config::get("Global"))) )->appId;
     }
 
     public function getStatusName(): ?string
@@ -53,6 +48,16 @@ class Lib extends Controller
     {
         return "data/$accountId.json";
     }
+
+    static function loadApp($appId, $accountId): Lib {
+        $app = self::load($appId, $accountId);
+        if (! isset($app->TokenMoySklad) ){
+            $app->TokenMoySklad = null ;
+        }
+
+        return $app;
+    }
+
 
     static function load($appId, $accountId): Lib
     {
