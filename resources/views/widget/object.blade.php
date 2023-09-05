@@ -4,10 +4,8 @@
 
         <div class="row gradient rounded p-2">
             <div class="col-4">
-                <div class="mx-2 text-center"> <img src="https://smartwebkassa.kz/webkassa_png.png" width="100%"   alt=""> </div>
-            </div>
-            <div class="col-8 ">
-                <div class="mx-2 text-right" style="font-size: 10px"> Важно! После фискализации закрывайте документ без сохранения </div>
+                <img src="{{  ( Config::get("Global") )['url'].'client.svg' }}" width="50px" height="50px"  alt="">
+                <img src="{{  ( Config::get("Global") )['url'].'client2.svg' }}" width="100px" height="100%"  alt="">
             </div>
         </div>
 
@@ -18,16 +16,7 @@
 
         <div  class="mt-1 mx-4 text-center">
             <div class="row">
-                <div class="col-1"> </div>
-                <button id="btnF" onclick="fiscalization()" class="col-4 btn p-1 btn-warning text-white rounded-pill" style="font-size: 14px"></button>
-                <div class="col-1"></div>
-                <button id="TIS_search" onclick="getSearchToTIS()" class="col-4 btn p-1 btn-info text-white rounded-pill" style="font-size: 14px"> Посмотреть в кассе </button>
-                <div class="col-1"></div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-1"> </div>
-                <button id="CloseChangeWebKassa" onclick="CloseChangeWebKassa()" class="col-9 btn p-1 btn-danger text-white rounded-pill" style="font-size: 14px; display: none">Закрыть смену</button>
-                <div class="col-1"></div>
+
             </div>
         </div>
 
@@ -39,31 +28,12 @@
         let accountId = "{{$accountId}}"
         let Global_object_Id
         let entity_type = "{{$entity}}"
+        let employee = "{{$employee}}"
+
+        console.log(employee)
 
 
-        function getSearchToTIS(){ window.open('{{Config::get("Global")['webkassa']}}'+"spa-ui/reports/tickets-history") }
 
-        function CloseChangeWebKassa(){
-            window.document.getElementById('CloseChangeWebKassa').style.display = 'none'
-            let settings = ajax_settings("{{Config::get("Global")['url']}}"+'kassa/ZReport/'+accountId, 'GET', null)
-            console.log('Widget setting attributes: ↓')
-            console.log(settings)
-
-            $.ajax(settings).done(function (response) {
-                console.log("{{Config::get("Global")['url']}}" + 'kassa/ZReport/'+accountId+' response ↓ ')
-                console.log(settings)
-
-                if (response.statusCode == 200) {
-                    window.document.getElementById('messageGoodAlert').style.display = 'block'
-                    window.document.getElementById("messageGoodAlert").innerText = "Смена Закрыта"
-                }
-                else {
-                    window.document.getElementById('messageErrorAlert').style.display = 'block'
-                    window.document.getElementById('messageErrorAlert').innerText = response.message
-                    window.document.getElementById('CloseChangeWebKassa').style.display = 'block'
-                }
-            });
-        }
 
         function ajax_settings(url, method, data){
             return {
@@ -95,13 +65,19 @@
                 objectId: Global_object_Id,
             };
 
+            let sendingMessage = {
+                name: "OpenFeedback",
+                correlationId: receivedMessage.messageId
+            };
+            hostWindow.postMessage(sendingMessage, '*');
+
             //receivedMessage = null;
 
             let settings = ajax_settings("{{Config::get("Global")['url']}}"+'widget/Info/Attributes/', 'GET', data)
             console.log('Widget setting attributes: ↓')
             console.log(settings)
 
-            $.ajax(settings).done(function (response) {
+          /*  $.ajax(settings).done(function (response) {
                 console.log("{{Config::get("Global")['url']}}" + 'widget/Info/Attributes/ response ↓ ')
                 console.log(settings)
 
@@ -112,29 +88,7 @@
                 hostWindow.postMessage(sendingMessage, '*');
 
 
-                let btnF = window.document.getElementById('btnF')
-                let TIS_search = window.document.getElementById('TIS_search')
-                window.document.getElementById('CloseChangeWebKassa').style.display = 'block'
-
-                if (response.ticket_id == null){
-                    btnF.innerText = 'Фискализация';
-                    window.document.getElementById('messageGoodAlert').style.display = 'none'
-                    window.document.getElementById("messageGoodAlert").innerText = ""
-                    TIS_search.style.display = 'none'
-                } else {
-                    btnF.innerText = 'Действие с чеком';
-                    window.document.getElementById('messageGoodAlert').style.display = 'block'
-                    window.document.getElementById("messageGoodAlert").innerText = "Чек уже создан. Фискальный номер:  " + response.ticket_id
-                    TIS_search.style.display = 'block'
-                }
-
-                if (response.Close === true){
-                    window.document.getElementById('CloseChangeWebKassa').style.display = 'none'
-                } else {
-                    window.document.getElementById('CloseChangeWebKassa').style.display = 'block'
-                }
-
-            });
+            });*/
         }
 
          });

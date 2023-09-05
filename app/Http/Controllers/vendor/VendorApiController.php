@@ -19,7 +19,7 @@ class VendorApiController extends Controller
         return $this->request('PUT', "/apps/{$appId}/{$accountId}/status", ["status" => $status]);
     }
 
-    private function request(string $method, string $path, $body = null)
+    private function request(string $method, string $path, $body = [])
     {
         $url = Config::get("Global.moyskladVendorApiEndpointUrl") . $path;
         $bearerToken = $this->buildJWT();
@@ -27,7 +27,7 @@ class VendorApiController extends Controller
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$bearerToken}",
             'Content-type' => 'application/json',
-        ])->send($method, $url, $body ?? []);
+        ])->send($method, $url, $body);
 
         return $response->json();
     }

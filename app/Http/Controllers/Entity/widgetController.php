@@ -30,7 +30,6 @@ class widgetController extends Controller
             ]);
         }
 
-        dd($employee);
 
         $employeeModel = employeeModel::where('employeeId', $employee->id)->get();
         $accountId = $employee->accountId;
@@ -49,6 +48,7 @@ class widgetController extends Controller
         return view('widget.object', [
             'accountId' => $accountId,
             'entity' => $object,
+            'employee' => $employee,
         ]);
 
 
