@@ -34,9 +34,6 @@
 
     <script>
         const hostWindow = window.parent
-        let app = @json($message);
-        window.document.getElementById('errorMessage').innerText = JSON.stringify(app)
-
 
         window.addEventListener("message", function(event) {
             console.log(event.data)
@@ -48,6 +45,12 @@
             hostWindow.postMessage(sendingMessage, '*');
 
         })
+
+        let app = @json($message);
+        window.document.getElementById('errorMessage').innerText = JSON.stringify(app)
+
+
+
 
     </script>
 
