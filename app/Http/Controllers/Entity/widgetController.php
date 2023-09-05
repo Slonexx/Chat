@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Entity;
 
 use App\Clients\MsClient;
-use App\Http\Controllers\Config\Lib\VendorApiController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\vendor\VendorApiController;
 use App\Models\employeeModel;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Contracts\Foundation\Application;
