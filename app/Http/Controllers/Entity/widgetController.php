@@ -22,15 +22,13 @@ class widgetController extends Controller
         $vendorAPI = new VendorApiController();
         $employee = $vendorAPI->context($request->contextKey);
 
-//        if (isset($employee['errors'])) {
-//            return view('widget.Error', [
-//                'status' => false,
-//                'code' => 400,
-//                'message' => "Проблема с получением данных виджета, просьба срочно сообщить разработчиком ",
-//            ]);
-//        }
-
-        dd($employee);
+        if (isset($employee['errors'])) {
+            return view('widget.Error', [
+                'status' => false,
+                'code' => 400,
+                'message' => "Проблема с получением данных виджета, просьба срочно сообщить разработчиком ",
+            ]);
+        }
 
         $employeeModel = employeeModel::where('employeeId', $employee->id)->get();
         $accountId = $employee->accountId;
