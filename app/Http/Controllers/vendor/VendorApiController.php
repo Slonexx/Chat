@@ -1,51 +1,57 @@
 <?php
 
-namespace App\Http\Controllers\Config\Lib;
+namespace App\Http\Controllers\vendor;
 
 use App\Http\Controllers\Controller;
 
 use \Firebase\JWT\JWT;
+use Illuminate\Support\Facades\Config;
 
 require_once 'jwt.lib.php';
 
 
 class VendorApiController extends Controller
 {
-    function context(string $contextKey) {
+    function context(string $contextKey)
+    {
         return $this->request('POST', '/context/' . $contextKey);
     }
 
-    function updateAppStatus(string $appId, string $accountId, string $status) {
+    function updateAppStatus(string $appId, string $accountId, string $status)
+    {
         return $this->request('PUT',
             "/apps/$appId/$accountId/status",
             "{\"status\": \"$status\"}");
     }
 
-    private function request(string $method, $path, $body = null) {
+    private function request(string $method, $path, $body = null)
+    {
 
-        $cfg = new cfg();
+        $url = Config::get("Global.moyskladVendorApiEndpointUrl") . $path;
 
         return makeHttpRequest(
             $method,
-            $cfg->moyskladVendorApiEndpointUrl . $path,
+            $url,
             buildJWT(),
             $body);
     }
 
 }
-function makeHttpRequest(string $method, string $url, string $bearerToken, $body = null) {
+
+function makeHttpRequest(string $method, string $url, string $bearerToken, $body = null)
+{
     $opts = $body
         ? array('http' =>
             array(
-                'method'  => $method,
-                'header'  => array('Authorization: Bearer ' . $bearerToken, "Content-type: application/json"),
+                'method' => $method,
+                'header' => array('Authorization: Bearer ' . $bearerToken, "Content-type: application/json"),
                 'content' => $body
             )
         )
         : array('http' =>
             array(
-                'method'  => $method,
-                'header'  => 'Authorization: Bearer ' . $bearerToken
+                'method' => $method,
+                'header' => 'Authorization: Bearer ' . $bearerToken
             )
         );
     $context = stream_context_create($opts);
