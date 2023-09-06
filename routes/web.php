@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Entity\PopapController;
 use App\Http\Controllers\Entity\widgetController;
 use App\Http\Controllers\initialization\indexController;
 use App\Http\Controllers\Setting\CreateAuthTokenController;
@@ -20,8 +21,11 @@ Route::get('/Setting/delete/employee/{accountId}', [CreateAuthTokenController::c
 
 //Widget
 Route::get('/widget/{object}', [widgetController::class, 'widgetObject']);
-Route::get('/widget/Info/Attributes', [widgetController::class, 'widgetInfoAttributes']);
+Route::get('/widget/get/Data', [widgetController::class, 'widgetGetData']);
 Route::get('LOG/widget/Info/Attributes', [widgetController::class, 'LOG_widgetInfoAttributes']);
+
+//Popup
+Route::get('/Popup/{object}', [PopapController::class, 'Popup']);
 
 //Install or delete web app
 Route::put('/api/moysklad/vendor/1.0/apps/{apps}/{accountId}', [vendorEndpoint::class, 'put']);

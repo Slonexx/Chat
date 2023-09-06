@@ -5,14 +5,9 @@
 
 
     <div class="row gradient rounded p-2">
-        <div class="col-6">
-            <div class="mx-2">
+        <div class="col">
                 <img src="{{  ( Config::get("Global") )['url'].'client.svg' }}" width="50px" height="50px"  alt="">
                 <img src="{{  ( Config::get("Global") )['url'].'client2.svg' }}" width="100px" height="100%"  alt="">
-            </div>
-        </div>
-        <div class="col-2 ">
-
         </div>
     </div>
 

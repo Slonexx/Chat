@@ -3,6 +3,7 @@
 namespace App\Clients;
 
 use App\Http\Controllers\getBaseTableByAccountId\getMainSettingBD;
+use App\Models\employeeModel;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -12,17 +13,54 @@ use Illuminate\Support\Str;
 class newClient
 {
     private Client $client;
-    private getMainSettingBD $Setting;
+    private mixed $Setting;
     private mixed $URL_;
 
 
-    public function __construct($accountId)
+    public function __construct($employeeId)
     {
-        $this->Setting = new getMainSettingBD($accountId);
         $this->URL_ = json_decode(json_encode(Config::get("Global")));
 
+        try {
+            $model = employeeModel::where( 'employeeId', $employeeId )->first();
+
+            if ($model != null) {
+                $tmp = $model->getAttributes();
+                $this->Setting = json_decode(json_encode($tmp));
+            } else {
+                $this->Setting = json_decode(json_encode([
+                    'accountId' => "",
+                    'employeeId' => "",
+                    'employeeName' => "",
+                    'email' => "",
+                    'password' => "",
+                    'appId' => "",
+                    'access' => "",
+                    'cabinetUserId' => "",
+                    'accessToken' => "",
+                    'refreshToken' => "",
+                ]));
+            }
+
+        } catch (BadResponseException) {
+            $this->Setting = json_decode(json_encode([
+                'accountId' => "",
+                'employeeId' => "",
+                'employeeName' => "",
+                'email' => "",
+                'password' => "",
+                'appId' => "",
+                'access' => "",
+                'cabinetUserId' => "",
+                'accessToken' => "",
+                'refreshToken' => "",
+            ]));
+        }
+
+
+
+
         $this->client = new Client([
-            'base_uri' => $this->URL_->url_,
             'headers' => [
                 'Content-Type' => 'application/json',
             ]

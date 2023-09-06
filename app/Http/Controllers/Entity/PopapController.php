@@ -19,7 +19,8 @@ class PopapController extends Controller
 {
     public function Popup($object): Factory|View|Application
     {
-        return view( 'popup.ViewPopap', ['Entity' => $object] );
+        return view( 'popup.ViewPopap', ['Entity' => $object,] );
+
     }
 
     public function showPopup(Request $request, $object): JsonResponse

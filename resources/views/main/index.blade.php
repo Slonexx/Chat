@@ -13,12 +13,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             @include('div.TopServicePartner')
-
-
-
-
-
-
     </div>
     <script>
         NAME_HEADER_TOP_SERVICE("Возможности интеграции")
