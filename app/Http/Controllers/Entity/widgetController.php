@@ -18,13 +18,13 @@ class widgetController extends Controller
 {
     public function widgetObject(Request $request, $object): Factory|View|Application
     {
-        $accountId = '1dd5bd55-d141-11ec-0a80-055600047495';
+        //$accountId = '1dd5bd55-d141-11ec-0a80-055600047495';
 
         try {
-           /* $vendorAPI = new VendorApiController();
-            $employee = $vendorAPI->context($request->contextKey);*/
-            $client = new MsClient($accountId);
-            $employee = $client->get('https://online.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');
+           $vendorAPI = new VendorApiController();
+            $employee = $vendorAPI->context($request->contextKey);
+            //$client = new MsClient($accountId);
+            //$employee = $client->get('https://online.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');
         } catch (\Throwable) {
             return view('widget.Error', [
                 'status' => false,
