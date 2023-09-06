@@ -10,7 +10,7 @@
                 </span>
 
             <img id="ImageOrGifHide" src="{{ Config::get("Global.url").'loading.gif' }}"
-                 width="5%" alt="" style="display: none">
+                 width="15%" alt="" style="display: none">
         </div>
     </div>
 
@@ -22,7 +22,10 @@
         <div class="row">
             <div class="col">
                 <button id="Chat" onclick="PopupShow('2')" class="btn btn-outline-dark gradient_focus"> Чат с клиентом </button>
+            </div>
+            <div class="col">
                 <button onclick="PopupShow('1')" class="btn btn-outline-dark gradient_focus"> Общий чат </button>
+
             </div>
         </div>
     </div>
@@ -130,7 +133,7 @@
         function fiscalization(onButtonParams){
             messageId++;
             let sendingMessage = {
-                name: "Show",
+                name: "ShowPopupRequest",
                 messageId: messageId,
                 popupName: "Show",
                 popupParameters: {
