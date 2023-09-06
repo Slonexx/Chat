@@ -64,22 +64,23 @@
 
 
 
-        let receivedMessage =
+        /*let receivedMessage =
             {"name":"Open","extensionPoint":"document.customerorder.edit",
                 "objectId":"5f3023e9-05b3-11ee-0a80-06f20001197a",
                 "messageId":5,
                 "displayMode":"expanded"
-            }
+            }*/
 
-        //window.addEventListener("message", function(event) {
+        window.addEventListener("message", function(event) {
             window.document.getElementById('main').style.display = 'none'
+            window.document.getElementById('messageErrorAlert').style.display = 'none'
             window.document.getElementById('Chat').style.display = "block"
             window.document.getElementById('GifOrImageHideOrGifHide').style.display = 'none'
             window.document.getElementById('ImageOrGifHide').style.display = 'inline'
 
 
 
-            //const receivedMessage = event.data;
+            const receivedMessage = event.data;
             if (receivedMessage.name === 'Open') { hostWindow.postMessage({ name: "OpenFeedback",  correlationId: receivedMessage.messageId}, '*');
 
                 entityId = receivedMessage.objectId;
@@ -122,7 +123,7 @@
 
             }
 
-        //});
+        });
 
 
 
