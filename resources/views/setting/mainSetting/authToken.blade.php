@@ -5,7 +5,7 @@
 
     <div class="mx-1 mt-3 py-3 p-4 bg-white rounded">
         <div class="row  gradient rounded p-2 pb-2 mt-1" style="margin-top: -1rem">
-            <div class="col-6" style="margin-top: 0.25rem"><span class="text-black" style="font-size: 20px"> Настройки → авторизация  </span>
+            <div class="col-6" style="margin-top: 0.25rem"><span class="text-black" style="font-size: 20px"> Настройки → Сотрудники и доступы  </span>
             </div>
             <div class="col-3 d-flex justify-content-end ">
                 <button onclick="showHideCreateEmployee('1')" class="btn btn-outline-dark gradient_focus"> добавить

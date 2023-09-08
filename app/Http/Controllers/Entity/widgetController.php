@@ -89,6 +89,16 @@ class widgetController extends Controller
             try {
                 $license = json_decode(($newClient->licenses())->getBody()->getContents()) ;
             } catch (BadResponseException $e) {
+                $error = json_decode($e->getResponse()->getBody()->getContents());
+
+                if ($error->error->code == 'ApiInvalidTokenError') {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Ошибка токена сотрудника, просьба зайти в приложение в раздел " Сотрудники и доступы ", напротив сотрудника '.
+                            $employee->employeeName.' нажмите на кнопку "изменить", после в всплывающем окне нажмите на кнопку "изменить"',
+                        'onToken' => ""
+                    ]);
+                } else
                 return response()->json([
                     'status' => false,
                     'message' => 'Ошибка получение линий в ChatApp, просьба сообщить разработчиком приложения, '. $e->getMessage(),
@@ -158,7 +168,6 @@ class widgetController extends Controller
                 'api' => [
                     'access_token' => $employee->accessToken,
                     'license_id' => $license_id,
-                    'messenger_type' => 'grWhatsApp',
                     'crm_domain' => 'smartchatapp.kz',
                     'employee_ext_code' => $employee->employeeId,
                 ],

@@ -19,6 +19,10 @@ Route::get('/Setting/get/employee/{accountId}', [CreateAuthTokenController::clas
 Route::get('/Setting/create/employee/{accountId}', [CreateAuthTokenController::class, 'createEmployee']);
 Route::get('/Setting/delete/employee/{accountId}', [CreateAuthTokenController::class, 'deleteEmployee']);
 
+//Setting for
+Route::get('/Setting/organization/{accountId}', [CreateAuthTokenController::class, 'getCreateAuthToken']);
+Route::post('/Setting/organization/{accountId}', [CreateAuthTokenController::class, 'postCreateAuthToken']);
+
 //Widget
 Route::get('/widget/{object}', [widgetController::class, 'widgetObject']);
 Route::get('/widget/get/Data', [widgetController::class, 'widgetGetData']);
