@@ -16,7 +16,9 @@
 
         @include('div.alert')
         @isset($message)
-            <script>alertViewByColorName("danger", "{{ $message }}")</script>
+            @if($message != '')
+                <script>alertViewByColorName("danger", "{{ $message }}")</script>
+            @endif
         @endisset
         <div id="sleepInfoDelete" class="mt-2 alert alert-info fade show in text-center text-black " style="display: none">
                 <div class="row">

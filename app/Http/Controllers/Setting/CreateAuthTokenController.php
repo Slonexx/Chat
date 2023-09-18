@@ -81,13 +81,7 @@ class CreateAuthTokenController extends Controller
         $fullName = $request->fullName ?? "Имя аккаунта";
         $uid = $request->uid ?? "логин аккаунта";
 
-          /*  $app = AppInstanceContoller::loadApp($cfg->appId, $accountId);
-            $app->status = AppInstanceContoller::ACTIVATED;
-            $vendorAPI = new VendorApiController();
-            $vendorAPI->updateAppStatus($cfg->appId, $accountId, $app->getStatusName());
-            $app->persist();*/
-
-            return to_route('main', [
+            return to_route('creatOrganization', [
                 'accountId' => $accountId,
                 'isAdmin' => $isAdmin,
                 'fullName' => $fullName,

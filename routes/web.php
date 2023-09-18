@@ -13,7 +13,7 @@ Route::get('/', [indexController::class, 'initialization']);
 Route::get('/{accountId}/', [indexController::class, 'index'])->name('main');
 
 //Setting get Employee
-Route::get('/Setting/createToken/{accountId}', [CreateAuthTokenController::class, 'getCreateAuthToken']);
+Route::get('/Setting/createToken/{accountId}', [CreateAuthTokenController::class, 'getCreateAuthToken'])->name('creatEmployee');
 Route::post('/Setting/createToken/{accountId}', [CreateAuthTokenController::class, 'postCreateAuthToken']);
 
 Route::get('/Setting/get/employee/{accountId}', [CreateAuthTokenController::class, 'getEmployee']);
@@ -21,7 +21,7 @@ Route::get('/Setting/create/employee/{accountId}', [CreateAuthTokenController::c
 Route::get('/Setting/delete/employee/{accountId}', [CreateAuthTokenController::class, 'deleteEmployee']);
 
 //Setting for
-Route::get('/Setting/organization/{accountId}', [organizationController::class, 'getCreate']);
+Route::get('/Setting/organization/{accountId}', [organizationController::class, 'getCreate'])->name('creatOrganization');
 Route::post('/Setting/organization/{accountId}', [organizationController::class, 'postCreate']);
 
 Route::get('/Setting/organization/get/Licenses/{accountId}', [organizationController::class, 'getLicenses']);

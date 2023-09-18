@@ -66,6 +66,7 @@ class organizationController extends Controller
             'MyEmployee' => $Employee,
             'MsOrgan' => $E,
             'saveOrgan' => $saveOrgan,
+            'message' => $request->message ?? '',
 
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
@@ -80,11 +81,12 @@ class organizationController extends Controller
         $fullName = $request->fullName ?? "Имя аккаунта";
         $uid = $request->uid ?? "логин аккаунта";
 
-        return to_route('main', [
+        return to_route('creatOrganization', [
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
             'fullName' => $fullName,
             'uid' => $uid,
+            'message' => 'Настройки сохранились',
         ]);
     }
 
