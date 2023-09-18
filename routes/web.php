@@ -37,5 +37,5 @@ Route::get('LOG/widget/Info/Attributes', [widgetController::class, 'LOG_widgetIn
 Route::get('/Popup/{object}', [PopapController::class, 'Popup']);
 
 //Install or delete web app
-Route::put('/api/moysklad/vendor/1.0/apps/{apps}/{accountId}', [vendorEndpoint::class, 'put']);
+Route::put('Config/vendor-endpoint/api/moysklad/vendor/1.0/apps/{apps}/{accountId}', [vendorEndpoint::class, 'put']);
 Route::delete('Config/vendor-endpoint/api/moysklad/vendor/1.0/apps/{apps}/{accountId}', [vendorEndpoint::class, 'delete']);
