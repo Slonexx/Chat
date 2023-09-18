@@ -24,6 +24,7 @@ class MsClient{
             'headers' => [
                 'Authorization' =>  $this->Setting->tokenMs,
                 'Content-Type' => 'application/json',
+                'Accept-Encoding' => 'gzip',
             ]
         ]);
     }

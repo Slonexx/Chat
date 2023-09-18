@@ -52,7 +52,7 @@ class CreateAuthTokenController extends Controller
 
         $ms = new MsClient($accountId);
         try {
-            $E = $ms->get('https://online.moysklad.ru/api/remap/1.2/entity/employee')->rows;
+            $E = $ms->get('https://api.moysklad.ru/api/remap/1.2/entity/employee')->rows;
         } catch (BadResponseException $e) {
             return view('setting.error', [
                 'message' => json_decode($e->getResponse()->getBody()->getContents()),
@@ -123,7 +123,7 @@ class CreateAuthTokenController extends Controller
 
         return response()->json([
         'status' => 500,
-        'message' => 'Ошибка с индикатором контрагента, проблема поиска',
+        'message' => 'Ошибка с индикатором сотрудника, проблема поиска',
     ]);
 
     }
@@ -229,7 +229,7 @@ class CreateAuthTokenController extends Controller
         } else {
             return response()->json([
                 'status' => 200,
-                'message' => 'Данных нету',
+                'message' => 'Данных нет',
             ]);
         }
 

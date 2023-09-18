@@ -5,16 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class settingModel extends Model
+class organizationModel extends Model
 {
     use HasFactory;
-    protected  $primaryKey = 'accountId';
-    protected $casts = [
-        'accountId' => 'string',
-    ];
+
     protected $fillable = [
         'accountId',
-        'tokenMs',
+        'organId',
+        'organName',
+
+        'employeeId',
+        'employeeName',
+
+        'lineId',
+        'lineName',
     ];
 
 }

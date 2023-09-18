@@ -4,6 +4,7 @@ use App\Http\Controllers\Entity\PopapController;
 use App\Http\Controllers\Entity\widgetController;
 use App\Http\Controllers\initialization\indexController;
 use App\Http\Controllers\Setting\CreateAuthTokenController;
+use App\Http\Controllers\Setting\organizationController;
 use App\Http\Controllers\vendor\vendorEndpoint;
 use Illuminate\Support\Facades\Route;
 
@@ -20,8 +21,12 @@ Route::get('/Setting/create/employee/{accountId}', [CreateAuthTokenController::c
 Route::get('/Setting/delete/employee/{accountId}', [CreateAuthTokenController::class, 'deleteEmployee']);
 
 //Setting for
-Route::get('/Setting/organization/{accountId}', [CreateAuthTokenController::class, 'getCreateAuthToken']);
-Route::post('/Setting/organization/{accountId}', [CreateAuthTokenController::class, 'postCreateAuthToken']);
+Route::get('/Setting/organization/{accountId}', [organizationController::class, 'getCreate']);
+Route::post('/Setting/organization/{accountId}', [organizationController::class, 'postCreate']);
+
+Route::get('/Setting/organization/get/Licenses/{accountId}', [organizationController::class, 'getLicenses']);
+Route::get('/Setting/organization/create/Licenses/{accountId}', [organizationController::class, 'createLicenses']);
+Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationController::class, 'deleteLicenses']);
 
 //Widget
 Route::get('/widget/{object}', [widgetController::class, 'widgetObject']);

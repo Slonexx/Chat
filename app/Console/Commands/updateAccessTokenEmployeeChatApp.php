@@ -29,7 +29,7 @@ class updateAccessTokenEmployeeChatApp extends Command
 
             try {
                 $ClientCheckMC = new MsClient($settings->accountId);
-                $body = $ClientCheckMC->get('https://online.moysklad.ru/api/remap/1.2/entity/employee');
+                $body = $ClientCheckMC->get('https://api.moysklad.ru/api/remap/1.2/entity/employee');
             } catch (BadResponseException $e) { dd($e->getMessage()); continue;}
 
             $employeeModelsWhereAccountId= employeeModel::where('accountId', $settings->accountId )->get();

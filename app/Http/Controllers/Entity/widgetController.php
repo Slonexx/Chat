@@ -7,6 +7,7 @@ use App\Clients\newClient;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\vendor\VendorApiController;
 use App\Models\employeeModel;
+use App\Models\organizationModel;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -24,7 +25,7 @@ class widgetController extends Controller
            $vendorAPI = new VendorApiController();
             $employee = $vendorAPI->context($request->contextKey);
             //$client = new MsClient($accountId);
-            //$employee = $client->get('https://online.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');
+            //$employee = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');
         } catch (\Throwable) {
             return view('widget.Error', [
                 'status' => false,
@@ -56,7 +57,7 @@ class widgetController extends Controller
         $Client = new MsClient($accountId);
 
         try {
-            $Client->get("https://online.moysklad.ru/api/remap/1.2/entity/employee");
+            $Client->get("https://api.moysklad.ru/api/remap/1.2/entity/employee");
         } catch (BadResponseException $e) {
             return view('widget.Error', [
                 'status' => false,
@@ -105,16 +106,7 @@ class widgetController extends Controller
                     'onToken' => ""
                 ]);
             }
-
-            //настройку по компании и линиям
-            $license_id = 0;
-            foreach ($license->data as $item) {
-                if (property_exists($item, 'licenseId')){
-                    $license_id = $item->licenseId;
-                    break;
-                }
-            }
-            if ($license_id == 0) {
+            if ($license->data == []) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Ошибка получение линий в ChatApp',
@@ -126,9 +118,12 @@ class widgetController extends Controller
                 ]);
             }
 
+            //настройку по компании и линиям
+
+
 
             try {
-               $documents = $msClient->get('https://online.moysklad.ru/api/remap/1.2/entity/'.$entity_type.'/'.$entityId);
+               $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/'.$entity_type.'/'.$entityId);
                $agent =  $msClient->get($documents->agent->meta->href);
             } catch (BadResponseException $e) {
                 return response()->json([
@@ -141,6 +136,25 @@ class widgetController extends Controller
                     ]),
                 ]);
             }
+
+            $organId = basename($documents->organization->meta->href);
+            $license_id = 0;
+
+            $existingRecords = organizationModel::where('accountId', $accountId)->where('employeeId', $employee->employeeId)->get();
+            if (!$existingRecords->isEmpty()) {
+                foreach ($existingRecords as $record) {
+                    if ($record->organId == 0) {
+                        $license_id = $record->lineId;
+                        break;
+                    }
+                    if ($record->organId == $organId){
+                        $license_id = $record->lineId;
+                        break;
+                    } else {continue;}
+                }
+            }
+
+
             if (property_exists($agent, 'phone')) {
                 $phone = str_replace(" ", "", $agent->phone);
                 if (strpos($phone, "+7") === 0) {
@@ -153,7 +167,7 @@ class widgetController extends Controller
                 if (strlen($phone) > 12) {
                     return response()->json([
                         'status' => false,
-                        'message' => "Некорректный номер контрагента",
+                        'message' => "Некорректный номер телефона контрагента",
                         'onToken' => http_build_query([
                             'api' => [
                                 'access_token' => $employee->accessToken,
@@ -161,10 +175,20 @@ class widgetController extends Controller
                         ]),
                     ]);
                 }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Отсутствует номер телефона контрагента",
+                    'onToken' => http_build_query([
+                        'api' => [
+                            'access_token' => $employee->accessToken,
+                        ],
+                    ]),
+                ]);
             }
 
 
-            $all = http_build_query([
+            $all = [
                 'api' => [
                     'access_token' => $employee->accessToken,
                     'license_id' => $license_id,
@@ -179,11 +203,14 @@ class widgetController extends Controller
                         //Сделать изменения по Диалог
                     ]
                 ],
-            ]);
+            ];
+            if ($all['api']['license_id'] == 0) {
+                unset($all['api']['license_id'] );
+            }
 
             return response()->json([
                 'status' => true,
-                'all' => $all,
+                'all' => http_build_query($all),
                 'onToken' => http_build_query([
                         'api' => [
                             'access_token' => $employee->accessToken,
@@ -254,9 +281,9 @@ class widgetController extends Controller
     private function getUrlEntity($enType, $enId): ?string
     {
         return match ($enType) {
-            "customerorder" => "https://online.moysklad.ru/api/remap/1.2/entity/customerorder/" . $enId,
-            "demand" => "https://online.moysklad.ru/api/remap/1.2/entity/demand/" . $enId,
-            "salesreturn" => "https://online.moysklad.ru/api/remap/1.2/entity/salesreturn/" . $enId,
+            "customerorder" => "https://api.moysklad.ru/api/remap/1.2/entity/customerorder/" . $enId,
+            "demand" => "https://api.moysklad.ru/api/remap/1.2/entity/demand/" . $enId,
+            "salesreturn" => "https://api.moysklad.ru/api/remap/1.2/entity/salesreturn/" . $enId,
             default => null,
         };
     }

@@ -62,7 +62,7 @@ class indexController extends Controller
 
             $ms = new MsClient($accountId);
             try {
-                $ms->get('https://online.moysklad.ru/api/remap/1.2/entity/employee');
+                $ms->get('https://api.moysklad.ru/api/remap/1.2/entity/employee');
 
 
                 $apps = json_decode(json_encode(Config::get("Global")))->appId;
