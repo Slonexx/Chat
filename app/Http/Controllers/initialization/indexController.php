@@ -46,9 +46,9 @@ class indexController extends Controller
         $uid = $request->uid ?? "логин аккаунта";
 
         $setting = new getSettingVendorController($accountId);
-        $employeeId = employeeModel::where('employeeId', 'e793faeb-e63a-11ec-0a80-0b4800079eb3')->first();;
 
-      /*  if ($setting->TokenMoySklad != null) {
+
+        if ($setting->TokenMoySklad != null) {
             $existingRecord = settingModel::where('accountId', $accountId)->first();
 
             if ($existingRecord) {
@@ -91,27 +91,9 @@ class indexController extends Controller
             'isAdmin' => $isAdmin,
             'fullName' => $fullName,
             'uid' => $uid,
-        ]);*/
-
-        $fields = [
-            'api' => [
-                'access_token' => $employeeId->accessToken,
-                'license_id' => 36651,
-                'messenger_type' => 'grWhatsApp',
-                'crm_domain' => 'smartInnovation',
-                'employee_ext_code' => '123',
-            ],
-            'crm' => [
-                'phones' => [
-                ],
-                'dialogIds' => [
-                ]
-            ],
-        ];
+        ]);
 
         return view("main.index" , [
-            'query' => $fields,
-
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
             'fullName' => $fullName,
