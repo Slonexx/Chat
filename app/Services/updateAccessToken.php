@@ -15,6 +15,9 @@ class updateAccessToken
 
         $Client = new newClient($data['accountId']);
         try {
+
+
+
             $body = json_decode(($Client->createTokenMake($data['email'],$data['password'] ,$data['appId'] ))->getBody()->getContents());
             $model = new employeeModel();
             $existingRecords = employeeModel::where('employeeId', $data['employeeId'] )->get();
