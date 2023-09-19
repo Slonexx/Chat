@@ -28,6 +28,8 @@ class indexController extends Controller
                 'accountId' => "errorMS",
                 'message' => "Ошибка получение contextKey, просьба сообщить разработчикам приложения",
             ]);
+        } else {
+            $employee = $employee->data;
         }
 
         $accountId = $employee->accountId;
