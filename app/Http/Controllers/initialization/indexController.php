@@ -7,15 +7,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\vendor\getSettingVendorController;
 use App\Http\Controllers\vendor\Lib;
 use App\Http\Controllers\vendor\VendorApiController;
-use App\Models\employeeModel;
 use App\Models\settingModel;
 use GuzzleHttp\Exception\BadResponseException;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 
 class indexController extends Controller
 {
-    public function initialization(Request $request): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
+    public function initialization(Request $request): View|Factory|Application|RedirectResponse
     {
         $contextKey = $request->contextKey;
         if ($contextKey == null) {
@@ -46,42 +48,43 @@ class indexController extends Controller
         ]);
     }
 
-    public function index(Request $request, $accountId): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
+    public function index(Request $request, $accountId): Factory|View|Application
     {
 
-        $isAdmin = $request->isAdmin;
+        $isAdmin = $request->isAdmin ?? "NO";
         $fullName = $request->fullName ?? "Имя аккаунта";
         $uid = $request->uid ?? "логин аккаунта";
 
         $setting = new getSettingVendorController($accountId);
+        $existingRecord = settingModel::find($accountId);
+
+        if ($existingRecord == null) {
+            $model = new settingModel();
+            $model->accountId = $accountId;
+            $model->tokenMs = $setting->TokenMoySklad;
+            $model->save();
+        } else {
+            $Attributes = $existingRecord->getAttributes();
+            if ($Attributes['tokenMs'] != $setting->TokenMoySklad) {
+                settingModel::updateOrInsert(['accountId' => $accountId], ['accountId' => $accountId, 'tokenMs' => $setting->TokenMoySklad,]);
+            }
+        }
+
+        if ($setting->status != 100) {
+            $app = Lib::loadApp($accountId);
+            $app->status = Lib::ACTIVATED;
+            $vendorAPI = new VendorApiController();
+            $vendorAPI->updateAppStatus($accountId, $app->getStatusName());
+            $app->persist();
+        }
+
 
 
         if ($setting->TokenMoySklad != null) {
-            $existingRecord = settingModel::where('accountId', $accountId)->first();
-
-            if ($existingRecord) {
-                settingModel::updateOrInsert(['accountId' => $accountId], ['accountId' => $accountId, 'tokenMs' => $setting->TokenMoySklad,]);
-            } else {
-                $model = new settingModel();
-                $model->accountId = $accountId;
-                $model->tokenMs = $setting->TokenMoySklad;
-                $model->save();
-            }
-
             $ms = new MsClient($accountId);
             try {
                 $ms->get('https://api.moysklad.ru/api/remap/1.2/entity/employee');
-
-
-                $apps = json_decode(json_encode(Config::get("Global")))->appId;
-
-                $app = Lib::loadApp($apps, $accountId);
-                $app->status = Lib::ACTIVATED;
-                $vendorAPI = new VendorApiController();
-                $vendorAPI->updateAppStatus($accountId, $app->getStatusName());
-                $app->persist();
-
-            } catch (BadResponseException $e) {
+            } catch (BadResponseException) {
                 return view('setting.error', [
                     'message' => "Токен приложение умер, просьба сообщить разработчикам приложения",
 
@@ -109,10 +112,10 @@ class indexController extends Controller
         ] );
 
     }
-    public function error(Request $request, $accountId): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
+    public function error(Request $request, $accountId): Factory|View|Application
     {
 
-        $isAdmin = $request->isAdmin;
+        $isAdmin = $request->isAdmin ?? "NO";
         $fullName = $request->fullName ?? "Имя аккаунта";
         $uid = $request->uid ?? "логин аккаунта";
         $message = $request->message ?? "Отсутствуют данные, просьба сообщить разработчикам приложения";

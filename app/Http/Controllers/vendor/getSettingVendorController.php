@@ -11,21 +11,22 @@ use Illuminate\Support\Facades\Config;
 
 class getSettingVendorController extends Controller
 {
-    var $appId;
-    var $accountId;
-    var $TokenMoySklad;
+    public string $appId;
+    public string $accountId;
+    public string $TokenMoySklad;
+    public mixed $status;
 
 
     public function __construct($accountId)
     {
 
-        $json = Lib::loadApp((json_decode(json_encode(Config::get("Global"))) )->appId, $accountId);
+        $json = Lib::loadApp($accountId);
 
-        //dd($json);
 
         $this->appId = $json->appId;
         $this->accountId = $json->accountId;
         $this->TokenMoySklad = $json->TokenMoySklad;
+        $this->status = $json->status;
 
 
         return $json;

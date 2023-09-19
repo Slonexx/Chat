@@ -49,8 +49,8 @@ class Lib extends Controller
         return "data/$accountId.json";
     }
 
-    static function loadApp($appId, $accountId): Lib {
-        $app = self::load($appId, $accountId);
+    static function loadApp($accountId): Lib {
+        $app = self::load(Config::get("Global.appUid"), $accountId);
         if (! isset($app->TokenMoySklad) ){
             $app->TokenMoySklad = null ;
         }
@@ -79,6 +79,7 @@ class Lib extends Controller
         $this->accountId = $json->accountId;
         $this->TokenMoySklad = $json->TokenMoySklad;
         $this->appId = $json->appId;
+        $this->status = $json->status;
     }
 
 

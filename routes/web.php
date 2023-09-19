@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 //main windows
 Route::get('/', [indexController::class, 'initialization']);
 Route::get('/{accountId}/', [indexController::class, 'index'])->name('main');
-Route::get('/{accountId}/', [indexController::class, 'error'])->name('error');
+Route::get('error/{accountId}/', [indexController::class, 'error'])->name('error');
 
 //Setting get Employee
 Route::get('/Setting/createToken/{accountId}', [CreateAuthTokenController::class, 'getCreateAuthToken'])->name('creatEmployee');
