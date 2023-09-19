@@ -21,6 +21,8 @@ class getSettingVendorController extends Controller
 
         $json = Lib::loadApp((json_decode(json_encode(Config::get("Global"))) )->appId, $accountId);
 
+        //dd($json);
+
         $this->appId = $json->appId;
         $this->accountId = $json->accountId;
         $this->TokenMoySklad = $json->TokenMoySklad;
