@@ -48,10 +48,12 @@ class VendorApiController extends Controller
 
         try {
             $response = $client->request($method, $url, $options);
-            return response()->json([
+            $data = [
                 'status' => true,
                 'data' => json_decode($response->getBody()->getContents()),
-            ]);
+            ];
+            $convertedData = new Collection($data);
+            return json_decode($convertedData->toJson());
         } catch (BadResponseException $e){
 
             $data = [
