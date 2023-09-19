@@ -44,14 +44,14 @@ function makeHttpRequest(string $method, string $url, string $bearerToken, $body
         ? array('http' =>
             array(
                 'method' => $method,
-                'header' => array('Authorization: Bearer ' . 'Accept-Encoding: gzip ' . $bearerToken, "Content-type: application/json"),
+                'header' => array('Authorization: Bearer '. $bearerToken, "Accept-Encoding: gzip",  "Content-type: application/json"),
                 'content' => $body
             )
         )
         : array('http' =>
             array(
                 'method' => $method,
-                'header' => array('Authorization: Bearer ' . $bearerToken  . 'Accept-Encoding: gzip ')
+                'header' => array('Authorization: Bearer' . $bearerToken , "Accept-Encoding: gzip")
             )
         );
     $context = stream_context_create($opts);
