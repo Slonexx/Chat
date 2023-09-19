@@ -23,6 +23,12 @@ class indexController extends Controller
         }
         $vendorAPI = new VendorApiController();
         $employee = $vendorAPI->context($contextKey);
+        if (!$employee->status) {
+            return to_route('error', [
+                'accountId' => "errorMS",
+                'message' => "Ошибка получение contextKey, просьба сообщить разработчикам приложения",
+            ]);
+        }
 
         $accountId = $employee->accountId;
         $fullName = $employee->fullName;
@@ -70,7 +76,7 @@ class indexController extends Controller
                 $app = Lib::loadApp($apps, $accountId);
                 $app->status = Lib::ACTIVATED;
                 $vendorAPI = new VendorApiController();
-                $vendorAPI->updateAppStatus($apps, $accountId, $app->getStatusName());
+                $vendorAPI->updateAppStatus($accountId, $app->getStatusName());
                 $app->persist();
 
             } catch (BadResponseException $e) {
@@ -100,6 +106,23 @@ class indexController extends Controller
             'uid' => $uid,
         ] );
 
+    }
+    public function error(Request $request, $accountId): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
+    {
+
+        $isAdmin = $request->isAdmin;
+        $fullName = $request->fullName ?? "Имя аккаунта";
+        $uid = $request->uid ?? "логин аккаунта";
+        $message = $request->message ?? "Отсутствуют данные, просьба сообщить разработчикам приложения";
+
+        return view('setting.error', [
+            'message' => $message,
+
+            'accountId' => $accountId,
+            'isAdmin' => $isAdmin,
+            'fullName' => $fullName,
+            'uid' => $uid,
+        ]);
     }
 
 }

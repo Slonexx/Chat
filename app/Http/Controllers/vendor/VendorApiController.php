@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\vendor;
 
 use App\Http\Controllers\Controller;
-
-use \Firebase\JWT\JWT;
+use Firebase\JWT\JWT;
+use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Support\Facades\Config;
+use GuzzleHttp\Client;
+use Illuminate\Support\Collection;
 
 require_once 'jwt.lib.php';
-
 
 class VendorApiController extends Controller
 {
@@ -17,53 +18,62 @@ class VendorApiController extends Controller
         return $this->request('POST', '/context/' . $contextKey);
     }
 
-    function updateAppStatus(string $appId, string $accountId, string $status)
+    function updateAppStatus(string $accountId, string $status)
     {
+        $appId = Config::get("Global.appId");
+
         return $this->request('PUT',
             "/apps/$appId/$accountId/status",
-            "{\"status\": \"$status\"}");
+            ["status" => $status]);
     }
 
     private function request(string $method, $path, $body = null)
     {
-
         $url = Config::get("Global.moyskladVendorApiEndpointUrl") . $path;
+        $bearerToken = buildJWT();
 
-        return makeHttpRequest(
-            $method,
-            $url,
-            buildJWT(),
-            $body);
+        $client = new Client();
+
+        $options = [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $bearerToken,
+                'Accept-Encoding' => 'gzip',
+                'Content-type' => 'application/json'
+            ]
+        ];
+
+        if ($body !== null) {
+            $options['json'] = $body;
+        }
+
+        try {
+            $response = $client->request($method, $url, $options);
+            return response()->json([
+                'status' => true,
+                'data' => json_decode($response->getBody()->getContents()),
+            ]);
+        } catch (BadResponseException $e){
+
+            $data = [
+                'status' => false,
+                'data' => json_decode($e->getResponse()->getBody()->getContents()),
+                'message' => $e->getMessage(),
+                'request' => $e->getRequest(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+            ];
+
+            $convertedData = new Collection($data);
+
+            return json_decode($convertedData->toJson());
+        }
+
+
     }
-
-}
-
-function makeHttpRequest(string $method, string $url, string $bearerToken, $body = null)
-{
-    $opts = $body
-        ? array('http' =>
-            array(
-                'method' => $method,
-                'header' => array('Authorization: Bearer '. $bearerToken, "Accept-Encoding: gzip",  "Content-type: application/json"),
-                'content' => $body
-            )
-        )
-        : array('http' =>
-            array(
-                'method' => $method,
-                'header' => array('Authorization: Bearer' . $bearerToken , "Accept-Encoding: gzip")
-            )
-        );
-    $context = stream_context_create($opts);
-    $result = file_get_contents($url, false, $context);
-    return json_decode($result);
 }
 
 function buildJWT(): string
 {
-
-
-
     $token = array(
         "sub" =>  Config::get("Global.appUid"),
         "iat" => time(),
