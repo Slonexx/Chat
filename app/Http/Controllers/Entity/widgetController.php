@@ -25,12 +25,17 @@ class widgetController extends Controller
            $vendorAPI = new VendorApiController();
             $employee = $vendorAPI->context($request->contextKey);
             if (!$employee->status) {
+
                 return view('widget.Error', [
                     'status' => false,
                     'code' => 400,
                     'message' => "Проблема с получением данных виджета, просьба срочно сообщить разработчиком ",
                 ]);
-            } else $employee = $employee->data;
+            } else {
+                $employee = $employee->data;
+            }
+            //$client = new MsClient($accountId);
+            //$employee = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');
         } catch (\Throwable) {
             return view('widget.Error', [
                 'status' => false,
@@ -38,8 +43,8 @@ class widgetController extends Controller
                 'message' => "Проблема с получением данных виджета, просьба срочно сообщить разработчиком ",
             ]);
         }
-        $employeeModel = employeeModel::where('employeeId', $employee->id );
 
+        $employeeModel = employeeModel::where('employeeId', $employee->id )->first();
         if ($employeeModel == null) {
             return view('widget.Error', [
                 'status' => false,
