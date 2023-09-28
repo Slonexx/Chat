@@ -23,6 +23,9 @@
                 <a id="link_3" class="mt-1" href="/Setting/organization/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}"> Организация и линии </a>
             </div>
         </div>
+
+        <a target="_blank" href="https://smartrekassa.bitrix24.site/instruktsiiponastroyke"> Инструкция </a>
+
     </div>
 </div>
 <div class="main head-full" style=""> @yield('content') </div>

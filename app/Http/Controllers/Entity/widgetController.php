@@ -127,13 +127,16 @@ class widgetController extends Controller
                 ]);
             }
 
-            //настройку по компании и линиям
-
 
 
             try {
                $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/'.$entity_type.'/'.$entityId);
-               $agent =  $msClient->get($documents->agent->meta->href);
+               if ($entity_type == 'counterparty') {
+                   $agent = $documents;
+               } else {
+                   $agent =  $msClient->get($documents->agent->meta->href);
+               }
+
             } catch (BadResponseException $e) {
                 return response()->json([
                     'status' => false,
