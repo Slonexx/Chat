@@ -148,8 +148,12 @@ class widgetController extends Controller
                     ]),
                 ]);
             }
+            if ($entity_type == 'counterparty') {
+                $organId = 0;
+            } else {
+                $organId = basename($documents->organization->meta->href);
+            }
 
-            $organId = basename($documents->organization->meta->href);
             $license_id = 0;
 
             $existingRecords = organizationModel::where('accountId', $accountId)->where('employeeId', $employee->employeeId)->get();

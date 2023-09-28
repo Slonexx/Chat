@@ -112,8 +112,8 @@
                             <div class="col-4">Доступ</div>
                             <select id="access" name="access" class="col form-select">
                                 <option value="0">Полный доступ</option>
-                                <option value="1">Доступ к документом</option>
-                                <option value="2">Доступ к контрагентом</option>
+                                <option value="1">Доступ к документам</option>
+                                <option value="2">Доступ к контрагентам</option>
                             </select>
                         </div>
 
