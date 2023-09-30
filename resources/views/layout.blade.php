@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <a target="_blank" href="https://smartrekassa.bitrix24.site/instruktsiiponastroyke"> Инструкция </a>
+        <a target="_blank" href="https://smartchatapp.bitrix24.site/instruktsiiponastroyke/"> Инструкция </a>
 
     </div>
 </div>

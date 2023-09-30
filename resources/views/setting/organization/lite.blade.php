@@ -64,7 +64,9 @@
                         MsOrgan = {}
                     } else MsOrgan = MsOrgan.filter(employee => employee.id !== id);
                 } else {
-                    MsOrgan = [].concat(MsOrgan, BaseMsEmployee.filter(employee => employee.id === id))
+                    if (id == '0') {
+                        MsOrgan = BaseMsOrgan
+                    } else MsOrgan = [].concat(MsOrgan, BaseMsOrgan.filter(employee => employee.id === id))
                 }
 
                 break
