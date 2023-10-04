@@ -75,17 +75,15 @@
             }*/
 
         window.addEventListener("message", function(event) {
-            window.document.getElementById('main').style.display = 'none'
-            window.document.getElementById('messageErrorAlert').style.display = 'none'
-            window.document.getElementById('Chat').style.display = "block"
-            window.document.getElementById('GifOrImageHideOrGifHide').style.display = 'none'
-            window.document.getElementById('ImageOrGifHide').style.display = 'inline'
-
-
 
             const receivedMessage = event.data;
-            if (receivedMessage.name === 'Open') { hostWindow.postMessage({ name: "OpenFeedback",  correlationId: receivedMessage.messageId}, '*');
 
+            if (receivedMessage.name === 'Open') { hostWindow.postMessage({ name: "OpenFeedback",  correlationId: receivedMessage.messageId}, '*');
+                window.document.getElementById('main').style.display = 'none'
+                window.document.getElementById('messageErrorAlert').style.display = 'none'
+                window.document.getElementById('Chat').style.display = "block"
+                window.document.getElementById('GifOrImageHideOrGifHide').style.display = 'none'
+                window.document.getElementById('ImageOrGifHide').style.display = 'inline'
                 entityId = receivedMessage.objectId;
                 let data = {
                     accountId: accountId,
