@@ -32,7 +32,6 @@ Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationCon
 //Widget
 Route::get('/widget/{object}', [widgetController::class, 'widgetObject']);
 Route::get('/widget/get/Data', [widgetController::class, 'widgetGetData']);
-Route::get('LOG/widget/Info/Attributes', [widgetController::class, 'LOG_widgetInfoAttributes']);
 
 //Popup
 Route::get('/Popup/{object}', [PopapController::class, 'Popup']);
