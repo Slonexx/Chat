@@ -19,30 +19,27 @@ class widgetController extends Controller
 {
     public function widgetObject(Request $request, $object): Factory|View|Application
     {
-        //$accountId = '1dd5bd55-d141-11ec-0a80-055600047495';
+        $accountId = '1dd5bd55-d141-11ec-0a80-055600047495';
 
-        try {
-           $vendorAPI = new VendorApiController();
+        $client = new MsClient($accountId);
+        $employee = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');
+
+        /*try {
+            $vendorAPI = new VendorApiController();
             $employee = $vendorAPI->context($request->contextKey);
-            if (!$employee->status) {
-
-                return view('widget.Error', [
+            if (!$employee->status) { return view('widget.Error', [
                     'status' => false,
                     'code' => 400,
                     'message' => "Проблема с получением данных виджета, просьба срочно сообщить разработчиком ",
                 ]);
-            } else {
-                $employee = $employee->data;
-            }
-            //$client = new MsClient($accountId);
-            //$employee = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');
+            } else { $employee = $employee->data; }
         } catch (BadResponseException) {
             return view('widget.Error', [
                 'status' => false,
                 'code' => 400,
                 'message' => "Проблема с получением данных виджета, просьба срочно сообщить разработчиком ",
             ]);
-        }
+        }*/
 
         $employeeModel = employeeModel::where('employeeId', $employee->id )->first();
         if ($employeeModel == null) {
@@ -220,12 +217,11 @@ class widgetController extends Controller
                     ]
                 ],
             ];
-            if ($all['api']['license_id'] == 0) {
-                unset($all['api']['license_id'] );
-            }
+            if ($all['api']['license_id'] == 0) { unset($all['api']['license_id'] ); }
 
             return response()->json([
                 'status' => true,
+                'license_id' => $license_id,
                 'all' => http_build_query($all),
                 'onToken' => http_build_query([
                         'api' => [

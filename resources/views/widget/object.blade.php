@@ -25,7 +25,11 @@
             </div>
             <div class="col">
                 <button onclick="PopupShow('1')" class="btn btn-outline-dark gradient_focus"> Общий чат </button>
-
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button id="template" onclick="PopupShow('3')" class="btn btn-outline-dark gradient_focus"> Отправить шаблон сообщений </button>
             </div>
         </div>
     </div>
@@ -36,6 +40,8 @@
         const hostWindow = window.parent
         let messageId = 0
         let entityId
+
+        let license_id
         let all
         let onToken
 
@@ -44,39 +50,28 @@
         let employee = @json($employee)
 
 
-
         function PopupShow(status){
-            if (status === '1') {
-                fiscalization(onToken)
-            }
-            if (status === '2') {
-                fiscalization(all)
-            }
-        }
-
-
-        function ajax_settings(url, method, data){
-            return {
-                "url": url,
-                "method": "GET",
-                "timeout": 0,
-                "headers": {"Content-Type": "application/json",},
-                "data": data,
-            }
+            if (status === '1') { fiscalization("Show", onToken) }
+            if (status === '2') { fiscalization("Show", all) }
+            if (status === '3') { fiscalization('TemplateMessage', all) }
         }
 
 
 
-        /*let receivedMessage =
+
+
+
+        let receivedMessage =
             {"name":"Open","extensionPoint":"document.customerorder.edit",
                 "objectId":"5f3023e9-05b3-11ee-0a80-06f20001197a",
                 "messageId":5,
                 "displayMode":"expanded"
-            }*/
+            }
+
 
         window.addEventListener("message", function(event) {
 
-            const receivedMessage = event.data;
+            //const receivedMessage = event.data;
 
             if (receivedMessage.name === 'Open') { hostWindow.postMessage({ name: "OpenFeedback",  correlationId: receivedMessage.messageId}, '*');
                 window.document.getElementById('main').style.display = 'none'
@@ -92,6 +87,8 @@
                     employee: employee,
                 };
 
+                receivedMessage = []
+
                 let settings = ajax_settings("{{ Config::get("Global.url") }}"+'widget/get/Data', 'GET', data)
                 console.log('Widget setting attributes: ↓')
                 console.log(settings)
@@ -105,6 +102,7 @@
                     window.document.getElementById('ImageOrGifHide').style.display = 'none'
 
                     if (response.status) {
+                        license_id = response.license_id
                         all = response.all
                         onToken = response.onToken
                     } else {
@@ -128,17 +126,19 @@
 
 
 
-        function fiscalization(onButtonParams){
+        function fiscalization(name, onButtonParams){
             messageId++;
             let sendingMessage = {
                 name: "ShowPopupRequest",
                 messageId: messageId,
-                popupName: "Show",
+                popupName: name,
                 popupParameters: {
                     accountId:accountId,
                     object_Id:entityId,
                     entity_type:entity_type,
                     build_query:onButtonParams,
+
+                    license_id:license_id,
                 },
             };
             console.log("Widget Sending : ↓" )
@@ -146,6 +146,17 @@
             hostWindow.postMessage(sendingMessage, '*');
         }
 
+    </script>
 
+    <script>
+        function ajax_settings(url, method, data){
+            return {
+                "url": url,
+                "method": "GET",
+                "timeout": 0,
+                "headers": {"Content-Type": "application/json",},
+                "data": data,
+            }
+        }
     </script>
 @endsection

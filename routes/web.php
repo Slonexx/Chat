@@ -5,6 +5,7 @@ use App\Http\Controllers\Entity\widgetController;
 use App\Http\Controllers\initialization\indexController;
 use App\Http\Controllers\Setting\CreateAuthTokenController;
 use App\Http\Controllers\Setting\organizationController;
+use App\Http\Controllers\Setting\templateController;
 use App\Http\Controllers\vendor\vendorEndpoint;
 use Illuminate\Support\Facades\Route;
 
@@ -29,12 +30,19 @@ Route::get('/Setting/organization/get/Licenses/{accountId}', [organizationContro
 Route::get('/Setting/organization/create/Licenses/{accountId}', [organizationController::class, 'createLicenses']);
 Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationController::class, 'deleteLicenses']);
 
+Route::get('/Setting/template/{accountId}', [templateController::class, 'getCreate'])->name('template');
+Route::post('/Setting/template/{accountId}', [templateController::class, 'postCreate']);
+Route::get('/Setting/template/get/attributes/{accountId}', [templateController::class, 'getAttributes']);
+Route::get('/Setting/template/create/poles/{accountId}', [templateController::class, 'getCreatePoles']);
+Route::get('/Setting/template/nameuid/poles/{accountId}', [templateController::class, 'getNameUIDPoles']);
+Route::get('/Setting/template/delete/poles/{accountId}', [templateController::class, 'deletePoles']);
 //Widget
 Route::get('/widget/{object}', [widgetController::class, 'widgetObject']);
 Route::get('/widget/get/Data', [widgetController::class, 'widgetGetData']);
 
 //Popup
 Route::get('/Popup/{object}', [PopapController::class, 'Popup']);
+Route::get('/Popup/template/message/{object}', [PopapController::class, 'Popup']);
 
 //Install or delete web app
 Route::put('Config/vendor-endpoint/api/moysklad/vendor/1.0/apps/{apps}/{accountId}', [vendorEndpoint::class, 'put']);

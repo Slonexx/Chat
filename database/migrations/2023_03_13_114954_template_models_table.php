@@ -9,17 +9,14 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::create('organization_models', function (Blueprint $table) {
+        Schema::create('template_models', function (Blueprint $table) {
             $table->id();
             $table->string('accountId');
             $table->string('organId');
-            $table->string('organName');
+            $table->string('name');
+            $table->string('name_uid');
 
-            $table->string('employeeId');
-            $table->string('employeeName');
-
-            $table->string('lineId');
-            $table->string('lineName');
+            $table->longText('message');
 
             $table->timestamps();
         });
@@ -28,6 +25,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('organization_models');
+        Schema::dropIfExists('template_models');
     }
 };
