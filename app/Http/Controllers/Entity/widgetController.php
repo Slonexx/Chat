@@ -19,12 +19,12 @@ class widgetController extends Controller
 {
     public function widgetObject(Request $request, $object): Factory|View|Application
     {
-        $accountId = '1dd5bd55-d141-11ec-0a80-055600047495';
+      /*  $accountId = '1dd5bd55-d141-11ec-0a80-055600047495';
 
         $client = new MsClient($accountId);
-        $employee = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');
+        $employee = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');*/
 
-        /*try {
+        try {
             $vendorAPI = new VendorApiController();
             $employee = $vendorAPI->context($request->contextKey);
             if (!$employee->status) { return view('widget.Error', [
@@ -39,7 +39,7 @@ class widgetController extends Controller
                 'code' => 400,
                 'message' => "Проблема с получением данных виджета, просьба срочно сообщить разработчиком ",
             ]);
-        }*/
+        }
 
         $employeeModel = employeeModel::where('employeeId', $employee->id)->first();
         if ($employeeModel == null) {

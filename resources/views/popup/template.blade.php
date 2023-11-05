@@ -116,7 +116,7 @@
         let arrayMessageTemplate
 
 
-        let receivedMessage = {
+       /* let receivedMessage = {
             "name":"OpenPopup",
             "messageId":1,
             "popupName":"TemplateMessage",
@@ -135,10 +135,10 @@
                     "phone":"+77750498888",
 
                 }
-        };
+        };*/
 
         window.addEventListener("message", function(event) {
-        //let receivedMessage = event.data
+        let receivedMessage = event.data
             search.value = '';
             textMessage.value = '';
             errorMessageInContent.style.display = 'none';
@@ -157,7 +157,7 @@
 
             nameAgent.innerText = agent
             phoneAgent.innerText = phone
-            receivedMessage = []
+            //receivedMessage = []
 
             let data = {
                 accountId: accountId,
