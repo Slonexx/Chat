@@ -186,17 +186,42 @@
         margin-left: 19%;
         position: relative;
         z-index: 10;
-        background-color: #FFFFFF;
         min-height: 100%;
         padding-bottom: 1px
     }
 
-    .page-wrapper .dark-box {
-        background-color: #102B60;
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0
+    .container {
+        margin-top: 6rem;
+        width: 50%;
+        height: 600px; /* Задайте нужную высоту контейнера */
+        display: flex;
+        flex-direction: column;
     }
 
+    .content {
+        flex-grow: 1;
+    }
+
+    .footer {
+        background-color: #464646; /* Задайте нужный цвет фона для футера */
+        height: 30%;
+    }
+
+
+    .gradient_focus:hover{
+        color: white;
+        border: 0px;
+        background: rgb(26, 183, 183);
+        background-image: linear-gradient(147deg, #17e18a 0%, #1ab7b7 74%);
+    }
+
+    .gradient_focus:active, .gradient_focus:focus{
+        background-color: rgb(26, 183, 183);
+        background-image: linear-gradient(147deg, #17e18a 0%, #1ab7b7 74%);
+        border: 0px;
+        background-size: 100%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        -moz-text-fill-color: transparent;
+    }
 </style>

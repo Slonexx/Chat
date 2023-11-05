@@ -41,12 +41,12 @@ class widgetController extends Controller
             ]);
         }*/
 
-        $employeeModel = employeeModel::where('employeeId', $employee->id )->first();
+        $employeeModel = employeeModel::where('employeeId', $employee->id)->first();
         if ($employeeModel == null) {
             return view('widget.Error', [
                 'status' => false,
                 'code' => 400,
-                'message' => "Данные сотрудника ".$employee->fullName." отсутствуют, просьба зайти в приложение и настроить для для него",
+                'message' => "Данные сотрудника " . $employee->fullName . " отсутствуют, просьба зайти в приложение и настроить для для него",
             ]);
         }
         $employeeModel = $employeeModel->getAttributes();
@@ -54,13 +54,14 @@ class widgetController extends Controller
             return view('widget.Error', [
                 'status' => false,
                 'code' => 400,
-                'message' => "У сотрудника ".$employee->fullName." отсутствуют доступ.",
+                'message' => "У сотрудника " . $employee->fullName . " отсутствуют доступ.",
             ]);
         }
 
 
         $accountId = $employee->accountId;
         $Client = new MsClient($accountId);
+        $newClient = new newClient($employee->id);
 
         try {
             $Client->get("https://api.moysklad.ru/api/remap/1.2/entity/employee");
@@ -76,6 +77,7 @@ class widgetController extends Controller
             'accountId' => $accountId,
             'entity' => $object,
             'employee' => $employeeModel,
+            'employeeId' => $employee->id,
         ]);
 
 
@@ -94,23 +96,23 @@ class widgetController extends Controller
             $newClient = new newClient($employee->employeeId);
             $msClient = new MsClient($accountId);
             try {
-                $license = json_decode(($newClient->licenses())->getBody()->getContents()) ;
+                $license = json_decode(($newClient->licenses())->getBody()->getContents());
             } catch (BadResponseException $e) {
                 $error = json_decode($e->getResponse()->getBody()->getContents());
 
                 if ($error->error->code == 'ApiInvalidTokenError') {
                     return response()->json([
                         'status' => false,
-                        'message' => 'Ошибка токена сотрудника, просьба зайти в приложение в раздел " Сотрудники и доступы ", напротив сотрудника '.
-                            $employee->employeeName.' нажмите на кнопку "изменить", после в всплывающем окне нажмите на кнопку "изменить"',
+                        'message' => 'Ошибка токена сотрудника, просьба зайти в приложение в раздел " Сотрудники и доступы ", напротив сотрудника ' .
+                            $employee->employeeName . ' нажмите на кнопку "изменить", после в всплывающем окне нажмите на кнопку "изменить"',
                         'onToken' => ""
                     ]);
                 } else
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Ошибка получение линий в ChatApp, просьба сообщить разработчиком приложения, '. $e->getMessage(),
-                    'onToken' => ""
-                ]);
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Ошибка получение линий в ChatApp, просьба сообщить разработчиком приложения, ' . $e->getMessage(),
+                        'onToken' => ""
+                    ]);
             }
             if ($license->data == []) {
                 return response()->json([
@@ -125,19 +127,18 @@ class widgetController extends Controller
             }
 
 
-
             try {
-               $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/'.$entity_type.'/'.$entityId);
-               if ($entity_type == 'counterparty') {
-                   $agent = $documents;
-               } else {
-                   $agent =  $msClient->get($documents->agent->meta->href);
-               }
+                $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $entity_type . '/' . $entityId);
+                if ($entity_type == 'counterparty') {
+                    $agent = $documents;
+                } else {
+                    $agent = $msClient->get($documents->agent->meta->href);
+                }
 
             } catch (BadResponseException $e) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Ошибка запроса в МС = '.$e->getMessage(),
+                    'message' => 'Ошибка запроса в МС = ' . $e->getMessage(),
                     'onToken' => http_build_query([
                         'api' => [
                             'access_token' => $employee->accessToken,
@@ -152,16 +153,19 @@ class widgetController extends Controller
             }
 
             $license_id = 0;
+            $license_full = 0;
 
             $existingRecords = organizationModel::where('accountId', $accountId)->where('employeeId', $employee->employeeId)->get();
             if (!$existingRecords->isEmpty()) {
                 foreach ($existingRecords as $record) {
                     if ($record->organId == 0) {
                         $license_id = $record->lineId;
+                        $license_full = $record->lineName;
                         break;
                     }
-                    if ($record->organId == $organId){
+                    if ($record->organId == $organId) {
                         $license_id = $record->lineId;
+                        $license_full = $record->lineName;
                         break;
                     }
                 }
@@ -217,19 +221,23 @@ class widgetController extends Controller
                     ]
                 ],
             ];
-            if ($all['api']['license_id'] == 0) { unset($all['api']['license_id'] ); }
+            if ($all['api']['license_id'] == 0) {
+                unset($all['api']['license_id']);
+            }
 
             return response()->json([
                 'status' => true,
                 'license_id' => $license_id,
+                'license_full' => $license_full,
+                'agent' => $agent->name,
                 'phone' => $phone,
 
                 'all' => http_build_query($all),
                 'onToken' => http_build_query([
-                        'api' => [
-                            'access_token' => $employee->accessToken,
-                        ],
-                    ]),
+                    'api' => [
+                        'access_token' => $employee->accessToken,
+                    ],
+                ]),
             ]);
         } else {
             return response()->json([

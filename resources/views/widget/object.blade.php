@@ -42,6 +42,8 @@
         let entityId
 
         let license_id
+        let license_full
+        let agent
         let phone
 
         let all
@@ -49,7 +51,8 @@
 
         let entity_type = "{{$entity}}"
         let accountId = "{{$accountId}}"
-        let employee = @json($employee)
+        let employee = @json($employee);
+        let employeeId = "{{$employeeId}}"
 
 
         function PopupShow(status){
@@ -63,11 +66,12 @@
 
 
 
-        let receivedMessage =
-            {"name":"Open","extensionPoint":"document.customerorder.edit",
-                "objectId":"5f3023e9-05b3-11ee-0a80-06f20001197a",
-                "messageId":5,
-                "displayMode":"expanded"
+        let receivedMessage = {
+            "name":"Open",
+            "extensionPoint":"document.customerorder.edit",
+            "objectId":"5f3023e9-05b3-11ee-0a80-06f20001197a",
+            "messageId":5,
+            "displayMode":"expanded"
             }
 
 
@@ -105,6 +109,8 @@
 
                     if (response.status) {
                         license_id = response.license_id
+                        license_full = response.license_full
+                        agent = response.agent
                         phone = response.phone
 
                         all = response.all
@@ -143,6 +149,9 @@
                     build_query:onButtonParams,
 
                     license_id:license_id,
+                    license_full:license_full,
+                    employee:employeeId,
+                    nameAgent:agent,
                     phone:phone,
                 },
             };

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Entity;
 
 use App\Clients\MsClient;
+use App\Clients\newClient;
 use App\Http\Controllers\BD\getMainSettingBD;
 use App\Http\Controllers\Controller;
+use App\Models\organizationModel;
 use App\Models\polesModel;
 use App\Models\templateModel;
 use App\Services\ticket\DevService;
@@ -21,14 +23,15 @@ class PopapController extends Controller
 {
     public function Popup($object): Factory|View|Application
     {
-        return view( 'popup.ViewPopap', ['Entity' => $object,] );
+        return view('popup.ViewPopap', ['Entity' => $object,]);
     }
 
     public function template(): Factory|View|Application
     {
-        return view( 'popup.template' );
+        return view('popup.template');
     }
-    public function getTemplate(Request $request)
+
+    public function getTemplate(Request $request): JsonResponse
     {
         $data = json_decode(json_encode([
             'accountId' => $request->accountId ?? "",
@@ -39,7 +42,7 @@ class PopapController extends Controller
         $client = new MsClient($data->accountId);
         try {
             $entity = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $data->entity_type . '/' . $data->object_Id);
-        } catch (BadResponseException $e){
+        } catch (BadResponseException $e) {
             return response()->json([
                 'status' => true,
                 'data' => $e->getMessage(),
@@ -77,119 +80,341 @@ class PopapController extends Controller
 
     }
 
-
-    function messageUpdate(MsClient $client, mixed $entity, string $message, $index, $pole, $add_pole): string
+    public function messenger(Request $request): JsonResponse
     {
-        $word_pole_index = 'поле_'.$index;
-        $word_add_pole_index = 'доп_поле_'.$index;
+        $data = json_decode(json_encode([
+            'accountId' => $request->accountId ?? '',
+            'object_Id' => $request->object_Id ?? '',
+            'entity_type' => $request->entity_type ?? '',
+
+            'license_id' => $request->license_id ?? '',
+            'license_full' => $request->license_full ?? '',
+            'employee' => $request->employee ?? '',
+            'agent' => $request->agent ?? '',
+            'phone' => $request->phone ?? '',
+        ]));
+
+
+        $newClient = new newClient($data->employee);
+        $messenger = [];
+
+
+        try {
+            $linesChatApp = json_decode($newClient->licenses()->getBody()->getContents());
+        } catch (BadResponseException $e) {
+            if ($e->getCode() == 403) {
+                return response()->json([
+                'status' => false,
+                'message' => 'Ошибка токена сотрудника, просьба зайти в приложение в раздел " Сотрудники и доступы ", напротив сотрудника нажмите на кнопку "изменить", после в всплывающем окне нажмите на кнопку "изменить"',
+            ]);
+            }
+            else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Ошибка получение линий в chatApp в шаблоне сообщений, просьба сообщить разработчиком',
+                    'data' => $e->getResponse()->getBody()->getContents(),
+                ]);
+            }
+        }
+
+
+
+        foreach ($linesChatApp->data as $item) {
+            if ($item->licenseId == $data->license_id) {
+                foreach ($item->messenger as $messengerItem) {
+                    $messenger[] = [
+                        'name' => $messengerItem->name,
+                        'value' => $messengerItem->type
+                    ];
+                }
+            }
+        }
+
+       return response()->json([
+           'status'=> true,
+           'data' => $messenger
+       ]);
+
+    }
+    public function information(Request $request): JsonResponse
+    {
+        $data = json_decode(json_encode([
+            'accountId' => $request->accountId ?? '',
+            'object_Id' => $request->object_Id ?? '',
+            'entity_type' => $request->entity_type ?? '',
+
+            'license_id' => $request->license_id ?? '',
+            'license_full' => $request->license_full ?? '',
+            'employee' => $request->employee ?? '',
+
+            'phoneOrName' => $request->phoneOrName ?? '',
+            'messenger' => $request->messenger ?? '',
+            'linesId' => $request->linesId ?? '',
+            'agent' => $request->agent ?? '',
+            'phone' => $request->phone ?? '',
+        ]));
+
+        $msClient = new MsClient($data->accountId);
+        $newClient = new newClient($data->employee);
+
+
+        try {
+            $entity = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/'.$data->entity_type.'/'.$data->object_Id);
+        } catch (BadResponseException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Ошибка получение объекта в МоемСкладе, в шаблоне сообщений, просьба сообщить разработчиком',
+                'data' => $e->getResponse()->getBody()->getContents(),
+            ]);
+        }
+
+        if ($data->messenger == 'telegram') {
+            if ($this->containsLetters($data->phoneOrName)) {
+                try {
+                    $dataChatApp = json_decode(($newClient->usersCheckTelegram($data->linesId, $data->messenger, $data->phoneOrName)->getBody()->getContents()));
+                    if ($dataChatApp->data->chatId == null) {
+                        return response()->json([
+                            'status' => false,
+                            'data' => $data,
+                            'message' => 'Не смогли по имени пользователя в телеграмм, отправка не возможна',
+                        ]);
+                    } else $chatId = $dataChatApp->data->chatId;
+                } catch (BadResponseException $e){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Ошибка проверки пользователя по имени в телеграмма, просьба сообщить разработчиком',
+                        'data' => $e->getResponse()->getBody()->getContents(),
+                    ]);
+                }
+            } else {
+                try {
+                    $dataChatApp = json_decode(($newClient->phonesCheck($data->linesId, $data->messenger, $data->phoneOrName)->getBody()->getContents()));
+                    if ($dataChatApp->data->chatId == null) {
+                        return response()->json([
+                            'status' => false,
+                            'data' => $data,
+                            'message' => 'Не удается проверить по номер телефона в телеграмм, отправка не возможна',
+                        ]);
+                    } else $chatId = $dataChatApp->data->chatId;
+                } catch (BadResponseException $e){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Ошибка проверки пользователя по имени в телеграмма, просьба сообщить разработчиком',
+                        'data' => $e->getResponse()->getBody()->getContents(),
+                    ]);
+                }
+            }
+        } else {
+            try {
+                $dataChatApp = json_decode(($newClient->phonesCheck($data->linesId, $data->messenger, $data->phoneOrName)->getBody()->getContents()))->data->chatId;
+                if ($dataChatApp->data->chatId == null) {
+                    return response()->json([
+                        'status' => false,
+                        'data' => $data,
+                        'message' => 'Ошибка проверки пользователя по номеру телефона. Вы можете отправить сообщение, если только вы уверены, что в данный мессенджер существует',
+                    ]);
+                } else $chatId = $dataChatApp->data->chatId;
+            } catch (BadResponseException $e){
+                $data->chatId = $data->phoneOrName;
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Ошибка проверки пользователя по номеру телефона. Вы можете отправить сообщение, если только вы уверены, что в данный мессенджер существует',
+                    'data' => $data,
+                ]);
+            }
+        }
+
+        $data->chatId = $chatId;
+
+        return response()->json([
+            'status' => true,
+            'data' => $data
+        ]);
+    }
+    public function sendMessage(Request $request): JsonResponse
+    {
+        $data = json_decode(json_encode([
+            'accountId' => $request->accountId ?? '',
+            'object_Id' => $request->object_Id ?? '',
+            'entity_type' => $request->entity_type ?? '',
+
+            'license_id' => $request->license_id ?? '',
+            'license_full' => $request->license_full ?? '',
+            'employee' => $request->employee ?? '',
+
+            'phoneOrName' => $request->phoneOrName ?? '',
+            'messenger' => $request->messenger ?? '',
+            'linesId' => $request->linesId ?? '',
+            'agent' => $request->agent ?? '',
+            'phone' => $request->phone ?? '',
+            'chatId' => $request->chatId ?? '',
+            'text' => $request->text ?? '',
+        ]));
+
+
+//        $msClient = new MsClient($data->accountId);
+        $newClient = new newClient($data->employee);
+        try {
+            $res = ($newClient->sendMessage($data->linesId, $data->messenger, $data->chatId, $data->text))->getBody()->getContents();
+        } catch (BadResponseException $e) {
+            return response()->json([
+                'status' => false,
+                'data' => json_decode($e->getResponse()->getBody()->getContents())
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'data' => $data,
+                'response' => $res,
+            ]
+        ]);
+    }
+
+
+    private function messageUpdate(MsClient $client, mixed $entity, string $message, $index, $pole, $add_pole): string
+    {
+        $word_pole_index = 'поле_' . $index;
+        $word_add_pole_index = 'доп_поле_' . $index;
         $text_pole = '';
         $text_add_pole = '';
 
         if ($pole != null) {
             switch ($index) {
-                case '0': {
+                case '0':
+                {
                     $text_pole = $entity->name;
                     break;
                 }
-                case '1': {
+                case '1':
+                {
                     try {
                         $metaGet = $client->get($entity->organization->meta->href);
                         $text_pole = $metaGet->name;
-                    } catch (BadResponseException){ }
+                    } catch (BadResponseException) {
+                    }
                     break;
                 }
 
-                case '2': {
-                    if (property_exists($entity, 'deliveryPlannedMoment')) { $text_pole = substr($entity->deliveryPlannedMoment, 0, -5); }
+                case '2':
+                {
+                    if (property_exists($entity, 'deliveryPlannedMoment')) {
+                        $text_pole = substr($entity->deliveryPlannedMoment, 0, -5);
+                    }
                     break;
                 }
 
-                case '3': {
+                case '3':
+                {
                     if (property_exists($entity, 'salesChannel')) {
                         try {
                             $metaGet = $client->get($entity->salesChannel->meta->href);
                             $text_pole = $metaGet->name;
-                        } catch (BadResponseException){ }
+                        } catch (BadResponseException) {
+                        }
                     }
                     break;
                 }
 
-                case '4': {
+                case '4':
+                {
                     if (property_exists($entity, 'rate')) {
                         try {
                             $metaGet = $client->get($entity->rate->meta->href);
                             $text_pole = $metaGet->name;
-                        } catch (BadResponseException){ }
+                        } catch (BadResponseException) {
+                        }
                     }
                     break;
                 }
 
-                case '5': {
+                case '5':
+                {
                     if (property_exists($entity, 'store')) {
                         try {
                             $metaGet = $client->get($entity->store->meta->href);
                             $text_pole = $metaGet->name;
-                        } catch (BadResponseException){ }
+                        } catch (BadResponseException) {
+                        }
                     }
                     break;
                 }
 
-                case '6': {
+                case '6':
+                {
                     if (property_exists($entity, 'contract')) {
                         try {
                             $metaGet = $client->get($entity->contract->meta->href);
                             $text_pole = $metaGet->name;
-                        } catch (BadResponseException){ }
+                        } catch (BadResponseException) {
+                        }
                     }
                     break;
                 }
 
-                case '7': {
+                case '7':
+                {
                     if (property_exists($entity, 'project')) {
                         try {
                             $metaGet = $client->get($entity->project->meta->href);
                             $text_pole = $metaGet->name;
-                        } catch (BadResponseException){ }
+                        } catch (BadResponseException) {
+                        }
                     }
                     break;
                 }
 
-                case '8': {
-                    if (property_exists($entity, 'shipmentAddress')) { $text_pole = $entity->shipmentAddress; }
+                case '8':
+                {
+                    if (property_exists($entity, 'shipmentAddress')) {
+                        $text_pole = $entity->shipmentAddress;
+                    }
                     break;
                 }
 
-                case '9': {
-                    if (property_exists($entity, 'description')) { $text_pole = $entity->description; }
+                case '9':
+                {
+                    if (property_exists($entity, 'description')) {
+                        $text_pole = $entity->description;
+                    }
                     break;
                 }
 
-                case '10': {
+                case '10':
+                {
                     if (property_exists($entity, 'state')) {
                         try {
                             $metaGet = $client->get($entity->state->meta->href);
                             $text_pole = $metaGet->name;
-                        } catch (BadResponseException){ }
+                        } catch (BadResponseException) {
+                        }
                     }
                     break;
                 }
 
-                case '11': {
-                    if (property_exists($entity, 'sum')) {  $text_pole = $entity->sum / 100; }
+                case '11':
+                {
+                    if (property_exists($entity, 'sum')) {
+                        $text_pole = $entity->sum / 100;
+                    }
                     break;
                 }
 
-                case '12': {
+                case '12':
+                {
                     if (property_exists($entity, 'agent')) {
                         try {
                             $metaGet = $client->get($entity->agent->meta->href);
                             $text_pole = $metaGet->name;
-                        } catch (BadResponseException){ }
+                        } catch (BadResponseException) {
+                        }
                     }
                     break;
                 }
 
-                default: break;
+                default:
+                    break;
             }
         }
 
@@ -199,7 +424,11 @@ class PopapController extends Controller
                     if ($item->id == $add_pole) {
 
                         if (is_bool($item->value)) {
-                            if ($item) { $text_add_pole = "активно"; } else { $text_add_pole = "не активно"; }
+                            if ($item) {
+                                $text_add_pole = "активно";
+                            } else {
+                                $text_add_pole = "не активно";
+                            }
                         } else {
                             $text_add_pole = $item->value;
                         }
@@ -228,4 +457,7 @@ class PopapController extends Controller
         return $new_message;
     }
 
+    private function containsLetters($inputString) {
+    return preg_match("/[a-zA-Z]/", $inputString);
+    }
 }

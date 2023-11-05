@@ -104,6 +104,44 @@ class newClient
         ]);
     }
 
+    public function messagesSearch($licenseId, $messengerType , $chatId, $data): \Psr\Http\Message\ResponseInterface
+    {
+        return $this->client->get($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/chats/'.$chatId.'/messages/search',[
+            'headers' => [
+                'Authorization' => $this->Setting->accessToken
+            ]
+        ]);
+    }
+    public function usersCheckTelegram($licenseId, $messengerType , $userName): \Psr\Http\Message\ResponseInterface
+    {
+        return $this->client->get($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/users/'.$userName.'/check',[
+            'headers' => [
+                'Authorization' => $this->Setting->accessToken
+            ]
+        ]);
+    }
+
+    public function phonesCheck($licenseId, $messengerType , $phone): \Psr\Http\Message\ResponseInterface
+    {
+        $newPhone = '+'.substr($phone, -11);
+        return $this->client->get($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/phones/'.$newPhone.'/check',[
+            'headers' => [
+                'Authorization' => $this->Setting->accessToken
+            ]
+        ]);
+    }
+
+    public function sendMessage($licenseId, $messengerType , $chats, $text): \Psr\Http\Message\ResponseInterface
+    {
+        return $this->client->post($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/chats/'.$chats.'/messages/text',[
+            'headers' => [
+                'Authorization' => $this->Setting->accessToken
+            ],
+            'json' => [
+                'text' => $text,
+            ],
+        ]);
+    }
 
 
 }
