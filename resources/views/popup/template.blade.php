@@ -47,7 +47,7 @@
                             <div class="col mt-2">
                                 <button onclick="refreshInformation()" class="btn gradient_focus text-black" type="button"> Проверить &nbsp; <i class="fas fa-undo-alt"></i></button>
                             </div>
-                            <div class="col-7 text-end row">
+                            <div class="col-6 text-end row">
                                 <div class="col-2"></div>
                                 <div class="col-10"><i class="fas fa-user-circle"></i> &nbsp; <span id="nameAgent"> ИМЯ КОНТРАГЕНТА </span></div>
                                 <div class="col-2"></div>

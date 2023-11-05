@@ -193,7 +193,7 @@
     .container {
         margin-top: 4rem;
         width: 50%;
-        height: 600px; /* Задайте нужную высоту контейнера */
+        height: 630px; /* Задайте нужную высоту контейнера */
         display: flex;
         flex-direction: column;
     }
