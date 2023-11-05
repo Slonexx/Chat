@@ -101,6 +101,7 @@
                             <div id="dev_pole_0" class="mt-2 row">
                                 <div class="col-4">Выберите поле_0</div>
                                 <select id="pole_0" class="col form-select">
+                                    <option value="12">Имя контрагента</option>
                                     <option value="0">Название документа</option>
                                     <option selected value="1">Организация (название)</option>
                                     <option value="2">План отгрузки</option>

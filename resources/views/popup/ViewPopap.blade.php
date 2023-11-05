@@ -2,20 +2,20 @@
 @section('content')
 
     <div class="main-container" style="height: 720px">
-        <iframe
-            id="webchat"
-            src=""
-            sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation"
-            allow="camera https://dialogs.pro/; microphone https://dialogs.pro/; clipboard-read https://dialogs.pro/; clipboard-write https://dialogs.pro/"
-            width="100%"
-            height="99%"
-            style="border: 0;" >
-        </iframe>
+        <div class="content-container">
+            <iframe
+                id="webchat"
+                src=""
+                sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation"
+                allow="camera https://dialogs.pro/; microphone https://dialogs.pro/; clipboard-read https://dialogs.pro/; clipboard-write https://dialogs.pro/"
+                width="100%"
+                height="99%"
+                style="border: 0;" >
+            </iframe>
+        </div>
     </div>
 
 
-    @include('popup.script_popup_app')
-    @include('popup.style_popup_app')
 
     <script>
 
@@ -55,18 +55,6 @@
             //iframe.src = 'https://dialogs.pro/?' + build_query;
             iframe.src = 'https://chat.chatapp.online/?' + build_query;
 
-            /*let data = { object_Id: object_Id, accountId: accountId, };
-
-            let settings = ajax_settings(url+entity_type+"/show", "GET", data);
-            console.log(url+entity_type+"/show" + ' settings ↓ ')
-            console.log(settings)
-
-            $.ajax(settings).done(function (json) {
-                console.log(url+entity_type+"/show"  + ' response ↓ ')
-                console.log(json)
-
-
-            })*/
         }
         });
 

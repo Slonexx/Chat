@@ -24,7 +24,7 @@ class widgetController extends Controller
         $client = new MsClient($accountId);
         $employee = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');
 
-        try {
+        /*try {
             $vendorAPI = new VendorApiController();
             $employee = $vendorAPI->context($request->contextKey);
             if (!$employee->status) { return view('widget.Error', [
@@ -39,7 +39,7 @@ class widgetController extends Controller
                 'code' => 400,
                 'message' => "Проблема с получением данных виджета, просьба срочно сообщить разработчиком ",
             ]);
-        }
+        }*/
 
         $employeeModel = employeeModel::where('employeeId', $employee->id )->first();
         if ($employeeModel == null) {
@@ -222,6 +222,8 @@ class widgetController extends Controller
             return response()->json([
                 'status' => true,
                 'license_id' => $license_id,
+                'phone' => $phone,
+
                 'all' => http_build_query($all),
                 'onToken' => http_build_query([
                         'api' => [

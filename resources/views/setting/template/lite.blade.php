@@ -309,6 +309,7 @@
         let newElement = $('<div id="dev_pole_' + id + '" class="mt-2 row">' +
             '<div class="col-4">Выберите поле_' + id + '</div>' +
             '<select id="pole_' + id + '" class="col form-select">' +
+            '<option value="12">Имя контрагента</option>' +
             '<option value="0">Название документа</option>' +
             '<option value="1">Организация (название)</option>' +
             '<option value="2">План отгрузки</option>' +
@@ -345,6 +346,7 @@
         let newElement = $('<div id="dev_pole_' + id + '" class="mt-2 row">' +
             '<div class="col-4">Выберите поле_' + id + '</div>' +
                 '<select id="pole_' + id + '" class="col form-select">' +
+                    '<option value="12">Имя контрагента</option>' +
                     '<option value="0">Название документа</option>' +
                     '<option value="1">Организация (название)</option>' +
                     '<option value="2">План отгрузки</option>' +

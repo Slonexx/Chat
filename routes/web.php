@@ -42,7 +42,8 @@ Route::get('/widget/get/Data', [widgetController::class, 'widgetGetData']);
 
 //Popup
 Route::get('/Popup/{object}', [PopapController::class, 'Popup']);
-Route::get('/Popup/template/message/{object}', [PopapController::class, 'Popup']);
+Route::get('/Popup/template/message/Show', [PopapController::class, 'template']);
+Route::get('/Popup/template/message/get/All', [PopapController::class, 'getTemplate']);
 
 //Install or delete web app
 Route::put('Config/vendor-endpoint/api/moysklad/vendor/1.0/apps/{apps}/{accountId}', [vendorEndpoint::class, 'put']);
