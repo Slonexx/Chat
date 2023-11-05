@@ -191,7 +191,7 @@
     }
 
     .container {
-        margin-top: 6rem;
+        margin-top: 4rem;
         width: 50%;
         height: 600px; /* Задайте нужную высоту контейнера */
         display: flex;

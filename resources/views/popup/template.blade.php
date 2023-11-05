@@ -23,6 +23,7 @@
 
                 </ul>
             </div>
+{{--
 
             <div class="page-wrapper">
                 <div class="bg-white row rounded p-3">
@@ -33,6 +34,7 @@
                 </div>
             </div>
 
+--}}
 
 
             <div class="page-wrapper">
@@ -116,7 +118,7 @@
         let arrayMessageTemplate
 
 
-       /* let receivedMessage = {
+        /*let receivedMessage = {
             "name":"OpenPopup",
             "messageId":1,
             "popupName":"TemplateMessage",
