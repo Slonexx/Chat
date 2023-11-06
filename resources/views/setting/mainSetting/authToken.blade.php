@@ -225,7 +225,7 @@
                    '<div class="col"> '+nameAccess(aValue)+' </div>' +
                    '<div onclick="showHideUpdateEmployee(\''+1+'\',\''+eValue+'\')" class="col-1 btn gradient_focus"> Изменить</div>' +
                    '<div class="col-1"></div>' +
-                   '<div onclick="deleteAccount(\''+eValue+'\', \''+item.employeeName+'\')" class="col-1 btn gradient_focus"><i class="fa-regular fa-circle-xmark"></i></div>' +
+                   '<div onclick="deleteAccount(\''+eValue+'\', \''+item.employeeName+'\')" class="col-1 btn gradient_focus">X</i></div>' +
                    '</div>')
                onEmployee(true, eValue)
            });
@@ -375,7 +375,7 @@
                             '<div class="col"> '+nameAccess(access)+' </div>' +
                             '<div class="col-1 btn gradient_focus"> Изменить</div>' +
                             '<div class="col-1"></div>' +
-                            '<div onclick="deleteAccount(\''+eValue+'\', \''+eName+'\')" class="col-1 btn gradient_focus"><i class="fa-regular fa-circle-xmark"></i></div>' +
+                            '<div onclick="deleteAccount(\''+eValue+'\', \''+eName+'\')" class="col-1 btn gradient_focus">X</div>' +
                             '</div>')
 
 
