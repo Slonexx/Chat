@@ -349,7 +349,7 @@
                     window.document.getElementById('sendMessage').style.display = 'block'
                     chatId = json.data.chatId
 
-                    if (json.status.hasOwnProperty('message')){
+                    if (json.hasOwnProperty('message')){
                         errorMessageInContent.style.display = 'block'
                         errorMessageInContent.innerText = JSON.stringify(json.message)
                     }
