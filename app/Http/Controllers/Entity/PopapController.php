@@ -331,7 +331,7 @@ class PopapController extends Controller
         $text_add_pole = '';
 
         if ($pole != null) {
-            switch ($index) {
+            switch ($pole) {
                 case '0':
                 {
                     $text_pole = $entity->name;
