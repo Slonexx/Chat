@@ -152,6 +152,7 @@
             textMessage.value = '';
             errorMessageInContent.style.display = 'none';
             successMessageInContent.style.display = 'none';
+            while (messenger.firstChild) { messenger.removeChild(messenger.firstChild); }
             window.document.getElementById('sendMessage').style.display = 'none'
 
             if (receivedMessage.name === 'OpenPopup') {
