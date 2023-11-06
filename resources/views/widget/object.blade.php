@@ -29,7 +29,7 @@
         </div>
         <div class="row mt-2">
             <div class="col">
-                <button id="template" onclick="PopupShow('3')" class="btn btn-outline-dark gradient_focus"> Отправить шаблон сообщений </button>
+                <button id="template" onclick="PopupShow('3')" class="btn btn-outline-dark gradient_focus"> Отправить шаблон </button>
             </div>
         </div>
     </div>

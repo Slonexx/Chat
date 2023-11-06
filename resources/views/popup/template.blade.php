@@ -142,9 +142,11 @@
         window.addEventListener("message", function(event) {
         let receivedMessage = event.data
             search.value = '';
+            toc.innerText = '';
             textMessage.value = '';
             errorMessageInContent.style.display = 'none';
             successMessageInContent.style.display = 'none';
+            window.document.getElementById('sendMessage').style.display = 'none'
 
         if (receivedMessage.name === 'OpenPopup') {
             main.style.display = 'flex'
@@ -186,7 +188,7 @@
                     arrayMessageTemplate = json.data;
                     window.document.getElementById('phoneOrName').value = phone;
 
-                    (json.data).forEach((item, id) => {
+                    (json.data).append((item, id) => {
                         $('#toc').after(
                             $('<li><a class="mx-1"> <button onclick="innerTemplateMessage(\''+id+'\')" class="btn">'+item.name+'</button></a></li>')
                         );
