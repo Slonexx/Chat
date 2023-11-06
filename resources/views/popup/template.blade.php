@@ -188,8 +188,8 @@
                     arrayMessageTemplate = json.data;
                     window.document.getElementById('phoneOrName').value = phone;
 
-                    (json.data).append((item, id) => {
-                        $('#toc').after(
+                    (json.data).forEach((item, id) => {
+                        $('#toc').append(
                             $('<li><a class="mx-1"> <button onclick="innerTemplateMessage(\''+id+'\')" class="btn">'+item.name+'</button></a></li>')
                         );
                     });
