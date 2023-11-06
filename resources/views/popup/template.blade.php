@@ -152,8 +152,9 @@
             textMessage.value = '';
             errorMessageInContent.style.display = 'none';
             successMessageInContent.style.display = 'none';
-            while (messenger.firstChild) { messenger.removeChild(messenger.firstChild); }
+            ImageOrGifHide.style.cssText = 'display: flex !important;'
             window.document.getElementById('sendMessage').style.display = 'none'
+            while (messenger.firstChild) { messenger.removeChild(messenger.firstChild); }
 
             if (receivedMessage.name === 'OpenPopup') {
                 main.style.display = 'flex'
