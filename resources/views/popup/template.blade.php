@@ -1,4 +1,4 @@
-@extends('popup.index')
+@extends('popup.indexTemplate')
 @section('content')
 
     <div class="main-container" style="height: 99%; width: 99%; background: rgb(220, 220, 220)">

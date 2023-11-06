@@ -27,7 +27,7 @@
 </head>
 
 
-<body>
+<body style="background-image: url({{  ( Config::get("Global") )['url'].'bg.svg' }});>
 
 @yield('content')
 
