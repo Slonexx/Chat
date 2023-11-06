@@ -44,6 +44,7 @@ Route::get('/widget/get/Data', [widgetController::class, 'widgetGetData']);
 Route::get('/Popup/{object}', [PopapController::class, 'Popup']);
 Route::get('/Popup/template/message/Show', [PopapController::class, 'template']);
 Route::get('/Popup/template/message/get/All', [PopapController::class, 'getTemplate']);
+Route::get('/Popup/template/message/get/where/name', [PopapController::class, 'searchTemplate']);
 Route::get('/Popup/template/message/get/information/messenger', [PopapController::class, 'messenger']);
 Route::get('/Popup/template/message/get/information/chatapp', [PopapController::class, 'information']);
 Route::get('/Popup/template/message/get/send/message', [PopapController::class, 'sendMessage']);

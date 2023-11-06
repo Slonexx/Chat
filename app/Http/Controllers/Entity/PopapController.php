@@ -79,6 +79,56 @@ class PopapController extends Controller
         ]);
 
     }
+    public function searchTemplate(Request $request): JsonResponse
+    {
+        $data = json_decode(json_encode([
+            'accountId' => $request->accountId ?? "",
+            'object_Id' => $request->object_Id ?? "",
+            'entity_type' => $request->entity_type ?? "",
+
+            'name' => $request->name ?? "",
+        ]));
+
+        $client = new MsClient($data->accountId);
+        try {
+            $entity = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $data->entity_type . '/' . $data->object_Id);
+        } catch (BadResponseException $e) {
+            return response()->json([
+                'status' => true,
+                'data' => $e->getMessage(),
+            ]);
+        }
+
+        $res = [];
+        try {
+            $model = templateModel::where('accountId', $data->accountId)->where('name', 'LIKE', '%' . $data->name . '%')->get();
+            if (!$model->isEmpty()) {
+                foreach ($model as $item) {
+                    $array = $item->toArray();
+
+                    $polesModel = polesModel::where('accountId', $data->accountId)->where('name_uid', ($item->toArray())['name_uid'])->get();
+                    if (!$polesModel->isEmpty()) {
+                        foreach ($polesModel as $polesModelItem) {
+                            $polesModelItemToArray = $polesModelItem->toArray();
+                            $array['message'] = $this->messageUpdate($client, $entity, $array['message'], $polesModelItemToArray['i'], $polesModelItemToArray['pole'], $polesModelItemToArray['add_pole']);
+                        }
+                    }
+                    $res[] = $array;
+                }
+            }
+        } catch (BadResponseException $e) {
+            return response()->json([
+                'status' => true,
+                'data' => $e->getMessage(),
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $res,
+        ]);
+
+    }
 
     public function messenger(Request $request): JsonResponse
     {
