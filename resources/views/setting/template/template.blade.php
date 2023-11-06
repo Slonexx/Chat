@@ -134,8 +134,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button id="addPoles" onclick="fuCreatePole()" type="button" class="col-3 btn btn-outline-dark gradient_focus">Добавит поле</button>
-                        <button onclick="fuCreateAddPole()" type="button" class="col-3 btn btn-outline-dark gradient_focus">Добавит доп поле</button>
+                        <button id="addPoles" onclick="fuCreatePole()" type="button" class="col-3 btn btn-outline-dark gradient_focus">Добавить поле</button>
+                        <button onclick="fuCreateAddPole()" type="button" class="col-3 btn btn-outline-dark gradient_focus">Добавить доп поле</button>
                         <div class="col"></div>
                         <button id="btn_createOnClick" onclick="createOnClick()" type="button" class="col-2 btn btn-outline-dark gradient_focus">Сохранить</button>
                     </div>
@@ -200,8 +200,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button id="addPolesUpdate" onclick="fuCreatePoleUpdate()" type="button" class="col-3 btn btn-outline-dark gradient_focus">Добавит поле</button>
-                        <button onclick="fuCreateAddPoleUpdate()" type="button" class="col-3 btn btn-outline-dark gradient_focus">Добавит доп поле</button>
+                        <button id="addPolesUpdate" onclick="fuCreatePoleUpdate()" type="button" class="col-3 btn btn-outline-dark gradient_focus">Добавить поле</button>
+                        <button onclick="fuCreateAddPoleUpdate()" type="button" class="col-3 btn btn-outline-dark gradient_focus">Добавить доп поле</button>
                         <div class="col"></div>
                         <button id="btn_createOnClickUpdate" onclick="createOnClickUpdate()" type="button" class="col-2 btn btn-outline-dark gradient_focus">Изменить</button>
                     </div>
