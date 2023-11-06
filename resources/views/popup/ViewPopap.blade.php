@@ -2,7 +2,7 @@
 @section('content')
 
     <div class="main-container" style="height: 720px">
-        <div class="content-container">
+        <div class="content-container" style="height: 720px">
             <iframe
                 id="webchat"
                 src=""
@@ -25,19 +25,6 @@
         let accountId = ''
         let entity_type = ''
         let build_query = ''
-
-
-        /*let receivedMessage = {
-            "name":"OpenPopup",
-            "messageId":1,
-            "popupName":"fiscalizationPopup",
-            "popupParameters":
-                {
-                    "object_Id":"ac0c9983-acec-11ed-0a80-06ac001abb0c",
-                    "accountId":"1dd5bd55-d141-11ec-0a80-055600047495",
-                    "entity_type":"customerorder",
-                }
-        };*/
 
         window.addEventListener("message", function(event) {
         let receivedMessage = event.data
