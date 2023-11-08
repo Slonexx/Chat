@@ -1,7 +1,7 @@
 @extends('popup.index')
 @section('content')
 
-    <div class="main-container" style="height: 1080px">
+    <div class="main-container" style="height: 800px">
         <div class="content-container" style="height: 100%">
             <iframe
                 id="webchat"
@@ -9,7 +9,7 @@
                 sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation"
                 allow="camera https://dialogs.pro/; microphone https://dialogs.pro/; clipboard-read https://dialogs.pro/; clipboard-write https://dialogs.pro/"
                 width="100%"
-                height="105%"
+                height="99%"
                 style="border: 0;" >
             </iframe>
         </div>
