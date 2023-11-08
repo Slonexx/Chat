@@ -27,7 +27,7 @@
 </head>
 
 
-<body style="background-image: url({{  ( Config::get("Global") )['url'].'bg.svg' }});>
+<body class="bg_popup">
 
 @yield('content')
 
@@ -43,6 +43,12 @@
 
     .gradient-invert{
         background-image: linear-gradient(135deg, #dcdcdc 0%, #f5f7fa 100%);
+    }
+
+    .bg_popup{
+        background-image: url({{  ( Config::get("Global") )['url'].'bg.svg' }});
+        background-size: cover;
+        background-repeat: repeat;
     }
 </style>
 

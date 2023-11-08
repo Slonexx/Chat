@@ -1,7 +1,7 @@
 @extends('popup.indexTemplate')
 @section('content')
 
-    <div class="main-container" style="height: 99%; width: 99%; background: rgb(220, 220, 220)">
+    <div class="main-container" style="height: 99%; width: 99%;">
         <div class="content-container">
             <div class="toc-wrapper">
                 <div class="row">
@@ -124,7 +124,7 @@
         let arrayMessageTemplate
 
 
-        /*let receivedMessage = {
+        let receivedMessage = {
             "name":"OpenPopup",
             "messageId":1,
             "popupName":"TemplateMessage",
@@ -143,10 +143,10 @@
                     "phone":"+77750498888",
 
                 }
-        };*/
+        };
 
         window.addEventListener("message", function(event) {
-        let receivedMessage = event.data
+       // let receivedMessage = event.data
             search.value = '';
             toc.innerText = '';
             textMessage.value = '';
@@ -169,7 +169,7 @@
 
                 nameAgent.innerText = agent
                 phoneAgent.innerText = phone
-            //receivedMessage = []
+            receivedMessage = []
 
                 let data = {
                     accountId: accountId,

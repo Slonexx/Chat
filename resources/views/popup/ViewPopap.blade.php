@@ -1,8 +1,8 @@
 @extends('popup.index')
 @section('content')
 
-    <div class="main-container" style="height: 720px">
-        <div class="content-container" style="height: 720px">
+    <div class="main-container" style="height: 1080px">
+        <div class="content-container">
             <iframe
                 id="webchat"
                 src=""
