@@ -2,7 +2,7 @@
 @section('content')
 
     <div class="main-container" style="height: 1080px">
-        <div class="content-container">
+        <div class="content-container" style="height: 100%">
             <iframe
                 id="webchat"
                 src=""
