@@ -93,7 +93,7 @@
                         <div class="mt-2 row">
                             <div class="col-4">Электронная почта</div>
                             <input class="form-control col" id="email" type="email" name="email"
-                                   placeholder="example@gmail.com" value="">
+                                   placeholder="example@gmail.com bp chatapp" value="">
                         </div>
 
                         <div class="mt-2 row">
@@ -163,7 +163,7 @@
                         <div class="mt-2 row">
                             <div class="col-4">Электронная почта</div>
                             <input class="form-control col" id="email2" type="email" name="email2"
-                                   placeholder="example@gmail.com" value="">
+                                   placeholder="example@gmail.com из chatapp" value="">
                         </div>
 
                         <div class="mt-2 row">
@@ -182,8 +182,8 @@
                             <div class="col-4">Доступ</div>
                             <select id="access2" name="access2" class="col form-select">
                                 <option value="0">Полный доступ</option>
-                                <option value="1">Доступ к документом</option>
-                                <option value="2">Доступ к контрагентом</option>
+                                <option value="1">Доступ к документам</option>
+                                <option value="2">Доступ к контрагентам</option>
                             </select>
                         </div>
 
@@ -406,10 +406,10 @@
                nameAccess = 'Полный доступ'
            }
            if (aValue === '1') {
-               nameAccess = 'Доступ к документом'
+               nameAccess = 'Доступ к документам'
            }
            if (aValue === '2') {
-               nameAccess = 'Доступ к контрагентом'
+               nameAccess = 'Доступ к контрагентам'
            }
            return nameAccess
        }
