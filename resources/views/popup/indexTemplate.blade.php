@@ -46,9 +46,7 @@
     }
 
     .bg_popup{
-        background-image: url({{  ( Config::get("Global") )['url'].'bg.svg' }});
-        background-size: cover;
-        background-repeat: repeat;
+        background-image: url({{  ( Config::get("Global") )['url'].'bg.png' }});
     }
 </style>
 
