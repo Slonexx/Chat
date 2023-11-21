@@ -204,11 +204,10 @@
                     };
 
                     onEmployee(true, 'MsOrgan', organId)
-
                 } else {
                     // Добавляем уникальное значение lineName к существующей строке
                     if (!createMain[organId].line.includes(lineName)) {
-                        createMain[organId].line += ' ' + lineName;
+                        createMain[organId].line += ', ' + lineName;
                     }
                 }
             });
