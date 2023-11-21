@@ -39,8 +39,8 @@
 
 
             let iframe = document.getElementById('webchat');
-            //iframe.src = 'https://dialogs.pro/?' + build_query;
-            iframe.src = 'https://chat.chatapp.online/?' + build_query;
+            iframe.src = 'https://dialogs.pro/?' + build_query;
+            //iframe.src = 'https://chat.chatapp.online/?' + build_query;
 
         }
         });

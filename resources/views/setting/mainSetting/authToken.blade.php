@@ -93,7 +93,7 @@
                         <div class="mt-2 row">
                             <div class="col-4">Электронная почта</div>
                             <input class="form-control col" id="email" type="email" name="email"
-                                   placeholder="example@gmail.com bp chatapp" value="">
+                                   placeholder="example@gmail.com из chatapp" value="">
                         </div>
 
                         <div class="mt-2 row">
@@ -333,6 +333,9 @@
         }
 
         function examination(status, createOrUpdate, eValue, eName, email, password, appId, access){
+
+            messageEmployee.style.display = 'none'
+            messageEmployee2.style.display = 'none'
 
             let data = {
                 employee: eValue,
