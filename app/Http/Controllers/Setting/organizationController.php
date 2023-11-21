@@ -136,18 +136,18 @@ class organizationController extends Controller
           $line = '';
 
           try {
-              if ($data[0]->organId == '0') {
-                  $existingRecords = organizationModel::where('accountId', $accountId)->get();
-              } else {
-                  $existingRecords = organizationModel::where('accountId', $accountId)->where('organId', $data[0]->organId)->get();
-              }
+              if ($data[0]->organId == '0')  $existingRecords = organizationModel::where('accountId', $accountId)->get();
+               else $existingRecords = organizationModel::where('accountId', $accountId)->where('organId', $data[0]->organId)->get();
+
 
               if (!$existingRecords->isEmpty()) { foreach ($existingRecords as $record) { $record->delete(); } }
 
 
               foreach ($data as $id => $item) {
 
-                  $line = $line.' '.$item->organName;
+                  if ($line != '') $line = $line.', '.$item->lineName;
+                  else $line = $item->lineName;
+
 
                   if ($id == $length) {
                       $add = '';
