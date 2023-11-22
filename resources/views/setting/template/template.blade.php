@@ -220,9 +220,6 @@
         let saveOrgan = @json($saveOrgan);
         let saveTemplate = @json($template);
 
-        console.log(saveTemplate)
-
-
         if (saveTemplate.length > 0) {
             saveTemplate.forEach((item) => {
 

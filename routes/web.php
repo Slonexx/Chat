@@ -30,12 +30,16 @@ Route::get('/Setting/organization/get/Licenses/{accountId}', [organizationContro
 Route::get('/Setting/organization/create/Licenses/{accountId}', [organizationController::class, 'createLicenses']);
 Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationController::class, 'deleteLicenses']);
 
+//Setting for
 Route::get('/Setting/template/{accountId}', [templateController::class, 'getCreate'])->name('template');
 Route::post('/Setting/template/{accountId}', [templateController::class, 'postCreate']);
+
 Route::get('/Setting/template/get/attributes/{accountId}', [templateController::class, 'getAttributes']);
 Route::get('/Setting/template/create/poles/{accountId}', [templateController::class, 'getCreatePoles']);
 Route::get('/Setting/template/nameuid/poles/{accountId}', [templateController::class, 'getNameUIDPoles']);
 Route::get('/Setting/template/delete/poles/{accountId}', [templateController::class, 'deletePoles']);
+
+
 //Widget
 Route::get('/widget/{object}', [widgetController::class, 'widgetObject']);
 Route::get('/widget/get/Data', [widgetController::class, 'widgetGetData']);
