@@ -18,9 +18,14 @@
 
     <script>
 
-
+        console.log(1);
+        console.log(1);
+        console.log(1);
+        console.log(1);
+        console.log(1);
         var height = document.body.clientHeight;
         console.log("Высота содержимого в iframe: " + height + "px");
+
 
 
 
