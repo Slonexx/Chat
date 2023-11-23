@@ -8,8 +8,7 @@
             <div class="col-6" style="margin-top: 0.25rem"><span class="text-black" style="font-size: 20px"> Настройки → Сотрудники и доступы  </span>
             </div>
             <div class="col-3 d-flex justify-content-end ">
-                <button onclick="showHideCreateEmployee('1')" class="btn btn-outline-dark gradient_focus"> добавить
-                </button>
+
             </div>
             <div class="col-3 text-right"><img src="{{  ( Config::get("Global") )['url'].'2logoHead.png' }}"  width="100%" alt=""></div>
         </div>
@@ -50,9 +49,17 @@
 
 
             <hr>
-            <div class='d-flex justify-content-end text-black btnP'>
-                <button class="btn btn-outline-dark gradient_focus"> Дальше → </button>
+            <div class="row">
+                <div class="col">
+                    <div onclick="showHideCreateEmployee('1')" class="btn btn-outline-dark gradient_focus"> добавить </div>
+                </div>
+                <div class="col">
+                    <div class='d-flex justify-content-end text-black btnP'>
+                        <button class="btn btn-outline-dark gradient_focus"> Дальше → </button>
+                    </div>
+                </div>
             </div>
+
         </form>
 
 

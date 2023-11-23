@@ -146,11 +146,9 @@ class widgetController extends Controller
                     ]),
                 ]);
             }
-            if ($entity_type == 'counterparty') {
-                $organId = 0;
-            } else {
-                $organId = basename($documents->organization->meta->href);
-            }
+            if ($entity_type == 'counterparty') $organId = 0;
+            else $organId = basename($documents->organization->meta->href);
+
 
             $license_id = 0;
             $license_full = 0;

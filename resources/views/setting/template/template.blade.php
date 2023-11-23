@@ -8,18 +8,11 @@
             <div class="col-6" style="margin-top: 0.25rem"><span class="text-black" style="font-size: 20px"> Настройки → Шаблон сообщений  </span>
             </div>
             <div class="col-3 d-flex justify-content-end ">
-                <button onclick="showHideCreate('1')" class="btn btn-outline-dark gradient_focus"> добавить
-                </button>
             </div>
             <div class="col-3 text-right"><img src="{{  ( Config::get("Global") )['url'].'2logoHead.png' }}"  width="100%" alt=""></div>
         </div>
 
         @include('div.alert')
-        @isset($message)
-            @if($message != '')
-                <script>alertViewByColorName("danger", "{{ $message }}")</script>
-            @endif
-        @endisset
         <div id="sleepInfoDelete" class="mt-2 alert alert-info fade show in text-center text-black " style="display: none">
                 <div class="row">
                     <div class="col-10 mt-1" id="messageInfoDelete"></div>
@@ -50,9 +43,20 @@
 
 
             <hr>
-            <div class='d-flex justify-content-end text-black btnP'>
-                <button class="btn btn-outline-dark gradient_focus"> Дальше → </button>
+
+
+            <div class="row">
+                <div class="col">
+                    <div onclick="showHideCreate('1')" class="btn btn-outline-dark gradient_focus"> добавить
+                    </div>
+                </div>
+                <div class="col">
+                    <div class='d-flex justify-content-end text-black btnP'>
+                        <button class="btn btn-outline-dark gradient_focus"> Сохранить </button>
+                    </div>
+                </div>
             </div>
+
         </form>
 
 
@@ -219,6 +223,17 @@
         let accountId = '{{ $accountId }}'
         let saveOrgan = @json($saveOrgan);
         let saveTemplate = @json($template);
+        let jsonMessage = @json($message);
+
+        if (jsonMessage !== '') {
+            if ( jsonMessage === 'Настройки сохранились' ){
+                alertViewByColorName("success", jsonMessage)
+            } else {
+                alertViewByColorName("danger", jsonMessage)
+            }
+        }
+
+
 
         if (saveTemplate.length > 0) {
             saveTemplate.forEach((item) => {

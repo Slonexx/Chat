@@ -322,15 +322,20 @@
                 console.log(json)
 
                 if (json.status) {
-                    (json.data).forEach((item) => {
-                        let option1 = document.createElement("option")
-                        option1.text = item.name
-                        option1.value = item.value
-                        messenger.appendChild(option1)
-                    });
 
-                    messengerName(messenger.value)
+                    if ((json.data).length > 0) {
+                        (json.data).forEach((item) => {
+                            let option1 = document.createElement("option")
+                            option1.text = item.name
+                            option1.value = item.value
+                            messenger.appendChild(option1)
+                        });
 
+                        messengerName(messenger.value)
+                    } else {
+                        ErrorMessage.style.display = 'block'
+                        ErrorMessage.innerText = "У данной линии отсутствуют мессенджеры"
+                    }
                 } else {
                     errorMessageInContent.style.display = 'block'
                     errorMessageInContent.innerText = JSON.stringify(json.message)
