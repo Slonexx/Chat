@@ -22,8 +22,8 @@
         var height = document.body.clientHeight;
         console.log("Высота содержимого в iframe: " + height + "px");
 
-        body.height = height-10
-        max_content.height = height-20
+        body.style.height = height-10
+        max_content.style.height = height-20
 
 
 
