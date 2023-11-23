@@ -1,7 +1,7 @@
 @extends('popup.index')
 @section('content')
 
-    <div class="main-container content-container" style="height: max-content">
+    <div id="iframe" class="main-container content-container" style="height: max-content">
         <iframe
             id="web-chat"
             src=""
@@ -12,6 +12,25 @@
             style="border: 0;">
         </iframe>
     </div>
+    <script>
+
+        var iframe = document.getElementById('iframe');
+        if (iframe) {
+
+            function updateIframe() {
+                iframe.style.height = iframe.contentWindow.document.body.offsetHeight + 'px';
+            }
+
+            iframe.addEventListener('load', function() {
+                window.addEventListener('resize', function() {
+                    updateIframe();
+                });
+                updateIframe();
+            });
+
+        }
+
+    </script>
 
 
 
