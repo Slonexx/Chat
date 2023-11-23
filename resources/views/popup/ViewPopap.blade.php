@@ -2,7 +2,7 @@
 <body id="body" class="bg-white">
 @section('content')
 
-    <div id="max_content" class="main-container content-container">
+    <div id="max_content" class="main-container content-container" style="background: #0d1116">
        {{-- <iframe
             id="web-chat"
             src=""
