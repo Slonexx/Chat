@@ -14,20 +14,18 @@
     </div>
     <script>
 
-        var iframe = document.getElementById('iframe');
-        if (iframe) {
+        const iframe = document.getElementById('iframe');
 
-            function updateIframe() {
-                iframe.style.height = iframe.contentWindow.document.body.offsetHeight + 'px';
-            }
+        // Устанавливаем начальную высоту, чтобы избежать прокрутки на стороне iframe
+        iframe.style.height = 'auto';
 
-            iframe.addEventListener('load', function() {
-                window.addEventListener('resize', function() {
-                    updateIframe();
-                });
-                updateIframe();
-            });
+        // Функция для обновления высоты iframe на основе его содержимого
+        function setIframeHeight() {
+            // Получаем высоту содержимого в iframe
+            const bodyHeight = iframe.contentWindow.document.body.scrollHeight;
 
+            // Устанавливаем высоту iframe равной высоте содержимого
+            iframe.style.height = `${bodyHeight}px`;
         }
 
     </script>

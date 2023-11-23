@@ -27,7 +27,7 @@
 </head>
 
 
-<body class="bg-white" style="max-height: 720px; min-height: 600px">
+<body id="iframe" class="bg-white">
 
 @yield('content')
 
