@@ -1,8 +1,8 @@
 @extends('popup.index')
-<body class="bg-white">
+<body id="body" class="bg-white">
 @section('content')
 
-    <div class="main-container content-container">
+    <div id="max_content" class="main-container content-container">
        {{-- <iframe
             id="web-chat"
             src=""
@@ -18,13 +18,11 @@
 
     <script>
 
-        console.log(1);
-        console.log(1);
-        console.log(1);
-        console.log(1);
-        console.log(1);
         var height = document.body.clientHeight;
         console.log("Высота содержимого в iframe: " + height + "px");
+
+        body.height = height-10
+        max_content.height = height-20
 
 
 
