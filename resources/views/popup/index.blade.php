@@ -27,7 +27,7 @@
 </head>
 
 
-<body id="iframe" class="bg-white">
+
 
 @yield('content')
 
@@ -45,7 +45,5 @@
         background-image: linear-gradient(135deg, #dcdcdc 0%, #f5f7fa 100%);
     }
 </style>
-
-</body>
 </html>
 
