@@ -3,8 +3,7 @@
 @section('content')
 
     <div id="max_content" class="main-container content-container" style="background: #0d1116">
-        dawdsaw
-       {{-- <iframe
+         <iframe
             id="web-chat"
             src=""
             sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation"
@@ -12,19 +11,15 @@
             width="100%"
             height="98%"
             style="border: 0;">
-        </iframe>--}}
+        </iframe>
     </div>
 
 
 
     <script>
-
         var height = document.body.clientHeight;
-        console.log("Высота содержимого в iframe: " + height + "px");
-
-        body.style.height = height-10
-        max_content.style.height = height-20
-
+        body.style.height = height
+        max_content.style.height = height-10
 
 
 
