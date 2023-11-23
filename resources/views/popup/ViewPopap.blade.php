@@ -23,6 +23,7 @@
         function setIframeHeight() {
             // Получаем высоту содержимого в iframe
             const bodyHeight = iframe.contentWindow.document.body.scrollHeight;
+            console.log(bodyHeight)
 
             // Устанавливаем высоту iframe равной высоте содержимого
             iframe.style.height = `${bodyHeight}px`;
