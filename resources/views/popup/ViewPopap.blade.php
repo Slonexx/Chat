@@ -1,7 +1,7 @@
 @extends('popup.index')
 @section('content')
 
-    <div class="main-container" style="height: 100vh">
+    <div class="main-container" style="height: 100%">
         <div class="content-container">
             <div>
                 <iframe
