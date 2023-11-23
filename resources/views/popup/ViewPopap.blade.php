@@ -43,7 +43,7 @@
 
 
                 let iframe = document.getElementById('web-chat');
-                iframe.src = 'https://dialogs.pro/?' + build_query;*/
+                iframe.src = 'https://dialogs.pro/?' + build_query;
                 //iframe.src = 'https://chat.chatapp.online/?' + build_query;
             }
         });
