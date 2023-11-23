@@ -27,7 +27,7 @@
 </head>
 
 
-<body class="bg-white">
+<body id="iframe" class="bg-white">
 
 @yield('content')
 

@@ -1,7 +1,7 @@
 @extends('popup.index')
 @section('content')
 
-    <div id="iframe" class="main-container content-container" style="height: max-content">
+    <div class="main-container content-container" style="height: 100%">
         <iframe
             id="web-chat"
             src=""
