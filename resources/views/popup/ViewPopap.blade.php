@@ -2,7 +2,7 @@
 <body id="body" class="bg-white">
 @section('content')
 
-    <div id="max_content" class="main-container content-container" style="background: #0d1116">
+    <div id="max_content" class="main-container content-container">
          <iframe
             id="web-chat"
             src=""
@@ -19,7 +19,7 @@
     <script>
         var height = document.body.clientHeight;
         body.style.height = height
-        max_content.style.height = height-10
+        max_content.style.height = height-2
 
 
 
