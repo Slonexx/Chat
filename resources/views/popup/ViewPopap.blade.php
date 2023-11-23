@@ -42,7 +42,7 @@
                 build_query = receivedMessage.popupParameters.build_query;
 
 
-                /*let iframe = document.getElementById('web-chat');
+                let iframe = document.getElementById('web-chat');
                 iframe.src = 'https://dialogs.pro/?' + build_query;*/
                 //iframe.src = 'https://chat.chatapp.online/?' + build_query;
             }
