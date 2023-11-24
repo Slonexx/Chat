@@ -371,6 +371,9 @@ class PopapController extends Controller
                 {
                     if (property_exists($entity, 'rate')) {
                         try {
+
+                            dd($entity->rate);
+
                             $metaGet = $client->get($entity->rate->meta->href);
                             $text_pole = $metaGet->name;
                         } catch (BadResponseException) {
