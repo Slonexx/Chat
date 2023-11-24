@@ -2,7 +2,7 @@
 @section('content')
 
     <div class="main-container" style="height: 99%; width: 99%;">
-        <div class="content-container">
+        <div class="">
             <div class="toc-wrapper">
                 <div class="row">
                     <span class="mx-2 mt-2"> &nbsp;
@@ -23,24 +23,8 @@
 
                 </ul>
             </div>
-            {{--
-
-                        <div class="page-wrapper">
-                            <div class="bg-white row rounded p-3">
-                                <div class="row gradient-invert rounded p-1 " style="margin-top: -0.5rem">
-                                    <div class="col" style="margin-top: 0.25rem"><span class="text-black" style="font-size: 20px"> Шаблон сообщений  </span> </div>
-                                    <div class="col-3 text-right"><img src="{{  ( Config::get("Global") )['url'].'2logoHead.png' }}"  width="100%" alt=""></div>
-                                </div>
-                            </div>
-                        </div>
-
-            --}}
-
-
-            <div class="page-wrapper">
+            <div class="page-wrapper content-container">
                 <div id="main" class="container bg-white rounded" style="display: block">
-
-
                     <div class="content">
                         <div class="mx-1 mt-2 row gradient rounded p-2">
                             <div class="col mt-2">
@@ -100,7 +84,6 @@
 
                 <div id="ErrorMessage"  class="container rounded mt-2 alert alert-danger alert-dismissible fade show in text-center " style="display: none"></div>
             </div>
-
         </div>
     </div>
 
@@ -124,26 +107,26 @@
         let arrayMessageTemplate
 
 
-        // let receivedMessage = {
-        //     "name":"OpenPopup",
-        //     "messageId":1,
-        //     "popupName":"TemplateMessage",
-        //     "popupParameters":
-        //         {
-        //             "accountId":"1dd5bd55-d141-11ec-0a80-055600047495",
-        //             "object_Id":"5f3023e9-05b3-11ee-0a80-06f20001197a",
-        //             "entity_type":"customerorder",
-        //
-        //             "build_query":"",
-        //
-        //             "employee":"e793faeb-e63a-11ec-0a80-0b4800079eb3",
-        //             "license_id":"36651",
-        //             "license_full":"Chat Line Test name#36651",
-        //             "nameAgent":"Сергей",
-        //             "phone":"+77750498888",
-        //
-        //         }
-        // };
+        /*let receivedMessage = {
+            "name":"OpenPopup",
+            "messageId":1,
+            "popupName":"TemplateMessage",
+            "popupParameters":
+                {
+                    "accountId":"1dd5bd55-d141-11ec-0a80-055600047495",
+                    "object_Id":"5f3023e9-05b3-11ee-0a80-06f20001197a",
+                    "entity_type":"customerorder",
+
+                    "build_query":"",
+
+                    "employee":"e793faeb-e63a-11ec-0a80-0b4800079eb3",
+                    "license_id":"36651",
+                    "license_full":"Chat Line Test name#36651",
+                    "nameAgent":"Сергей",
+                    "phone":"+77750498888",
+
+                }
+        };*/
 
         window.addEventListener("message", function(event) {
         let receivedMessage = event.data
@@ -169,7 +152,7 @@
 
                 nameAgent.innerText = agent
                 phoneAgent.innerText = phone
-            receivedMessage = []
+            //receivedMessage = []
 
                 let data = {
                     accountId: accountId,
