@@ -139,7 +139,7 @@
             while (messenger.firstChild) { messenger.removeChild(messenger.firstChild); }
 
             if (receivedMessage.name === 'OpenPopup') {
-                main.style.display = 'block'
+                main.style.display = 'flex'
                 accountId = receivedMessage.popupParameters.accountId
                 object_Id = receivedMessage.popupParameters.object_Id
                 entity_type = receivedMessage.popupParameters.entity_type
@@ -190,7 +190,7 @@
                         linesId.appendChild(option1)
 
                     } else {
-                        main.style.setProperty('display', 'none', 'important');
+                        window.document.getElementById('main').style.setProperty('display', 'none', 'important');
                         ErrorMessage.style.setProperty('block', 'none', 'important');
                         ErrorMessage.innerText = json.data
                     }
