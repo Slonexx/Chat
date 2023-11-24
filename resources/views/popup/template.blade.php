@@ -139,7 +139,7 @@
             while (messenger.firstChild) { messenger.removeChild(messenger.firstChild); }
 
             if (receivedMessage.name === 'OpenPopup') {
-                main.style.display = 'flex'
+                main.style.display = 'block'
                 accountId = receivedMessage.popupParameters.accountId
                 object_Id = receivedMessage.popupParameters.object_Id
                 entity_type = receivedMessage.popupParameters.entity_type
