@@ -215,12 +215,11 @@
     }
 
     .main-container {
-        overflow: auto;
-    }
-    .content-container {
         overflow-y: auto;
         overflow-x: hidden;
-        flex-grow: 2;
+        flex-grow: 1;
+    }
+    .content-container {
 
     }
     .buttons-container-head{
