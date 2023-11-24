@@ -201,7 +201,10 @@
     }
 
     .content {
-        flex-grow: 1;
+        overflow: auto;
+        overflow-x: scroll; /* прокрутка по горизонтали */
+        overflow-y: scroll; /* прокрутка по вертикали */
+        flex-grow: 3;
     }
 
     .footer {
@@ -218,14 +221,10 @@
         display: flex;
         flex-direction: column;
         height: 100vh;
-        overflow: auto;
-        overflow-x: scroll; /* прокрутка по горизонтали */
-        overflow-y: scroll; /* прокрутка по вертикали */
     }
     .content-container {
-        overflow: auto;
-        overflow-x: scroll; /* прокрутка по горизонтали */
-        overflow-y: scroll; /* прокрутка по вертикали */
+        overflow-y: auto;
+        overflow-x: hidden;
         flex-grow: 2;
 
     }
