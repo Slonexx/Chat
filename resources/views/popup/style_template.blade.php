@@ -216,7 +216,6 @@
 
     .main-container {
         overflow-y: auto;
-        overflow-x: hidden;
         flex-grow: 1;
     }
     .content-container {
