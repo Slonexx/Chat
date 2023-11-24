@@ -2,7 +2,7 @@
 @section('content')
 
     <div class="main-container" style="height: 99%; width: 99%;">
-        <div class="content-container" style="height: 100%">
+        <div style="height: 100%">
             <div class="toc-wrapper">
                 <div class="row">
                     <span class="mx-2 mt-2"> &nbsp;
@@ -23,7 +23,7 @@
 
                 </ul>
             </div>
-            <div class="page-wrapper">
+            <div class="page-wrapper content-container" style="height: 100vh;">
                 <div id="main" class="container bg-white rounded" style="display: block">
                     <div class="content">
                         <div class="mx-1 mt-2 row gradient rounded p-2">
