@@ -211,6 +211,10 @@
         min-height: 20%;
     }
 
+    body {
+        overflow: hidden;
+    }
+
     .main-container {
         display: flex;
         flex-direction: column;
