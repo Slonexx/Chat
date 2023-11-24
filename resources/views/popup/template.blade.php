@@ -2,7 +2,7 @@
 @section('content')
 
     <div class="main-container" style="height: 99%; width: 99%;">
-        <div class="content-container">
+        <div class="content-container" style="height: 100%">
             <div class="toc-wrapper">
                 <div class="row">
                     <span class="mx-2 mt-2"> &nbsp;
