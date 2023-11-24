@@ -81,7 +81,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div id="ErrorMessage"  class="container rounded mt-2 alert alert-danger alert-dismissible fade show in text-center " style="display: none"></div>
             </div>
         </div>
@@ -191,8 +190,8 @@
                         linesId.appendChild(option1)
 
                     } else {
-                        main.style.display = 'none'
-                        ErrorMessage.style.display = 'block'
+                        main.style.setProperty('display', 'none', 'important');
+                        ErrorMessage.style.setProperty('block', 'none', 'important');
                         ErrorMessage.innerText = json.data
                     }
                 })
