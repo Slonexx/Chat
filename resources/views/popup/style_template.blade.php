@@ -220,9 +220,10 @@
         height: 100vh;
     }
     .content-container {
+        overflow: auto;
         overflow-x: scroll; /* прокрутка по горизонтали */
         overflow-y: scroll; /* прокрутка по вертикали */
-        flex-grow: 1;
+        flex-grow: 2;
 
     }
     .buttons-container-head{
