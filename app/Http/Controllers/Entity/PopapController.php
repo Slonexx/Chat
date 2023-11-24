@@ -263,7 +263,7 @@ class PopapController extends Controller
                         'data' => $data,
                         'message' => 'Ошибка проверки пользователя по номеру телефона. Вы можете отправить сообщение, если только вы уверены, что в данный мессенджер существует',
                     ]);
-                } else $chatId = $dataChatApp->data->chatId;
+                } else $chatId = $dataChatApp;
             } catch (BadResponseException $e){
                 $data->chatId = $data->phoneOrName;
                 return response()->json([
