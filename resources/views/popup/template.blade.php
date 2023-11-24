@@ -24,7 +24,7 @@
                 </ul>
             </div>
             <div class="page-wrapper content-container" style="height: 100vh;">
-                <div id="main" class="container bg-white rounded" style="display: block">
+                <div id="mainsView" class="container bg-white rounded" style="display: block">
                     <div class="content">
                         <div class="mx-1 mt-2 row gradient rounded p-2">
                             <div class="col mt-2">
@@ -139,7 +139,7 @@
             while (messenger.firstChild) { messenger.removeChild(messenger.firstChild); }
 
             if (receivedMessage.name === 'OpenPopup') {
-                main.style.display = 'flex'
+                mainsView.style.display = 'flex'
                 accountId = receivedMessage.popupParameters.accountId
                 object_Id = receivedMessage.popupParameters.object_Id
                 entity_type = receivedMessage.popupParameters.entity_type
@@ -190,7 +190,7 @@
                         linesId.appendChild(option1)
 
                     } else {
-                        window.document.getElementById('main').style.setProperty('display', 'none', 'important');
+                        window.document.getElementById('mainsView').style.setProperty('display', 'none', 'important');
                         ErrorMessage.style.setProperty('block', 'none', 'important');
                         ErrorMessage.innerText = json.data
                     }
@@ -290,7 +290,7 @@
                     linesId.appendChild(option1)
 
                 } else {
-                    main.style.display = 'none'
+                    mainsView.style.display = 'none'
                     ErrorMessage.style.display = 'block'
                     ErrorMessage.innerText = json.data
                 }
