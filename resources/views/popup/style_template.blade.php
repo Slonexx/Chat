@@ -211,6 +211,17 @@
         min-height: 20%;
     }
 
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+    .content-container {
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex-grow: 1;
+    }
+
 
     .gradient_focus:hover{
         color: white;
