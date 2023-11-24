@@ -190,7 +190,7 @@
                         linesId.appendChild(option1)
 
                     } else {
-                        window.document.getElementById('mainsView').style.setProperty('display', 'none', 'important');
+                        window.document.getElementById('mainsView').style.setProperty('display', '');
                         ErrorMessage.style.setProperty('block', 'none', 'important');
                         ErrorMessage.innerText = json.data
                     }
