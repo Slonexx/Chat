@@ -257,7 +257,7 @@ class PopapController extends Controller
         } else {
             try {
                 $dataChatApp = json_decode(($newClient->phonesCheck($data->linesId, $data->messenger, $data->phoneOrName)->getBody()->getContents()))->data->chatId;
-                if ($dataChatApp->data->chatId == null) {
+                if ($dataChatApp == null) {
                     return response()->json([
                         'status' => false,
                         'data' => $data,
