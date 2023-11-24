@@ -218,6 +218,9 @@
         display: flex;
         flex-direction: column;
         height: 100vh;
+        overflow: auto;
+        overflow-x: scroll; /* прокрутка по горизонтали */
+        overflow-y: scroll; /* прокрутка по вертикали */
     }
     .content-container {
         overflow: auto;
