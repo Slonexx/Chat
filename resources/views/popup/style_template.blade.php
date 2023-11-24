@@ -214,13 +214,8 @@
         min-height: 20%;
     }
 
-    body {
-        overflow: hidden;
-    }
     .main-container {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
+        overflow: auto;
     }
     .content-container {
         overflow-y: auto;
