@@ -214,7 +214,6 @@
     body {
         overflow: hidden;
     }
-
     .main-container {
         display: flex;
         flex-direction: column;
@@ -224,6 +223,15 @@
         overflow-y: auto;
         overflow-x: hidden;
         flex-grow: 1;
+    }
+    .buttons-container-head{
+        background-color: rgba(76, 175, 237, 0.86);
+        padding-top: 3px;
+        min-height: 3px;
+    }
+    .buttons-container {
+        padding-top: 10px;
+        min-height: 100px;
     }
 
 
