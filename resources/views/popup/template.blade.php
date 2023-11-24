@@ -24,7 +24,7 @@
                 </ul>
             </div>
             <div class="page-wrapper content-container" style="height: 100vh;">
-                <div id="mainsView" class="container bg-white rounded" style="display: block">
+                <div id="mainsView" class="container bg-white rounded" style="display: flex">
                     <div class="content">
                         <div class="mx-1 mt-2 row gradient rounded p-2">
                             <div class="col mt-2">
@@ -124,7 +124,7 @@
                     "nameAgent":"Сергей",
                     "phone":"+77750498888",
 
-                }
+            }
         };*/
 
         window.addEventListener("message", function(event) {
@@ -315,8 +315,8 @@
 
                         messengerName(messenger.value)
                     } else {
-                        ErrorMessage.style.display = 'block'
-                        ErrorMessage.innerText = "У данной линии отсутствуют мессенджеры"
+                        errorMessageInContent.style.display = 'block'
+                        errorMessageInContent.innerText = "У данной линии отсутствуют мессенджеры"
                     }
                 } else {
                     errorMessageInContent.style.display = 'block'
