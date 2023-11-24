@@ -23,7 +23,7 @@
 
                 </ul>
             </div>
-            <div class="page-wrapper buttons-container">
+            <div class="page-wrapper">
                 <div id="main" class="container bg-white rounded" style="display: block">
                     <div class="content">
                         <div class="mx-1 mt-2 row gradient rounded p-2">

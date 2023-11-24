@@ -220,9 +220,10 @@
         height: 100vh;
     }
     .content-container {
-        overflow-y: auto;
-        overflow-x: hidden;
+        overflow-x: scroll; /* прокрутка по горизонтали */
+        overflow-y: scroll; /* прокрутка по вертикали */
         flex-grow: 1;
+
     }
     .buttons-container-head{
         background-color: rgba(76, 175, 237, 0.86);
