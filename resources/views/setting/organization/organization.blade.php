@@ -228,6 +228,11 @@
             if (val === '1') {
                 $('#createOrganization').modal('toggle')
 
+                while (organizationSelect.firstChild) { organizationSelect.removeChild(organizationSelect.firstChild); }
+                createLineForEmployee.innerText = ''
+                messageEmployee.style.display = 'none'
+
+
                 if (MsOrgan.length > 0) {
                     let organization = window.document.getElementById('organizationSelect')
                     while (organization.firstChild) { organization.removeChild(organization.firstChild); }
