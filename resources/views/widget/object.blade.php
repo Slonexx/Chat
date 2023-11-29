@@ -83,6 +83,7 @@
                 window.document.getElementById('main').style.display = 'none'
                 window.document.getElementById('messageErrorAlert').style.display = 'none'
                 window.document.getElementById('Chat').style.display = "block"
+                window.document.getElementById('template').style.display = "block"
                 window.document.getElementById('GifOrImageHideOrGifHide').style.display = 'none'
                 window.document.getElementById('ImageOrGifHide').style.display = 'inline'
                 entityId = receivedMessage.objectId;
@@ -121,6 +122,7 @@
 
                         if (response.onToken != ''){
                             window.document.getElementById('Chat').style.display = "none"
+                            window.document.getElementById('template').style.display = "none"
                             onToken = response.onToken
                         } else {
                             window.document.getElementById('main').style.display = 'none'
