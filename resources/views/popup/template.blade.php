@@ -1,7 +1,7 @@
 @extends('popup.indexTemplate')
 @section('content')
 
-    <div class="main-container" style="height: 99%; width: 99%;">
+    <div class="main-container" style="height: 99%; width: 99%; margin-bottom: 50px">
         <div style="height: 100%">
             <div class="toc-wrapper">
                 <div class="row">

@@ -206,9 +206,8 @@
 
     .footer {
         background-color: #464646; /* Задайте нужный цвет фона для футера */
-        height: 30%;
-        max-height: 30%;
-        min-height: 20%;
+        max-height: 20%;
+        min-height: 10%;
     }
 
     .main-container {
