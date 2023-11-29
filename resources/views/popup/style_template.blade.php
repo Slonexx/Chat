@@ -193,9 +193,9 @@
     .container {
         margin-top: 2rem;
         width: 50%;
-        height: 630px; /* Задайте нужную высоту контейнера */
-        max-height: 630px; /* Задайте нужную высоту контейнера */
-        min-height: 60%; /* Задайте нужную высоту контейнера */
+      /*  height: 630px; !* Задайте нужную высоту контейнера *!
+        max-height: 630px; !* Задайте нужную высоту контейнера *!
+        min-height: 60%; !* Задайте нужную высоту контейнера *!*/
         display: flex;
         flex-direction: column;
     }
@@ -206,8 +206,9 @@
 
     .footer {
         background-color: #464646; /* Задайте нужный цвет фона для футера */
-        max-height: 20%;
-        min-height: 10%;
+        max-height: 35%;
+        min-height: 30%;
+        margin-bottom:1%
     }
 
     .main-container {
