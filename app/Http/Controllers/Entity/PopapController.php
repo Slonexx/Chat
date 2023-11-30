@@ -494,9 +494,9 @@ class PopapController extends Controller
         //dd($words);
 
         foreach ($words as &$word) {
-            if ($word == $word_pole_index) {
+            if ($word == $word_pole_index or strpos($word, $word_pole_index)) {
                 $word = $text_pole;
-            } elseif ($word == $word_add_pole_index) {
+            } elseif ($word == $word_add_pole_index or strpos($word, $word_add_pole_index)) {
                 $word = $text_add_pole;
             }
         }
