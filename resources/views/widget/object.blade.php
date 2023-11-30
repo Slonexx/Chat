@@ -19,18 +19,16 @@
 
 
     <div id="main" class="mt-1 mx-4 text-center" style="display: none">
-        <div class="row">
+        <div class="row p-2">
             <div class="col">
-                <button id="Chat" onclick="PopupShow('2')" class="btn btn-outline-dark gradient_focus"> Чат с клиентом </button>
+                <button id="Chat" onclick="PopupShow('2')" class="w-100 btn btn-outline-dark gradient_focus"> Чат с клиентом </button>
             </div>
             <div class="col">
-                <button onclick="PopupShow('1')" class="btn btn-outline-dark gradient_focus"> Общий чат </button>
+                <button onclick="PopupShow('1')" class="w-100 btn btn-outline-dark gradient_focus"> Общий чат </button>
             </div>
         </div>
-        <div class="row mt-2">
-            <div class="col">
+        <div class="row mt-2 text-center m-2">
                 <button id="template" onclick="PopupShow('3')" class="btn btn-outline-dark gradient_focus"> Отправить шаблон </button>
-            </div>
         </div>
     </div>
 
