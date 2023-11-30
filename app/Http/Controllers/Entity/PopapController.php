@@ -489,14 +489,14 @@ class PopapController extends Controller
         }
 
         // Разбиваем строку по пробелам, запятам и другим знакам препинания
-        $words = preg_split('/([\s,]+)/', $message, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $words = preg_split('/([\s,.]+)/', $message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
         //dd($words);
 
         foreach ($words as &$word) {
-            if ($word == $word_pole_index or strpos($word, $word_pole_index)) {
+            if ($word == $word_pole_index) {
                 $word = $text_pole;
-            } elseif ($word == $word_add_pole_index or strpos($word, $word_add_pole_index)) {
+            } elseif ($word == $word_add_pole_index) {
                 $word = $text_add_pole;
             }
         }
