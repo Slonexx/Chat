@@ -489,7 +489,7 @@ class PopapController extends Controller
         }
 
         // Разбиваем строку по пробелам, запятам и другим знакам препинания
-        $words = preg_split('/([\s,.]+)/', $message, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $words = preg_split('/([\s,.\{\}\(\)]+)/', $message, -1, PREG_SPLIT_DELIM_CAPTURE);
 
         //dd($words);
 
