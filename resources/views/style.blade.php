@@ -1,6 +1,6 @@
 <style>
     .head-full {
-        height: 720px;
+        height: 100vh;
     }
 
     body {
