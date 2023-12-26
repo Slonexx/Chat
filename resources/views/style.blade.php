@@ -1,7 +1,5 @@
 <style>
-    .head-full {
-        height: 720px;
-    }
+
 
     body {
         font-family: 'Helvetica', 'Arial', sans-serif;
