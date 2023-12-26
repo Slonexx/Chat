@@ -21,7 +21,7 @@
             <div class="dropdown-container">
                 <a id="link_2" class="mt-1" href="/Setting/createToken/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}"> Сотрудники и доступы </a>
                 <a id="link_3" class="mt-1" href="/Setting/organization/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}"> Организация и линии </a>
-                <a id="link_4" class="mt-1" href="/Setting/template/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}"> Шаблоны сообщений </a>
+                {{--<a id="link_4" class="mt-1" href="/Setting/template/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}"> Шаблоны сообщений </a>--}}
             </div>
         </div>
 

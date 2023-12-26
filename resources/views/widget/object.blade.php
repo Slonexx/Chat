@@ -27,9 +27,9 @@
                 <button onclick="PopupShow('1')" class="w-100 btn btn-outline-dark gradient_focus"> Общий чат </button>
             </div>
         </div>
-        <div class="row mt-2 text-center m-2">
+       {{-- <div class="row mt-2 text-center m-2">
                 <button id="template" onclick="PopupShow('3')" class="btn btn-outline-dark gradient_focus"> Отправить шаблон </button>
-        </div>
+        </div>--}}
     </div>
 
 
