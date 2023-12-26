@@ -56,7 +56,7 @@
         function PopupShow(status){
             if (status === '1') { fiscalization("Show", onToken) }
             if (status === '2') { fiscalization("Show", all) }
-            if (status === '3') { fiscalization('TemplateMessage', all) }
+           /* if (status === '3') { fiscalization('TemplateMessage', all) }*/
         }
 
 
@@ -81,7 +81,7 @@
                 window.document.getElementById('main').style.display = 'none'
                 window.document.getElementById('messageErrorAlert').style.display = 'none'
                 window.document.getElementById('Chat').style.display = "block"
-                window.document.getElementById('template').style.display = "block"
+               /* window.document.getElementById('template').style.display = "block"*/
                 window.document.getElementById('GifOrImageHideOrGifHide').style.display = 'none'
                 window.document.getElementById('ImageOrGifHide').style.display = 'inline'
                 entityId = receivedMessage.objectId;
@@ -120,7 +120,7 @@
 
                         if (response.onToken != ''){
                             window.document.getElementById('Chat').style.display = "none"
-                            window.document.getElementById('template').style.display = "none"
+                            /*window.document.getElementById('template').style.display = "none"*/
                             onToken = response.onToken
                         } else {
                             window.document.getElementById('main').style.display = 'none'
