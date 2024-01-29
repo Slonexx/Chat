@@ -175,11 +175,13 @@ class widgetController extends Controller
                 if (strpos($phone, "+7") === 0) {
                     $phone = substr($phone, 2);
                 }
-                if (strlen($phone) < 12) {
-                    // Если меньше 12, добавьте +7
+                if (strlen($phone) < 12 and strpos($phone, "8") === 0) {
                     $phone = "+7" . $phone;
                 }
-                if (strlen($phone) > 12) {
+                if (strpos($phone, "+") === 0) {
+                    $phone = substr($phone, 1);
+                }
+                if (strlen($phone) > 16) {
                     return response()->json([
                         'status' => false,
                         'message' => "Некорректный номер телефона контрагента",
