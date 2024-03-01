@@ -10,5 +10,10 @@ class MainSettings extends Model
     protected $table = "main_settings";
 
     protected $guarded = [];
+
+    public function templates()
+    {
+        return $this->hasMany(Templates::class);
+    }
     
 }

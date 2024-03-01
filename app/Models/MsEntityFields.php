@@ -11,7 +11,7 @@ class MsEntityFields extends Model
 
     protected $guarded = [];
 
-    public function entities()
+    public function entity()
     {
         return $this->belongsTo(MsEntities::class)->withDefault();
     }

@@ -17,7 +17,7 @@ class ExampleSeeder extends Seeder
      */
     public function run()
     {
-        // MainSettings::create([
+        // $main_acc = MainSettings::create([
         //     "account_id" => "",
         //     "ms_token" => "",
         //     "app_id" => "",
@@ -25,6 +25,13 @@ class ExampleSeeder extends Seeder
         //     "password" => "",
         //     "is_activate" => ""
         // ]);
+
+        // $templates = [
+        //     ['title' => 'Уведомление о покупке(без доп поля)', 'content' => 'Здравствуйте, это компания {organization}, вы закали у нас товар на сумму {sum}.'],
+        //     ['title' => 'Адрес доставки', 'content' => 'Здравствуйте, скажите это верный адрес {shipmentAddress} ?'],
+        // ];
+
+        // $main_acc->templates()->createMany($templates);
 
         $msEntities = [
             (object)[
