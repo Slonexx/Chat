@@ -16,6 +16,10 @@ class MsEntities extends Model
         return $this->hasMany(MsEntityFields::class);
     }
 
+    function attributes(){
+        return $this->hasMany(AttributeSettings::class);
+    }
+
     public static function truncateIfNotEmpty()
     {
         $count = self::count();

@@ -33,6 +33,7 @@ Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationCon
 //Setting for
 Route::get('/Setting/template/{accountId}', [templateController::class, 'getCreate'])->name('template');
 Route::post('/Setting/template/{accountId}', [templateController::class, 'postCreate']);
+Route::post('/Setting/getTemplate/{accountId}', [templateController::class, 'getTemplate']);
 
 Route::get('/Setting/template/get/attributes/{accountId}', [templateController::class, 'getAttributes']);
 Route::get('/Setting/template/create/poles/{accountId}', [templateController::class, 'getCreatePoles']);

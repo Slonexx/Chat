@@ -11,6 +11,8 @@ use App\Models\employeeModel;
 use App\Models\organizationModel;
 use App\Models\polesModel;
 use App\Models\templateModel;
+use App\Services\MoySklad\TemplateService;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -276,6 +278,7 @@ class templateController extends Controller
 
     public function getAttributes(Request $request, $accountId): JsonResponse
     {
+
         $client = new MsClient($accountId);
 
         try {
@@ -317,5 +320,28 @@ class templateController extends Controller
             'counterparty' => $counterparty,
         ]);
 
+    }
+    /**
+     * testSet1{
+     * entityType : "demand",
+     * entityId : "277ca4f4-d6d6-11ee-0a80-0cc500080c42",
+     * templateId : "2"
+     * }
+     */
+    function getTemplate(Request $request, $accountId){
+
+        try{
+
+            $templateS = new TemplateService($accountId);
+
+            $entityType = $request->entityType ?? false;
+            $entityId = $request->entityId ?? false;
+            $templateId = $request->templateId ?? false;
+
+            $template = $templateS->getTemplate($entityType, $entityId, $templateId);
+            return $template->data;
+        } catch(Exception $e){
+            return response()->json($e->getMessage(), 500);
+        }
     }
 }

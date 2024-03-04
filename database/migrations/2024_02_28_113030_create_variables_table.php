@@ -22,8 +22,6 @@ return new class extends Migration
             $table->unsignedBigInteger('attribute_settings_id')->nullable();
             $table->foreign('attribute_settings_id')->references('id')->on('attribute_settings');
 
-            $table->string('value', 255);
-
             $table->timestamps();
         });
     }

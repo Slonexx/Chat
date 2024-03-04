@@ -29,9 +29,18 @@ class ExampleSeeder extends Seeder
         // $templates = [
         //     ['title' => 'Уведомление о покупке(без доп поля)', 'content' => 'Здравствуйте, это компания {organization}, вы закали у нас товар на сумму {sum}.'],
         //     ['title' => 'Адрес доставки', 'content' => 'Здравствуйте, скажите это верный адрес {shipmentAddress} ?'],
+        //     ['title' => 'Тестовый шаблон', 'content' => 'Шаблон для отгрузки {name} {agent}, {name}, {organization}, {deliveryPlannedMoment}, {salesChannel}, {rate}, {store}, {contract}, {project}, {shipmentAddress}, {description}, {state}, {sum}, {positions}, это доп поле номер фискализации {фиска}'],
         // ];
 
         // $main_acc->templates()->createMany($templates);
+
+        // $attributes = [
+        //     ['entity_type' => 'demand', 'attribute_id' => 'f6632f44-d621-11ee-0a80-06bd001d6ded', "name" => "фиска"],
+        // если доп поле было удалено соответственно значение не будет подставлено
+        //     ['entity_type' => 'demand', 'attribute_id' => '937c2b42-789b-11ee-0a80-019c001d8878', "name" => "доп.поле2"],
+        // ];
+
+        // $main_acc->attributes()->createMany($attributes);
 
         $msEntities = [
             (object)[
@@ -41,7 +50,7 @@ class ExampleSeeder extends Seeder
                     ['keyword' => 'agent', 'name_RU' => 'Имя контрагента', 'expand_filter' => 'agent'],
                     ['keyword' => 'name', 'name_RU' => 'Название документа', 'expand_filter' => null],
                     ['keyword' => 'organization', 'name_RU' => 'Организация', 'expand_filter' => 'organization'],
-                    ['keyword' => 'deliveryPlannedMoment', 'name_RU' => 'Планируемая дата отгрузки', 'expand_filter' => null],
+                    //['keyword' => 'deliveryPlannedMoment', 'name_RU' => 'Планируемая дата отгрузки', 'expand_filter' => null],
                     ['keyword' => 'salesChannel', 'name_RU' => 'Канал продаж', 'expand_filter' => 'salesChannel'],
                     ['keyword' => 'rate', 'name_RU' => 'Валюта', 'expand_filter' => "rate.currency"],
                     ['keyword' => 'store', 'name_RU' => 'Склад', 'expand_filter' => 'store'],

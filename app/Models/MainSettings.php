@@ -15,5 +15,10 @@ class MainSettings extends Model
     {
         return $this->hasMany(Templates::class);
     }
+
+    public function attributes()
+    {
+        return $this->hasMany(AttributeSettings::class);
+    }
     
 }

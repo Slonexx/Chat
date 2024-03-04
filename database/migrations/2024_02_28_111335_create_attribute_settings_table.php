@@ -15,8 +15,9 @@ return new class extends Migration
     {
         Schema::create('attribute_settings', function (Blueprint $table) {
             $table->id();
-
+            
             $table->string("entity_type", 64);
+            $table->string('name', 255);
             $table->uuid("attribute_id");
             //$table->string("upload", 1);
 
