@@ -30,14 +30,28 @@ Route::get('/Setting/organization/get/Licenses/{accountId}', [organizationContro
 Route::get('/Setting/organization/create/Licenses/{accountId}', [organizationController::class, 'createLicenses']);
 Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationController::class, 'deleteLicenses']);
 
-//Setting for
-Route::get('/Setting/template/{accountId}', [templateController::class, 'getCreate'])->name('template');
+// get list templates to front
 Route::post('/Setting/template/{accountId}', [templateController::class, 'postCreate']);
+Route::get('/Setting/template/{accountId}', [templateController::class, 'getCreated'])->name('template');
+//
+
+// save new templates
+Route::get('/Setting/template/create/poles/{accountId}', [templateController::class, 'getCreatePoles']);
+
+//update block
+//get template text by uuid
+Route::get('/Setting/template/nameuid/poles/{accountId}', [templateController::class, 'getNameUIDPoles']);
+Route::put('/Setting/template/{accountId}', [templateController::class, 'putTemplateByUuid']);
+//
+
+Route::get('/Setting/template/info/fields/', [templateController::class, 'getMainFields']);
+
+
+
+//getTemplateById
 Route::post('/Setting/getTemplate/{accountId}', [templateController::class, 'getTemplate']);
 
 Route::get('/Setting/template/get/attributes/{accountId}', [templateController::class, 'getAttributes']);
-Route::get('/Setting/template/create/poles/{accountId}', [templateController::class, 'getCreatePoles']);
-Route::get('/Setting/template/nameuid/poles/{accountId}', [templateController::class, 'getNameUIDPoles']);
 Route::get('/Setting/template/delete/poles/{accountId}', [templateController::class, 'deletePoles']);
 
 

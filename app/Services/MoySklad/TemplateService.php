@@ -34,6 +34,7 @@ class TemplateService {
     }
 
     function getTemplate($entityType, $entityId, $templateId){
+        //1)prepare
         $res = new Response();
         if(empty($entityType) || empty($entityId) || empty($templateId))
             return $this->res->error(
@@ -60,6 +61,7 @@ class TemplateService {
 
         // $templateWithAttributes = $template->attributes()->get()->toArray();
 
+        //2)get ms_entity_fields and info from Ms 
         $fieldsArray = MsEntities::join('ms_entity_fields', 'ms_entities.id', '=', 'ms_entity_fields.ms_entities_id')
             ->where('ms_entities.keyword', "=",  $entityType)
             ->select('ms_entity_fields.keyword', 'ms_entity_fields.expand_filter')
@@ -78,6 +80,7 @@ class TemplateService {
         $expandedInfo = $expandRes->data;
         $objectWithNeededValues = $service->cutMsObjectFromReqExpand($expandedInfo, $expandParams);
 
+        //3)getTemplate and replace 
         $template = Templates::where('id', $templateId)
             ->get();
 
@@ -98,6 +101,7 @@ class TemplateService {
             ->get()
             ->toArray();
         
+        //4)add. fields
         if($templatesWithAtttributes){
             $templateAttributeValues = [];
             foreach($templatesWithAtttributes as $item){

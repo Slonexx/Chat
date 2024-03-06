@@ -51,14 +51,14 @@
 
             <div class="row">
                 <div class="col">
-                    <div onclick="showHideCreate('1')" class="btn btn-outline-dark gradient_focus"> добавить
+                    <div onclick="showHideCreate('1')" class="btn btn-outline-dark gradient_focus"> Добавить
                     </div>
                 </div>
-                <div class="col">
+                <!-- <div class="col">
                     <div class='d-flex justify-content-end text-black btnP'>
                         <button class="btn btn-outline-dark gradient_focus"> Сохранить</button>
                     </div>
-                </div>
+                </div> -->
             </div>
 
         </form>
@@ -88,6 +88,7 @@
                     </div>
 
                     <div class="modal-body">
+                        <input type="hidden" id="templateId">
                         <div id="messageEmployee" class="alert alert-warning alert-primary fade show in text-center "
                              style="display: none"> Error
                         </div>
@@ -110,29 +111,6 @@
                                        type="checkbox" checked>
                             </div>
                         </div>
-                        <div id="idCreatePole" class="mt-2" style="display: block">
-                            <div id="dev_pole_0" class="mt-2 row">
-                                <div class="col-4">Выберите поле_0</div>
-                                <select id="pole_0" class="col form-select">
-                                    <option value="12">Имя контрагента</option>
-                                    <option value="0">Название документа</option>
-                                    <option selected value="1">Организация (название)</option>
-                                    <option value="2">План отгрузки</option>
-                                    <option value="3">Канал продаж (название)</option>
-                                    <option value="4">Валюта (название)</option>
-                                    <option value="5">Склад (название)</option>
-                                    <option value="6">Договор (номер)</option>
-                                    <option value="7">Проект (название)</option>
-                                    <option value="8">Адрес доставки</option>
-                                    <option value="9">Комментарий</option>
-                                    <option value="10">Статус документа (название)</option>
-                                    <option value="11">Общая сумма товаров (Итого)</option>
-                                </select>
-                                <button onclick="deletePole('dev_pole_0')" type="button"
-                                        class="col-1 btn btn-outline-dark gradient_focus"><i
-                                        class="far fa-times-circle"></i></button>
-                            </div>
-                        </div>
 
                         <div class="mt-1 rounded row gradient">
                             <div class="col-11 mt-1"> Дополнительные поля</div>
@@ -151,7 +129,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button id="addPoles" onclick="fuCreatePole()" type="button"
+                        <button id="addPoles" onclick="" type="button"
                                 class="col-3 btn btn-outline-dark gradient_focus">Добавить поле
                         </button>
                         <button onclick="fuCreateAddPole()" type="button"
@@ -261,7 +239,9 @@
         let accountId = '{{ $accountId }}'
         let saveOrgan = @json($saveOrgan);
         let saveTemplate = @json($template);
+        let fields = getFields();
         let jsonMessage = @json($message);
+
 
         if (jsonMessage !== '') {
             if (jsonMessage === 'Настройки сохранились') {
@@ -276,12 +256,12 @@
             saveTemplate.forEach((item) => {
 
                 $('#main').append(
-                    ' <div id="' + item.name_uid + '" class="row"> ' +
-                    ' <div class="col-3"> ' + item.name + ' </div> ' +
+                    ' <div id="' + item.uuid + '" class="row"> ' +
+                    ' <div class="col"> ' + item.title + ' </div> ' +
                     ' <div class="col"></div> ' +
-                    ' <div  onclick="updateTemplate(\'' + item.name_uid + '\')" class="col-1 btn gradient_focus"> Изменить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                    ' <div  onclick="updateTemplate(\'' + item.uuid + '\')" class="col-1 btn gradient_focus"> Изменить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                     ' <div  class="col-1"> </div> ' +
-                    ' <div onclick="deleteAccount(\'' + item.name_uid + '\' , \'' + item.name + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                    ' <div onclick="deleteAccount(\'' + item.uuid + '\' , \'' + item.title + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                     ' </div> '
                 )
 
@@ -297,11 +277,11 @@
                 messageEmployee.style.display = 'none'
                 messageEmployee.innerText = ''
                 nameTemplate.value = ''
-                idCreatePole.innerText = ''
+                //idCreatePole.innerText = ''
                 idCreateAddPole.innerText = ''
                 messageTextArea.value = ''
                 addPoles.click()
-                pole_1.value = '1'
+                //pole_1.value = '1'
 
                 while (organizationSelect.firstChild) {
                     organizationSelect.removeChild(organizationSelect.firstChild);
@@ -414,6 +394,7 @@
             }
         }
 
+        
 
     </script>
 

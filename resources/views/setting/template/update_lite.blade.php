@@ -26,7 +26,7 @@
 
     function updateTemplate(name_uid){
 
-        idCreatePole.innerText = ''
+        //idCreatePole.innerText = ''
         idCreateAddPole.innerText = ''
 
         isLeading(false);
@@ -43,44 +43,42 @@
             console.log(json);
 
             if (json.status) {
-                nameTemplateUpdate.value = json.data.name;
-                organizationSelectUpdate.value = json.data.organId;
-                messageTextAreaUpdate.value = json.data.message;
+                let templateId = document.getElementById("templateId");
+                templateId.value = name_uid;
+                
+                nameTemplateUpdate.value = json.data.title;
+                //organizationSelectUpdate.value = json.data.organId;
+                messageTextAreaUpdate.value = json.data.content;
 
-
-                let idCreatePole = json.data.idCreatePole;
+                let idCreatePole = fields.responseJSON.data;
                 for (let key in idCreatePole) {
-                    if (idCreatePole.hasOwnProperty(key)) {
-                        let item = idCreatePole[key];
-                        if (item.pole != null) {
-                            fuCreatePoleUpdate();
-                            window.document.getElementById('pole_'+key).value = item.pole;
-                        }
-                    }
+                    let item = idCreatePole[key]
+                    element = createElementForIdUpdate(key, item)
+                    $("#idCreatePoleUpdate").append(element);
                 }
 
-                let idCreateAddPoleUpdate = json.data.idCreateAddPole;
-                for (let key in idCreateAddPoleUpdate) {
-                    if (idCreateAddPoleUpdate.hasOwnProperty(key)) {
-                        let item = idCreateAddPoleUpdate[key];
-                        if (item.add_pole != null) {
-                            fuCreateAddPoleUpdate();
-                        }
-                    }
-                }
+                // let idCreateAddPoleUpdate = json.data.idCreateAddPole;
+                // for (let key in idCreateAddPoleUpdate) {
+                //     if (idCreateAddPoleUpdate.hasOwnProperty(key)) {
+                //         let item = idCreateAddPoleUpdate[key];
+                //         if (item.add_pole != null) {
+                //             fuCreateAddPoleUpdate();
+                //         }
+                //     }
+                // }
 
-                setTimeout(() => f(), 1000);
+                // setTimeout(() => f(), 1000);
 
-                function f() {
-                    for (let key in idCreateAddPoleUpdate) {
-                        if (idCreateAddPoleUpdate.hasOwnProperty(key)) {
-                            let item = idCreateAddPoleUpdate[key];
-                            if (item.add_pole != null) {
-                                window.document.getElementById('add_pole_'+key).value = item.add_pole;
-                            }
-                        }
-                    }
-                }
+                // function f() {
+                //     for (let key in idCreateAddPoleUpdate) {
+                //         if (idCreateAddPoleUpdate.hasOwnProperty(key)) {
+                //             let item = idCreateAddPoleUpdate[key];
+                //             if (item.add_pole != null) {
+                //                 window.document.getElementById('add_pole_'+key).value = item.add_pole;
+                //             }
+                //         }
+                //     }
+                // }
                 isLeading(true);
             } else {
                 messageEmployee.style.display = 'block';
@@ -159,31 +157,12 @@
     }
 
 
-    function createElementForIdUpdate(id, lastNumber) {
-        let newElement = $('<div id="dev_pole_' + id + '" class="mt-2 row">' +
-            '<div class="col-4">Выберите поле_' + id + '</div>' +
-            '<select id="pole_' + id + '" class="col form-select">' +
-            '<option value="12">Имя контрагента</option>' +
-            '<option value="0">Название документа</option>' +
-            '<option value="1">Организация (название)</option>' +
-            '<option value="2">План отгрузки</option>' +
-            '<option value="3">Канал продаж (название)</option>' +
-            '<option value="4">Валюта (название)</option>' +
-            '<option value="5">Склад (название)</option>' +
-            '<option value="6">Договор (номер)</option>' +
-            '<option value="7">Проект (название)</option>' +
-            '<option value="8">Адрес доставки</option>' +
-            '<option value="9">Комментарий</option>' +
-            '<option value="10">Статус документа (название)</option>' +
-            '<option value="11">Общая сумма товаров (Итого)</option>' +
-            '</select>' +
-            '<button onclick="deletePole(\'dev_pole_' + id + '\')" type="button" class="col-1 btn btn-outline-dark gradient_focus"><i class="far fa-times-circle"></i></button>' +
+    function createElementForIdUpdate(key, value) {
+        let newElement = $('<div id="dev_pole_' + value + '" class="mt-2 row">' +
+            '<div class="col-6">' + key + '</div>' +
+            '<div class="col-6">{' + value + '}</div>' +
             '</div>');
-        if (lastNumber === null) {
-            $('#idCreatePoleUpdate').prepend(newElement);
-        } else {
-            $('#dev_pole_' + lastNumber).after(newElement);
-        }
+        return newElement
     }
     function createElementForIdAddUpdate(id, lastNumber) {
         let newElement = $('<div id="dev_add_pole_' + id + '" class="mt-2 row">' +
@@ -245,7 +224,15 @@
             });
     }
 
+    function getFields(){
+        let settings = ajax_settings_with_json(baseURL + 'Setting/template/info/fields' , "GET");
+        return $.ajax(settings).done(function (json) {
+                console.log(baseURL + 'Setting/template/info/fields'   + ' response ↓ ')
+                console.log(json)
 
+            })
+        
+    }
 
 
     function idCreatePoleCheckedUpdate(checked) {

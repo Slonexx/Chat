@@ -56,7 +56,7 @@
                         ' <div id="'+json.data.name_uid+'" class="row"> ' +
                             ' <div class="col-3"> '+nameTemplate.value+' </div> ' +
                             ' <div class="col"></div> ' +
-                            ' <div onclick="updateTemplate(\''+json.data.name_uid+'\')"  class="col-1 btn gradient_focus"> Изменить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                            ' <div onclick="updateTemplate(\''+json.data.uuid+'\')"  class="col-1 btn gradient_focus"> Изменить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                             ' <div  class="col-1"> </div> ' +
                             ' <div onclick="deleteAccount(\''+json.data.name_uid+'\' , \''+json.data.name+'\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                         ' </div> '
@@ -109,15 +109,17 @@
         }
 
         if (req) {
+            let templateId = document.getElementById("templateId").value;
             let data = {
+                uuid: templateId,
                 name:  nameTemplateUpdate.value,
-                organId: organizationSelectUpdate.value,
-                idCreatePole: poles,
-                idCreateAddPole: add_poles,
+                // organId: organizationSelectUpdate.value,
+                // idCreatePole: poles,
+                // idCreateAddPole: add_poles,
                 message: messageTextAreaUpdate.value
             };
 
-            let settings = ajax_settings(baseURL + 'Setting/template/create/poles/' + accountId , "GET", data);
+            let settings = ajax_settings_with_json(baseURL + 'Setting/template/{accountId}' + accountId , "PUT", data);
             $.ajax(settings).done(function (json) {
                 console.log(baseURL + 'Setting/template/create/poles/' + accountId   + ' response ↓ ')
                 console.log(json)
@@ -299,9 +301,10 @@
         } else idCreateAddPole.style.display = 'none'
     }
     function idCreatePoleChecked(checked) {
-        if (checked) {
-            idCreatePole.style.display = 'block'
-        } else idCreatePole.style.display = 'none'
+        if (checked)
+            $("#idCreatePoleUpdate").toggle()
+        else 
+            $("#idCreatePoleUpdate").hide()
     }
 
 

@@ -29,4 +29,16 @@
         }
     }
 
+    function ajax_settings_with_json(url, method, data){
+        return {
+            "url": url,
+            "method": method,
+            "timeout": 0,
+            "headers": {"Content-Type": "application/json",},
+            "data": JSON.stringify(data),
+        }
+    }
+
+    
+
 </script>

@@ -8,10 +8,14 @@ use App\Clients\newClient;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\getBaseTableByAccountId\getMainSettingBD;
 use App\Models\employeeModel;
+use App\Models\MainSettings;
+use App\Models\MsEntityFields;
 use App\Models\organizationModel;
 use App\Models\polesModel;
 use App\Models\templateModel;
+use App\Models\Templates;
 use App\Services\MoySklad\TemplateService;
+use App\Services\Response;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -28,7 +32,7 @@ use JetBrains\PhpStorm\NoReturn;
 
 class templateController extends Controller
 {
-    public function getCreate(Request $request, $accountId): Factory|View|Application
+    public function getCreated(Request $request, $accountId): Factory|View|Application
     {
         $isAdmin = $request->isAdmin;
         $fullName = $request->fullName ?? "Имя аккаунта";
@@ -54,19 +58,25 @@ class templateController extends Controller
 
         //dd($saveOrgan);
 
-        $model = templateModel::where('accountId', $accountId)->get();
-        $Template = [];
-        if (!$existingRecords->isEmpty()) {
-            foreach ($model as $record) {
-                $Template[] = $record->getAttributes();
-            }
-        }
+        $templates = MainSettings::join("templates", "main_settings.id", "=", "templates.main_settings_id")
+        ->where("main_settings.account_id", $accountId)
+        ->select("templates.uuid", "templates.title")
+        ->get()
+        ->toArray();
+
+        // $model = templateModel::where('accountId', $accountId)->get();
+        // $Template = [];
+        // if (!$existingRecords->isEmpty()) {
+        //     foreach ($model as $record) {
+        //         $Template[] = $record->getAttributes();
+        //     }
+        // }
 
         // dd($Template);
 
         return view('setting.template.template', [
             'saveOrgan' => $saveOrgan,
-            'template' => $Template,
+            'template' => $templates,
             'message' => $request->message ?? '',
 
             'accountId' => $accountId,
@@ -96,81 +106,110 @@ class templateController extends Controller
     {
 
         try {
+            $res = new Response();
             $name_uid = (string)Str::uuid();
 
-            $data = json_decode(json_encode([
-                'name' => $request->name ?? '',
-                'name_uid' => $name_uid,
-                'organId' => $request->organId ?? '',
-                'message' => $request->message ?? '',
-
-                'idCreatePole' => $request->idCreatePole ?? [],
-                'idCreateAddPole' => $request->idCreateAddPole ?? [],
-            ]));
+            $dataArray = [
+                'title' => $request->name ?? '',
+                'content' => $request->message ?? '',
+                //'name_uid' => $name_uid,
+                //'organId' => $request->organId ?? '',
+                //'idCreatePole' => $request->idCreatePole ?? [],
+                //'idCreateAddPole' => $request->idCreateAddPole ?? [],
+            ];
+            $data = json_decode(json_encode($dataArray));
             $idCreatePole = $request->idCreatePole ?? [];
             $idCreateAddPole = $request->idCreateAddPole ?? [];
 
 
             $model = new templateModel();
-            $existingRecords = templateModel::where('accountId', $accountId)->where('name', $data->name)->get();
-
+            
+            $existingRecords = MainSettings::join("templates", "main_settings.id", "=", "templates.main_settings_id")
+            ->where("main_settings.account_id", $accountId)
+            ->where("templates.title", $data->title)
+            ->get("templates.*");
+            
             if (!$existingRecords->isEmpty()) {
-                foreach ($existingRecords as $record) {
-                    $polesModel = polesModel::where('accountId', $accountId)->where('name_uid', ($record->toArray())['name_uid'])->get();
-                    if (!$polesModel->isEmpty()) {
-                        foreach ($polesModel as $item) {
-                            $item->delete();
-                        }
-                    }
+                foreach($existingRecords as $record)
                     $record->delete();
-                }
             }
 
-            $model->accountId = $accountId;
-            $model->organId = $data->organId;
+            $setting = MainSettings::where("account_id", $accountId)->get();
 
-            $model->name = $data->name;
-            $model->name_uid = $name_uid;
+            if($setting->isEmpty()){
+                $er = $res->error($setting, 'Настройки по данному accountId не найдены');
+                return response()->json($er);
+            }
+            //из коллекции достали и сказали создай в шаблонах
+            $setting->first()->templates()->create($dataArray);
 
-            $model->message = $data->message;
-            $model->save();
+            $success = $res->success($data, 'Успешно сохранено');
+            return response()->json($success);
+
+            //$template = new Templates();
+            
+            //::where('accountId', $accountId)->where('name', $data->name)->get();
+
+            //проверка на имя
 
 
-            if (count($idCreatePole) + count($idCreateAddPole) > 0)
-                if ((count($idCreatePole) >= count($idCreateAddPole))) {
-                    foreach ($data->idCreatePole as $id => $item) {
-                        $model = new polesModel();
-                        $model->accountId = $accountId;
-                        $model->name = $data->name;
-                        $model->name_uid = $name_uid;
+            // if (!$existingRecords->isEmpty()) {
+            //     foreach ($existingRecords as $record) {
+            //         $polesModel = polesModel::where('accountId', $accountId)->where('name_uid', ($record->toArray())['name_uid'])->get();
+            //         if (!$polesModel->isEmpty()) {
+            //             foreach ($polesModel as $item) {
+            //                 $item->delete();
+            //             }
+            //         }
+            //         $record->delete();
+            //     }
+            // }
 
-                        $model->i = $id;
-                        if (isset($data->idCreatePole->$id)) $model->pole = $data->idCreatePole->$id;
-                        else $model->pole = null;
-                        if (isset($data->idCreateAddPole->$id)) $model->add_pole = $data->idCreateAddPole->$id;
-                        else $model->add_pole = null;
-                        $model->entity = null;
+            // $model->accountId = $accountId;
+            // $model->organId = $data->organId;
 
-                        $model->save();
-                    }
-                } else {
-                    foreach ($data->idCreateAddPole as $id => $item) {
-                        $model = new polesModel();
-                        $model->accountId = $accountId;
-                        $model->name = $data->name;
-                        $model->name_uid = $name_uid;
+            // $model->name = $data->name;
+            // $model->name_uid = $name_uid;
 
-                        $model->i = $id;
-                        if (isset($data->idCreatePole->$id)) $model->pole = $data->idCreatePole->$id;
-                        else $model->pole = null;
-                        if (isset($data->idCreateAddPole->$id)) $model->add_pole = $data->idCreateAddPole->$id;
-                        else $model->add_pole = null;
-                        $model->entity = null;
+            // $model->message = $data->message;
+            // $model->save();
 
-                        $model->save();
-                    }
-                }
-        } catch (BadResponseException $e) {
+
+            // if (count($idCreatePole) + count($idCreateAddPole) > 0)
+            //     if ((count($idCreatePole) >= count($idCreateAddPole))) {
+            //         foreach ($data->idCreatePole as $id => $item) {
+            //             $model = new polesModel();
+            //             $model->accountId = $accountId;
+            //             $model->name = $data->name;
+            //             $model->name_uid = $name_uid;
+
+            //             $model->i = $id;
+            //             if (isset($data->idCreatePole->$id)) $model->pole = $data->idCreatePole->$id;
+            //             else $model->pole = null;
+            //             if (isset($data->idCreateAddPole->$id)) $model->add_pole = $data->idCreateAddPole->$id;
+            //             else $model->add_pole = null;
+            //             $model->entity = null;
+
+            //             $model->save();
+            //         }
+            //     } else {
+            //         foreach ($data->idCreateAddPole as $id => $item) {
+            //             $model = new polesModel();
+            //             $model->accountId = $accountId;
+            //             $model->name = $data->name;
+            //             $model->name_uid = $name_uid;
+
+            //             $model->i = $id;
+            //             if (isset($data->idCreatePole->$id)) $model->pole = $data->idCreatePole->$id;
+            //             else $model->pole = null;
+            //             if (isset($data->idCreateAddPole->$id)) $model->add_pole = $data->idCreateAddPole->$id;
+            //             else $model->add_pole = null;
+            //             $model->entity = null;
+
+            //             $model->save();
+            //         }
+            //     }
+        } catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage()
@@ -188,43 +227,57 @@ class templateController extends Controller
     function getNameUIDPoles(Request $request, $accountId): JsonResponse
     {
         try {
+            $res = new Response();
             $nameUID = $request->nameUID ?? "";
 
-            $data = [
-                'name' => "",
-                'name_uid' => $nameUID,
-                'organId' => "",
-                'message' => "",
+            $template = Templates::where("uuid", $nameUID)
+                ->select("title", "content", "uuid")
+                ->get();
 
-                'idCreatePole' => [],
-                'idCreateAddPole' => [],
-            ];
-
-
-            $templateModel = templateModel::where('accountId', $accountId)->where('name_uid', $nameUID)->get();
-
-            if (!$templateModel->isEmpty()) {
-                foreach ($templateModel as $record) {
-                    $item_record = json_decode(json_encode($record->toArray()));
-
-                    $data['name'] = $item_record->name;
-                    $data['organId'] = $item_record->organId;
-                    $data['message'] = $item_record->message;
-
-                    $polesModel = polesModel::where('accountId', $accountId)->where('name_uid', $item_record->name_uid)->get();
-                    if (!$polesModel->isEmpty()) {
-                        foreach ($polesModel as $item) {
-                            $data['idCreatePole'][$item->i] = [
-                                'pole' => $item->pole,
-                            ];
-                            $data['idCreateAddPole'][$item->i] = [
-                                'add_pole' => $item->add_pole,
-                            ];
-                        }
-                    }
-                }
+            if($template->isEmpty()){
+                return $res->error($template->first(), "Не найден шаблон по данному uuid");
+            } else {
+                $templateContent = $template->first();
+                $templateRes = $res->success($templateContent);
+                return response()->json($templateRes);
             }
-        } catch (BadResponseException $e){
+
+
+            // $data = [
+            //     'name' => "",
+            //     'name_uid' => $nameUID,
+            //     'organId' => "",
+            //     'message' => "",
+
+            //     'idCreatePole' => [],
+            //     'idCreateAddPole' => [],
+            // ];
+
+
+            // $templateModel = templateModel::where('accountId', $accountId)->where('name_uid', $nameUID)->get();
+
+            // if (!$templateModel->isEmpty()) {
+            //     foreach ($templateModel as $record) {
+            //         $item_record = json_decode(json_encode($record->toArray()));
+
+            //         $data['name'] = $item_record->name;
+            //         $data['organId'] = $item_record->organId;
+            //         $data['message'] = $item_record->message;
+
+            //         $polesModel = polesModel::where('accountId', $accountId)->where('name_uid', $item_record->name_uid)->get();
+            //         if (!$polesModel->isEmpty()) {
+            //             foreach ($polesModel as $item) {
+            //                 $data['idCreatePole'][$item->i] = [
+            //                     'pole' => $item->pole,
+            //                 ];
+            //                 $data['idCreateAddPole'][$item->i] = [
+            //                     'add_pole' => $item->add_pole,
+            //                 ];
+            //             }
+            //         }
+            //     }
+            // }
+        } catch (Exception $e){
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage()
@@ -232,10 +285,10 @@ class templateController extends Controller
         }
 
 
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+        // return response()->json([
+        //     'status' => true,
+        //     'data' => $data
+        // ]);
 
 
     }
@@ -282,31 +335,31 @@ class templateController extends Controller
         $client = new MsClient($accountId);
 
         try {
-            $customerorder = $client->get('https://online.moysklad.ru/api/remap/1.2/entity/customerorder/metadata/attributes/');
+            $customerorder = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/customerorder/metadata/attributes/');
         } catch (BadResponseException) {
             $customerorder = null;
         }
 
         try {
-            $demand = $client->get('https://online.moysklad.ru/api/remap/1.2/entity/demand/metadata/attributes/');
+            $demand = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/demand/metadata/attributes/');
         } catch (BadResponseException) {
             $demand = null;
         }
 
         try {
-            $salesreturn = $client->get('https://online.moysklad.ru/api/remap/1.2/entity/salesreturn/metadata/attributes/');
+            $salesreturn = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/salesreturn/metadata/attributes/');
         } catch (BadResponseException) {
             $salesreturn = null;
         }
 
         try {
-            $invoiceout = $client->get('https://online.moysklad.ru/api/remap/1.2/entity/invoiceout/metadata/attributes/');
+            $invoiceout = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/invoiceout/metadata/attributes/');
         } catch (BadResponseException) {
             $invoiceout = null;
         }
 
         try {
-            $counterparty = $client->get('https://online.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/');
+            $counterparty = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/');
         } catch (BadResponseException) {
             $counterparty = null;
         }
@@ -344,4 +397,45 @@ class templateController extends Controller
             return response()->json($e->getMessage(), 500);
         }
     }
+
+    function putTemplateByUuid(Request $request, $accountId){
+        try{
+            $res = new Response();
+            $UUID = $request->uuid ?? "";
+            // при желании можно сделать обновление названия
+            //$title = $request->name ?? "";
+            $content = $request->message ?? "";
+            
+            $collectionTemplate = Templates::where("uuid", $UUID)->get();
+            if($collectionTemplate->isEmpty()) {
+                $er = $res->error($collectionTemplate->first(), "Не найден шаблон по данному uuid");
+                return response()->json($er);
+            } 
+
+            $template = $collectionTemplate->first();
+            //$template->title = $title;
+            $template->content = $content;
+            $template->save();
+
+            $templateRes = $res->success("+");
+            return response()->json($templateRes);
+        } catch(Exception $e){
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    function getMainFields(Request $request){
+        $res = new Response();
+        $templates = MsEntityFields::pluck('keyword', 'name_RU')->unique();
+        if($templates->isEmpty()){
+            $er = $res->error($templates->toArray(), "Не найден шаблон по данному uuid");
+            return response()->json($er);
+        } else {
+            $success = $res->success($templates->toArray());
+            return response()->json($success);
+        }
+
+    }
+
+
 }
