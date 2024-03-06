@@ -44,6 +44,10 @@ Route::get('/Setting/template/nameuid/poles/{accountId}', [templateController::c
 Route::put('/Setting/template/{accountId}', [templateController::class, 'putTemplateByUuid']);
 //
 
+//delete
+Route::delete('Setting/template/{accountId}/{uuid}', [templateController::class, 'deleteTemplate']);
+
+
 Route::get('/Setting/template/info/fields/', [templateController::class, 'getMainFields']);
 
 

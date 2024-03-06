@@ -106,7 +106,7 @@
         let arrayMessageTemplate
 
 
-        /*let receivedMessage = {
+        let receivedMessage = {
             "name":"OpenPopup",
             "messageId":1,
             "popupName":"TemplateMessage",
@@ -118,17 +118,17 @@
 
                     "build_query":"",
 
-                    "employee":"e793faeb-e63a-11ec-0a80-0b4800079eb3",
+                    "employee":"9989675d-5130-11ee-0a80-0c7f00028929",
                     "license_id":"36651",
                     "license_full":"Chat Line Test name#36651",
                     "nameAgent":"Сергей",
                     "phone":"+77750498888",
 
             }
-        };*/
+        };
 
         window.addEventListener("message", function(event) {
-        let receivedMessage = event.data
+        //let receivedMessage = event.data
             search.value = '';
             toc.innerText = '';
             textMessage.value = '';
@@ -151,7 +151,7 @@
 
                 nameAgent.innerText = agent
                 phoneAgent.innerText = phone
-            //receivedMessage = []
+            receivedMessage = []
 
                 let data = {
                     accountId: accountId,

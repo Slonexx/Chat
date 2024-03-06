@@ -27,9 +27,9 @@
                 <button onclick="PopupShow('1')" class="w-100 btn btn-outline-dark gradient_focus"> Общий чат </button>
             </div>
         </div>
-       {{-- <div class="row mt-2 text-center m-2">
+        <div class="row mt-2 text-center m-2">
                 <button id="template" onclick="PopupShow('3')" class="btn btn-outline-dark gradient_focus"> Отправить шаблон </button>
-        </div>--}}
+        </div>
     </div>
 
 
@@ -56,7 +56,7 @@
         function PopupShow(status){
             if (status === '1') { fiscalization("Show", onToken) }
             if (status === '2') { fiscalization("Show", all) }
-           /* if (status === '3') { fiscalization('TemplateMessage', all) }*/
+            if (status === '3') { fiscalization('TemplateMessage', all) }
         }
 
 
@@ -64,24 +64,24 @@
 
 
 
-        /*let receivedMessage = {
+        let receivedMessage = {
             "name":"Open",
             "extensionPoint":"document.customerorder.edit",
             "objectId":"5f3023e9-05b3-11ee-0a80-06f20001197a",
             "messageId":5,
             "displayMode":"expanded"
-            }*/
+            }
 
 
         window.addEventListener("message", function(event) {
 
-            const receivedMessage = event.data;
+        //const receivedMessage = event.data;
 
             if (receivedMessage.name === 'Open') { hostWindow.postMessage({ name: "OpenFeedback",  correlationId: receivedMessage.messageId}, '*');
                 window.document.getElementById('main').style.display = 'none'
                 window.document.getElementById('messageErrorAlert').style.display = 'none'
                 window.document.getElementById('Chat').style.display = "block"
-               /* window.document.getElementById('template').style.display = "block"*/
+                window.document.getElementById('template').style.display = "block"
                 window.document.getElementById('GifOrImageHideOrGifHide').style.display = 'none'
                 window.document.getElementById('ImageOrGifHide').style.display = 'inline'
                 entityId = receivedMessage.objectId;
@@ -92,7 +92,7 @@
                     employee: employee,
                 };
 
-                //receivedMessage = []
+                receivedMessage = []
 
                 let settings = ajax_settings("{{ Config::get("Global.url") }}"+'widget/get/Data', 'GET', data)
                 console.log('Widget setting attributes: ↓')

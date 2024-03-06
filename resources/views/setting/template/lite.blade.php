@@ -121,7 +121,7 @@
 
             let settings = ajax_settings_with_json(baseURL + 'Setting/template/{accountId}' + accountId , "PUT", data);
             $.ajax(settings).done(function (json) {
-                console.log(baseURL + 'Setting/template/create/poles/' + accountId   + ' response ↓ ')
+                console.log(baseURL + 'Setting/template/' + accountId   + ' response ↓ ')
                 console.log(json)
 
                 if (json.status) {
@@ -293,6 +293,16 @@
 
 
     function deletePole(id){ window.document.getElementById(id).remove() }
+
+    function deleteTemplate(uuid){
+        let settings = ajax_settings_with_json(baseURL + `Setting/template/${accountId}/${uuid}` , "DELETE");
+        $.ajax(settings).done(function (json) {
+                console.log(baseURL + `Setting/template/${accountId}/${uuid}`   + ' response ↓ ')
+                console.log(json)
+
+            })
+        document.getElementById(uuid).remove() 
+    }
 
 
     function idCreateAddPoleChecked(checked){

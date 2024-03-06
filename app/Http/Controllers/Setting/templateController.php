@@ -405,7 +405,8 @@ class templateController extends Controller
             // при желании можно сделать обновление названия
             //$title = $request->name ?? "";
             $content = $request->message ?? "";
-            
+            //чисто теоретически клиент Б может поменять текст шаблона клиента А зная его UUID. 
+            //Но так как клиенту выдаются только его шаблоны это не представляется возможным
             $collectionTemplate = Templates::where("uuid", $UUID)->get();
             if($collectionTemplate->isEmpty()) {
                 $er = $res->error($collectionTemplate->first(), "Не найден шаблон по данному uuid");
@@ -425,16 +426,41 @@ class templateController extends Controller
     }
 
     function getMainFields(Request $request){
-        $res = new Response();
-        $templates = MsEntityFields::pluck('keyword', 'name_RU')->unique();
-        if($templates->isEmpty()){
-            $er = $res->error($templates->toArray(), "Не найден шаблон по данному uuid");
-            return response()->json($er);
-        } else {
-            $success = $res->success($templates->toArray());
-            return response()->json($success);
+        try{
+            $res = new Response();
+            $templates = MsEntityFields::pluck('keyword', 'name_RU')->unique();
+            if($templates->isEmpty()){
+                $er = $res->error($templates->toArray(), "Не найден шаблон по данному uuid");
+                return response()->json($er);
+            } else {
+                $success = $res->success($templates->toArray());
+                return response()->json($success);
+            }
+        } catch(Exception $e){
+            return response()->json($e->getMessage(), 500);
         }
 
+    }
+
+    function deleteTemplate($accountId, $uuid){
+        try{
+            $res = new Response();
+            $setting = MainSettings::where("account_id", $accountId)->get();
+
+            if($setting->isEmpty()){
+                $er = $res->error($setting, 'Настройки по данному accountId не найдены');
+                return response()->json($er);
+            }
+            $setting->first()
+                ->templates()
+                ->where("uuid", $uuid)
+                ->delete();
+
+            $success = $res->success("", 'Успешно удалено');
+            return response()->json($success);
+        } catch(Exception $e){
+            return response()->json($e->getMessage(), 500);
+        }
     }
 
 

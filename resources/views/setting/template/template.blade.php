@@ -1,5 +1,4 @@
 @extends('layout')
-@section('item', 'link_4')
 @section('content')
     @include('setting.script_setting_app')
 
@@ -105,13 +104,13 @@
                         <hr>
 
                         <div class="rounded row gradient">
-                            <div class="col-11 mt-1"> Основные поля</div>
+                            <div class="col-11 mt-1">Основные поля</div>
                             <div class="col form-check form-switch">
                                 <input onchange="idCreatePoleChecked(this.checked)" class="mt-2 form-check-input"
                                        type="checkbox" checked>
                             </div>
                         </div>
-
+                        <div id="idCreatePole" class="mt-2" style="display: block"></div>
                         <div class="mt-1 rounded row gradient">
                             <div class="col-11 mt-1"> Дополнительные поля</div>
                             <div class="col form-check form-switch">
@@ -261,7 +260,7 @@
                     ' <div class="col"></div> ' +
                     ' <div  onclick="updateTemplate(\'' + item.uuid + '\')" class="col-1 btn gradient_focus"> Изменить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                     ' <div  class="col-1"> </div> ' +
-                    ' <div onclick="deleteAccount(\'' + item.uuid + '\' , \'' + item.title + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                    ' <div onclick="deleteTemplate(\'' + item.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                     ' </div> '
                 )
 
@@ -330,7 +329,14 @@
                     });
                 }
                 isLeading(true)
+                let idCreatePole = fields.responseJSON.data;
+                for (let key in idCreatePole) {
+                    let item = idCreatePole[key]
+                    element = createElementForIdUpdate(key, item)
+                    $("#idCreatePole").append(element);
+                }
             } else {
+                $("#idCreatePole").empty()
                 $('#createOrganization').modal('toggle')
             }
         }
