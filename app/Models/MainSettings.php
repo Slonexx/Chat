@@ -20,5 +20,16 @@ class MainSettings extends Model
     {
         return $this->hasMany(AttributeSettings::class);
     }
+
+    static function getGrouppedAttributes($accountId){
+        return MainSettings::join('attribute_settings', "main_settings.id", "=", "attribute_settings.main_settings_id")
+            ->where("account_id", $accountId)
+            ->get()
+            ->groupBy('entity_type') // Замените 'column_name' на название столбца, по которому нужно сгруппировать
+            ->map(function ($group) {
+                return $group->pluck('attribute_id', 'name'); // Выбираем столбец 'value' в качестве значения и столбец 'id' в качестве ключа
+            })
+            ->toArray();
+    }
     
 }

@@ -357,7 +357,7 @@
     }
 
 
-    function isLeading(params) {
+    function isLoading(params) {
         if (params) {
             updateGifOrImageHide.style.display = ""
             updateImageOrGifHide.style.display = "none"

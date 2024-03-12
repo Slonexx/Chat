@@ -1,11 +1,11 @@
 @extends('layout')
-@section('item', 'link_5')
+@section('item', 'link_4')
 @section('content')
     @include('setting.script_setting_app')
 
     <div class="mx-1 mt-3 py-3 p-4 bg-white rounded">
         <div class="row  gradient rounded p-2 pb-2 mt-1" style="margin-top: -1rem">
-            <div class="col-6" style="margin-top: 0.25rem"><span class="text-black" style="font-size: 20px"> Настройки → Шаблон сообщений  </span>
+            <div class="col-6" style="margin-top: 0.25rem"><span class="text-black" style="font-size: 20px"> Настройки → Дополнительные поля  </span>
             </div>
             <div class="col-3 d-flex justify-content-end ">
             </div>
@@ -35,9 +35,9 @@
             <div class="">
 
                 <div class="row bg-info rounded text-white">
-                    <div class="col-3"> Название</div>
+                    <div class="col-6"> Название</div>
                     <div class="col"></div>
-                    <div class="col-1 text-center"> Изменить</div>
+                    <div class="col-3 text-center"> Документ / Сущность</div>
                     <div class="col-1"></div>
                     <div class="col-1 text-center"> Удалить</div>
                 </div>
@@ -54,11 +54,6 @@
                     <div onclick="showHideCreate('1')" class="btn btn-outline-dark gradient_focus"> Добавить
                     </div>
                 </div>
-                <!-- <div class="col">
-                    <div class='d-flex justify-content-end text-black btnP'>
-                        <button class="btn btn-outline-dark gradient_focus"> Сохранить</button>
-                    </div>
-                </div> -->
             </div>
 
         </form>
@@ -95,43 +90,19 @@
 
                         <div class="mt-2 row">
                             <div class="col-4">Название</div>
-                            <input id="nameTemplate" class="form-control col" type="text"
+                            <input id="nameAddField" class="form-control col" type="text"
                                    placeholder="Придумайте название для шаблона">
                         </div>
                         <div class="mt-2 row">
-                            <div class="col-4">Организация</div>
-                            <select id="organizationSelect" class="col form-select"> </select>
+                            <div class="col-4">Доп. поле</div>
+                            <select id="msAddField" class="col form-select"> </select>
                         </div>
                         <hr>
-
-                        <div class="rounded row gradient">
-                            <div class="col-11 mt-1">Основные поля</div>
-                            <div class="col form-check form-switch">
-                                <input onchange="idCreatePoleChecked('idCreatePole', this.checked)" class="mt-2 form-check-input"
-                                       type="checkbox" checked>
-                            </div>
-                        </div>
-                        <div id="idCreatePole" class="mt-2" style="display: block"></div>
-                        <div class="mt-1 rounded row gradient">
-                            <div class="col-11 mt-1"> Дополнительные поля</div>
-                            <div class="col form-check form-switch">
-                                <input id="idCreateAddPoleInput" onchange="idCreateAddPoleChecked(this.checked)"
-                                       class="mt-2 form-check-input" type="checkbox">
-                            </div>
-                        </div>
-                        <div id="idCreateAddPole" class="mt-2" style="display: none"></div>
-
-                        <hr>
-                        <textarea id="messageTextArea" class="form-control" rows="3"
-                                  placeholder="Пример: 'Здравствуйте, это компания поле_1, хотите сделать еще заказ ?'"></textarea>
 
 
                     </div>
 
                     <div class="modal-footer">
-                        <button id="addPoles" onclick="" type="button"
-                                class="col-3 btn btn-outline-dark gradient_focus">Добавить поле
-                        </button>
                         <button onclick="fuCreateAddPole()" type="button"
                                 class="col-3 btn btn-outline-dark gradient_focus">Добавить доп поле
                         </button>
@@ -230,62 +201,76 @@
         </div>
     </div>
 
-    @include('setting.template.baseFunction')
-    @include('setting.template.lite')
-    @include('setting.template.update_lite')
+    @include('setting.add_fields.baseFunction')
+    @include('setting.add_fields.lite')
+    @include('setting.add_fields.update_lite')
 
     <script>
         const baseURL = '{{  ( Config::get("Global") )['url'] }}'
         let accountId = '{{ $accountId }}'
-        let saveOrgan = @json($saveOrgan);
-        let saveTemplate = @json($template);
-        let fields = getFields();
-        let jsonMessage = @json($message);
+
+        let addFields = @json($addFieldsWithValues);
+        let availableFields = @json($attributesWithoutFilled);
 
 
-        if (jsonMessage !== '') {
-            if (jsonMessage === 'Настройки сохранились') {
-                alertViewByColorName("success", jsonMessage)
-            } else {
-                alertViewByColorName("danger", jsonMessage)
-            }
-        }
+        if(Array.isArray(addFields)){
+            addFields.forEach((entityType) => {
+                if(Array.isArray(addFields)){
+                    entityType.forEach((name, uuid)=>{
+                        $('#main').append(
+                            ' <div id="' + uuid + '" class="row"> ' +
+                            ' <div class="col"> ' + name + ' </div> ' +
+                            ' <div class="col"></div> ' +
+                            ` <div class="col-1"> ${entityType} </div> ` +
+                            ' <div  class="col-1"> </div> ' +
+                            ' <div onclick="deleteTemplate(\'' + uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                            ' </div> '
+                        )
+        
+                    })
+                } else {
+                    $('#main').append(
+                        ' <div id="' + addFields.uuid + '" class="row"> ' +
+                        ' <div class="col-6"> ' + addFields.name + ' </div> ' +
+                        ' <div class="col"></div> ' +
+                        ` <div class="col-2" text-center> ${entityType} </div> ` +
+                        ' <div class="col-1"> </div> ' +
+                        ' <div class="col-1" text-center>onclick="deleteTemplate(\'' + addFields.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                        ' </div> '
+                    )
+                }
+    
+            });
+        } else {
+            let addFieldsKey = Object.keys(addFields)[0];
+            let currentEntityType = addFields[addFieldsKey];
+            const entriesFields = Object.entries(currentEntityType);
+            const associativeArray = [];
 
-
-        if (saveTemplate.length > 0) {
-            saveTemplate.forEach((item) => {
-
+            for (const [name, uuid] of entriesFields) {
                 $('#main').append(
-                    ' <div id="' + item.uuid + '" class="row"> ' +
-                    ' <div class="col"> ' + item.title + ' </div> ' +
+                    ' <div id="' + uuid + '" class="row"> ' +
+                    ' <div class="col"> ' + name + ' </div> ' +
                     ' <div class="col"></div> ' +
-                    ' <div  onclick="updateTemplate(\'' + item.uuid + '\')" class="col-1 btn gradient_focus"> Изменить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                    ` <div class="col-3 text-center"> ${addFieldsKey} </div> ` +
                     ' <div  class="col-1"> </div> ' +
-                    ' <div onclick="deleteTemplate(\'' + item.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                    ' <div onclick="deleteTemplate(\'' + uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                     ' </div> '
                 )
-
-            });
+            }
         }
-
-        //getAttributes()
 
         function showHideCreate(val) {
             if (val === '1') {
                 $('#createOrganization').modal('toggle')
-                isLeading(false)
+                isLoading(false)
                 messageEmployee.style.display = 'none'
                 messageEmployee.innerText = ''
                 nameTemplate.value = ''
-                //idCreatePole.innerText = ''
-                idCreateAddPole.innerText = ''
-                messageTextArea.value = ''
-                addPoles.click()
-                //pole_1.value = '1'
 
-                while (organizationSelect.firstChild) {
-                    organizationSelect.removeChild(organizationSelect.firstChild);
-                }
+                // while (organizationSelect.firstChild) {
+                //     organizationSelect.removeChild(organizationSelect.firstChild);
+                // }
 
                 if (saveOrgan.length > 0) {
                     saveOrgan.forEach((item) => {
@@ -339,65 +324,6 @@
             } else {
                 $("#idCreatePole").empty()
                 $('#createOrganization').modal('toggle')
-            }
-        }
-
-        function showHideCreateUpdate(val) {
-            if (val === '1') {
-                $('#updateOrganization').modal('toggle')
-
-                isLeading(false)
-
-                idCreatePoleUpdate.innerText = ''
-                idCreateAddPoleUpdate.innerText = ''
-
-                while (organizationSelectUpdate.firstChild) organizationSelectUpdate.removeChild(organizationSelectUpdate.firstChild);
-
-                if (saveOrgan.length > 0) {
-                    saveOrgan.forEach((item) => {
-                        let option1 = document.createElement("option");
-                        option1.text = item.organName;
-                        option1.value = item.organId;
-
-                        // Проверяем, есть ли уже такая опция в селекте
-                        let optionExists = false;
-                        for (let i = 0; i < organizationSelectUpdate.options.length; i++) {
-                            if (organizationSelectUpdate.options[i].value === option1.value || organizationSelectUpdate.options[i].text === option1.text) {
-                                optionExists = true;
-                                break;
-                            }
-                        }
-
-                        if (!optionExists) {
-                            organizationSelectUpdate.appendChild(option1);
-                        }
-                    });
-                } else {
-                    messageEmployee.style.display = 'block';
-                    messageEmployee.innerText = 'Отсутствует связи с "Организации и линии"';
-
-                    saveOrgan.forEach((item) => {
-                        let option1 = document.createElement("option");
-                        option1.text = "Все организации";
-                        option1.value = "0";
-
-                        // Проверяем, есть ли уже такая опция в селекте
-                        let optionExists = false;
-                        for (let i = 0; i < organizationSelectUpdate.options.length; i++) {
-                            if (organizationSelectUpdate.options[i].value === option1.value || organizationSelectUpdate.options[i].text === option1.text) {
-                                optionExists = true;
-                                break;
-                            }
-                        }
-
-                        if (!optionExists) {
-                            organizationSelectUpdate.appendChild(option1);
-                        }
-                    });
-                }
-                isLeading(true)
-            } else {
-                $('#updateOrganization').modal('toggle')
             }
         }
 

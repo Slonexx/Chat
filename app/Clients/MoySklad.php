@@ -50,7 +50,7 @@ class MoySklad {
         $body = $response->getBody()->getContents();
         $responseData = json_decode($body);
         $statusCode = $response->getStatusCode();
-        $statusCondition = $statusCode <= 400;
+        $statusCondition = $statusCode < 400;
 
         return $res->customResponse($responseData, $statusCode, $statusCondition);
     }

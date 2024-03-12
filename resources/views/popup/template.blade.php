@@ -19,8 +19,8 @@
                     </div>
                 </div>
                 <hr>
-                <ul id="toc" class="toc-list-h1">
-
+                <!-- <div id="templates" class="mt-2" style="display: block"></div> -->
+                <ul id="toc" class="toc-list-h1-title" style="display: block">
                 </ul>
             </div>
             <div class="page-wrapper content-container" style="height: 100vh;">
@@ -113,8 +113,8 @@
             "popupParameters":
                 {
                     "accountId":"1dd5bd55-d141-11ec-0a80-055600047495",
-                    "object_Id":"5f3023e9-05b3-11ee-0a80-06f20001197a",
-                    "entity_type":"customerorder",
+                    "object_Id":"277ca4f4-d6d6-11ee-0a80-0cc500080c42",
+                    "entity_type":"demand",
 
                     "build_query":"",
 
@@ -122,7 +122,7 @@
                     "license_id":"36651",
                     "license_full":"Chat Line Test name#36651",
                     "nameAgent":"Сергей",
-                    "phone":"+77750498888",
+                    "phone":"+77777492857",
 
             }
         };
@@ -130,7 +130,7 @@
         window.addEventListener("message", function(event) {
         //let receivedMessage = event.data
             search.value = '';
-            toc.innerText = '';
+            //toc.innerText = '';
             textMessage.value = '';
             errorMessageInContent.style.display = 'none';
             successMessageInContent.style.display = 'none';
@@ -169,7 +169,12 @@
                     phone: phone,
                 };
 
-                let settings = ajax_settings(url + "/get/All", "GET", data);
+                let dataForTemplatesRequest = {
+                    accountId: accountId,
+                    object_Id: object_Id,
+                    entity_type: entity_type
+                }
+                let settings = ajax_settings(url + "/get/All", "GET", dataForTemplatesRequest);
                 $.ajax(settings).done(function (json) {
                     console.log(url + entity_type + "/get/All" + ' response ↓ ')
                     console.log(json)
@@ -178,10 +183,25 @@
                         arrayMessageTemplate = json.data;
                         window.document.getElementById('phoneOrName').value = phone;
 
-                        (json.data).forEach((item, id) => {
-                            $('#toc').append(
-                                $('<li><a class="mx-1"> <button onclick="innerTemplateMessage(\'' + id + '\')" class="btn">' + item.name + '</button></a></li>')
-                            );
+                        (json.data).forEach((item) => {
+                            const li = document.createElement('li');
+
+                            const link = document.createElement('a');
+                            link.className = 'mx-1';
+
+                            const button = document.createElement('button');
+                            button.id = item.uuid;
+                            button.onclick = innerTemplateMessage
+                            button.type = "button" 
+                            button.className= "btn"
+                            button.innerText = item.title
+
+                            link.appendChild(button);
+                            li.appendChild(link);
+
+                            ul = document.getElementById('toc');
+
+                            ul.appendChild(li);
                         });
 
                         let option1 = document.createElement("option")
@@ -259,7 +279,7 @@
         }
 
         function searchTemplate() {
-            toc.innerText = '';
+            //toc.innerText = '';
 
             let data = {
                 accountId: accountId,
@@ -279,9 +299,9 @@
                     window.document.getElementById('phoneOrName').value = phone;
 
                     (json.data).forEach((item, id) => {
-                        $('#toc').append(
-                            $('<li><a class="mx-1"> <button onclick="innerTemplateMessage(\'' + id + '\')" class="btn">' + item.name + '</button></a></li>')
-                        );
+                        // $('#templates').append(
+                        //     $('<li><a class="mx-1"> <button onclick="innerTemplateMessage(\'' + id + '\')" class="btn">' + item.name + '</button></a></li>')
+                        // );
                     });
 
                     let option1 = document.createElement("option")
@@ -353,6 +373,14 @@
             })
         }
 
+        function createElementForIdUpdate(key, value) {
+            let newElement = $('<div id="dev_pole_' + value + '" class="mt-2 row">' +
+                '<div class="col-6">' + key + '</div>' +
+                '<div class="col-6">{' + value + '}</div>' +
+                '</div>');
+            return newElement
+        }
+
 
     </script>
 
@@ -386,8 +414,12 @@
             getInformation(data)
         }
 
-        function innerTemplateMessage(id) {
-            textMessage.value = arrayMessageTemplate[id].message
+        function innerTemplateMessage(e) {
+            uuid = e.currentTarget.id
+            const currentTemplateRow = arrayMessageTemplate.filter(value => value.uuid == uuid);
+            let content = currentTemplateRow.shift()?.content;
+            if(content != null)
+                window.document.getElementById('textMessage').value = content;
         }
 
         function messengerName(value) {

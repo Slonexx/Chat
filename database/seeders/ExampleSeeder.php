@@ -42,6 +42,16 @@ class ExampleSeeder extends Seeder
 
         // $main_acc->attributes()->createMany($attributes);
 
+        // organizationModel::create([
+        //     "accountId" => "1",
+        //     "organId" => "1",
+        //     "organName" => "",
+        //     "employeeId" => "11",
+        //     "employeeName" => "11",
+        //     "lineId" => "123",
+        //     "lineName" => "123",
+        // ]);
+
         $msEntities = [
             (object)[
                 'keyword' => 'demand',

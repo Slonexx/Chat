@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Setting\AddFieldsController;
 use App\Http\Controllers\Entity\PopapController;
 use App\Http\Controllers\Entity\widgetController;
 use App\Http\Controllers\initialization\indexController;
@@ -29,6 +30,9 @@ Route::post('/Setting/organization/{accountId}', [organizationController::class,
 Route::get('/Setting/organization/get/Licenses/{accountId}', [organizationController::class, 'getLicenses']);
 Route::get('/Setting/organization/create/Licenses/{accountId}', [organizationController::class, 'createLicenses']);
 Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationController::class, 'deleteLicenses']);
+
+
+Route::get('/Setting/addFields/{accountId}', [AddFieldsController::class, 'getAddFields']);
 
 // get list templates to front
 Route::post('/Setting/template/{accountId}', [templateController::class, 'postCreate']);
@@ -66,7 +70,7 @@ Route::get('/widget/get/Data', [widgetController::class, 'widgetGetData']);
 //Popup
 Route::get('/Popup/{object}', [PopapController::class, 'Popup']);
 Route::get('/Popup/template/message/Show', [PopapController::class, 'template']);
-Route::get('/Popup/template/message/get/All', [PopapController::class, 'getTemplate']);
+Route::get('/Popup/template/message/get/All', [templateController::class, 'getTemplates']);
 Route::get('/Popup/template/message/get/where/name', [PopapController::class, 'searchTemplate']);
 Route::get('/Popup/template/message/get/information/messenger', [PopapController::class, 'messenger']);
 Route::get('/Popup/template/message/get/information/chatapp', [PopapController::class, 'information']);

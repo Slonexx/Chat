@@ -229,7 +229,8 @@ class templateController extends Controller
         try {
             $res = new Response();
             $nameUID = $request->nameUID ?? "";
-
+            //чисто теоретически клиент Б может поменять текст шаблона клиента А зная его UUID. 
+            //Но так как клиенту выдаются только его шаблоны это не представляется возможным
             $template = Templates::where("uuid", $nameUID)
                 ->select("title", "content", "uuid")
                 ->get();
@@ -393,6 +394,23 @@ class templateController extends Controller
 
             $template = $templateS->getTemplate($entityType, $entityId, $templateId);
             return $template->data;
+        } catch(Exception $e){
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    function getTemplates(Request $request){
+
+        try{
+
+            $entityType = $request->entity_type ?? false;
+            $entityId = $request->object_Id ?? false;
+            $accountId = $request->accountId ?? false;
+            $templateS = new TemplateService($accountId);
+
+
+            $template = $templateS->getTemplates($entityType, $entityId);
+            return response()->json($template);
         } catch(Exception $e){
             return response()->json($e->getMessage(), 500);
         }
