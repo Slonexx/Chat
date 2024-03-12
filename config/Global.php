@@ -20,6 +20,8 @@ return [
     "factureoutMetadataAttributes" => "{$MsURL}entity/factureout/metadata/attributes/",
     "factureout" => "{$MsURL}entity/factureout/",
 
+    "invoiceoutMetadataAttributes" => "{$MsURL}entity/invoiceout/metadata/attributes/",
+
     'moyskladJsonApiEndpointUrl' =>  "{$MsURL}",
 
     "organizationMetadataAttributes" => "{$MsURL}entity/organization/metadata/attributes/",

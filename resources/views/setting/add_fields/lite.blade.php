@@ -6,77 +6,55 @@
         idCreatePoleUpdate.innerText = ''
         idCreateAddPoleUpdate.innerText = ''
 
-        isLeading(false)
+        isLoading(false)
         let req = true
 
-        let pole_ = document.getElementById('idCreatePole').querySelectorAll('[id^="pole_"]')
-        let poles = {}
-        for (let i = 0; i < pole_.length; i++) {
-           poles[ parseInt((pole_[i].id).match(/\d+/)[0]) ] = pole_[i].value
-        }
-
-        let add_pole_ = document.getElementById('idCreateAddPole').querySelectorAll('[id^="add_pole_"]')
-        let add_poles = {}
-        for (let i = 0; i < add_pole_.length; i++) {
-            add_poles[ parseInt((add_pole_[i].id).match(/\d+/)[0]) ] = add_pole_[i].value
-        }
-
         if (nameTemplate.value === '') {
-            messageEmployee.style.display = 'block'
-            messageEmployee.innerText = 'Отсутствует название шаблона'
-            req = false
-        }
-
-
-        if (messageTextArea.value === '') {
-            messageEmployee.style.display = 'block'
-            messageEmployee.innerText = 'Отсутствует сообщение'
+            messageAddField.style.display = 'block'
+            messageAddField.innerText = 'Отсутствует название доп.поля'
             req = false
         }
 
         if (req) {
             let data = {
-                name:  nameTemplate.value,
-                organId: organizationSelect.value,
-                idCreatePole: poles,
-                idCreateAddPole: add_poles,
-                message: messageTextArea.value
+                name:  nameAddField.value,
+                uuid: msAddFieldSelect.value,
             };
 
-            let settings = ajax_settings(baseURL + 'Setting/template/create/poles/' + accountId , "GET", data);
+            let settings = ajax_settings_with_json(baseURL + `/Setting/addFields/${accountId}`, "POST", data);
             $.ajax(settings).done(function (json) {
-                console.log(baseURL + 'Setting/template/create/poles/' + accountId   + ' response ↓ ')
+                console.log(baseURL + `/Setting/addFields/${accountId} response ↓ `)
                 console.log(json)
 
                 if (json.status) {
 
                     showHideCreate('2')
-
+                    let callbackData = json.data
                     $('#main').append(
-                        ' <div id="'+json.data.name_uid+'" class="row"> ' +
-                            ' <div class="col-3"> '+nameTemplate.value+' </div> ' +
-                            ' <div class="col"></div> ' +
-                            ' <div onclick="updateTemplate(\''+json.data.uuid+'\')"  class="col-1 btn gradient_focus"> Изменить <i class="fa-regular fa-circle-xmark"></i></div> ' +
-                            ' <div  class="col-1"> </div> ' +
-                            ' <div onclick="deleteAccount(\''+json.data.name_uid+'\' , \''+json.data.name+'\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                        ' <div id="' + callbackData.uuid + '" class="row"> ' +
+                        ' <div class="col"> ' + data.name + ' </div> ' +
+                        ' <div class="col"></div> ' +
+                        ` <div class="col-3 text-center"> ${complianceList[entityType]} </div> ` +
+                        ' <div  class="col-1"> </div> ' +
+                        ' <div onclick="deleteTemplate(\'' + callbackData.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                         ' </div> '
                     )
 
 
 
-                    isLeading(true)
+                    isLoading(true)
                 }
                 else {
-                    messageEmployee.style.display = 'block'
-                    messageEmployee.innerText = json.message
-                    isLeading(true)
+                    messageAddField.style.display = 'block'
+                    messageAddField.innerText = json.message
+                    isLoading(true)
                 }
 
             })
 
 
         }
-        else isLeading(true)
+        else isLoading(true)
     }
 
     function createOnClickUpdate(){

@@ -59,8 +59,8 @@
         </form>
 
 
-        <div id="createOrganization" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
-             aria-labelledby="createOrganization" aria-hidden="true">
+        <div id="createAddFields" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+             aria-labelledby="createAddFields" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
 
@@ -72,7 +72,7 @@
                                 <img id="ImageOrGifHide" src="{{  ( Config::get("Global") )['url'].'loading.gif' }}"
                                      width="15%" alt="" style="display: none">
                             </span>
-                            <span>Создание шаблона сообщений</span>
+                            <span>Создание доп. полей для шаблонов</span>
                         </div>
 
                         <button onclick="showHideCreate('2')" type="button"
@@ -84,115 +84,24 @@
 
                     <div class="modal-body">
                         <input type="hidden" id="templateId">
-                        <div id="messageEmployee" class="alert alert-warning alert-primary fade show in text-center "
+                        <div id="messageAddField" class="alert alert-warning alert-primary fade show in text-center "
                              style="display: none"> Error
                         </div>
 
                         <div class="mt-2 row">
                             <div class="col-4">Название</div>
                             <input id="nameAddField" class="form-control col" type="text"
-                                   placeholder="Придумайте название для шаблона">
+                                   placeholder="Придумайте название для доп. поля">
                         </div>
                         <div class="mt-2 row">
                             <div class="col-4">Доп. поле</div>
-                            <select id="msAddField" class="col form-select"> </select>
+                            <select id="msAddFieldSelect" class="col form-select"> </select>
                         </div>
-                        <hr>
-
 
                     </div>
-
                     <div class="modal-footer">
-                        <button onclick="fuCreateAddPole()" type="button"
-                                class="col-3 btn btn-outline-dark gradient_focus">Добавить доп поле
-                        </button>
-                        <div class="col"></div>
-                        <button id="btn_createOnClick" onclick="createOnClick()" type="button"
+                        <button id="create" onclick="createOnClick()" type="button"
                                 class="col-2 btn btn-outline-dark gradient_focus">Сохранить
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <div id="updateOrganization" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
-             aria-labelledby="updateOrganization" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <div class="modal-title" style="font-size: 16px">
-                            <span id="GifAndImage">
-                                <img id="updateGifOrImageHide"
-                                     src="{{  ( Config::get("Global") )['url'].'client.svg' }}"
-                                     width="15%" alt="">
-                                <img id="updateImageOrGifHide"
-                                     src="{{  ( Config::get("Global") )['url'].'loading.gif' }}"
-                                     width="15%" alt="" style="display: none">
-                            </span>
-                            <span>Изменения шаблона</span>
-                        </div>
-
-                        <button onclick="showHideCreateUpdate('2')" type="button"
-                                class="close btn btn-outline-dark gradient_focus" data-dismiss="modal"
-                                aria-label="Close">
-                            <span aria-hidden="true">x</span>
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div id="messageEmployeeUpdate"
-                             class="alert alert-warning alert-primary fade show in text-center " style="display: none">
-                            Error
-                        </div>
-
-                        <div class="mt-2 row">
-                            <div class="col-4">Название</div>
-                            <input id="nameTemplateUpdate" class="form-control col" type="text"
-                                   placeholder="Придумайте название для шаблона" disabled>
-                        </div>
-                        <div class="mt-2 row">
-                            <div class="col-4">Организация</div>
-                            <select id="organizationSelectUpdate" class="col form-select"> </select>
-                        </div>
-                        <hr>
-
-                        <div class="rounded row gradient">
-                            <div class="col-11 mt-1"> Основные поля</div>
-                            <div class="col form-check form-switch">
-                                <input id="idCreatePoleInputUpdate" onchange="idCreatePoleChecked('idCreatePoleUpdate', this.checked)"
-                                       class="mt-2 form-check-input" type="checkbox" checked>
-                            </div>
-                        </div>
-                        <div id="idCreatePoleUpdate" class="mt-2" style="display: block"></div>
-
-                        <div class="mt-1 rounded row gradient">
-                            <div class="col-11 mt-1"> Дополнительные поля</div>
-                            <div class="col form-check form-switch">
-                                <input id="idCreateAddPoleInputUpdate" onchange="idCreateAddPoleChecked(this.checked)"
-                                       class="mt-2 form-check-input" type="checkbox">
-                            </div>
-                        </div>
-                        <div id="idCreateAddPoleUpdate" class="mt-2" style="display: none"></div>
-
-                        <hr>
-                        <textarea id="messageTextAreaUpdate" class="form-control" rows="3"
-                                  placeholder="Пример: 'Здравствуйте, это компания поле_1, хотите сделать еще заказ ?'"></textarea>
-
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <button id="addPolesUpdate" onclick="fuCreatePoleUpdate()" type="button"
-                                class="col-3 btn btn-outline-dark gradient_focus">Добавить поле
-                        </button>
-                        <button onclick="fuCreateAddPoleUpdate()" type="button"
-                                class="col-3 btn btn-outline-dark gradient_focus">Добавить доп поле
-                        </button>
-                        <div class="col"></div>
-                        <button id="btn_createOnClickUpdate" onclick="createOnClickUpdate()" type="button"
-                                class="col-2 btn btn-outline-dark gradient_focus">Изменить
                         </button>
                     </div>
 
@@ -211,119 +120,55 @@
 
         let addFields = @json($addFieldsWithValues);
         let availableFields = @json($attributesWithoutFilled);
-
-
-        if(Array.isArray(addFields)){
-            addFields.forEach((entityType) => {
-                if(Array.isArray(addFields)){
-                    entityType.forEach((name, uuid)=>{
-                        $('#main').append(
-                            ' <div id="' + uuid + '" class="row"> ' +
-                            ' <div class="col"> ' + name + ' </div> ' +
-                            ' <div class="col"></div> ' +
-                            ` <div class="col-1"> ${entityType} </div> ` +
-                            ' <div  class="col-1"> </div> ' +
-                            ' <div onclick="deleteTemplate(\'' + uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
-                            ' </div> '
-                        )
         
-                    })
-                } else {
-                    $('#main').append(
-                        ' <div id="' + addFields.uuid + '" class="row"> ' +
-                        ' <div class="col-6"> ' + addFields.name + ' </div> ' +
-                        ' <div class="col"></div> ' +
-                        ` <div class="col-2" text-center> ${entityType} </div> ` +
-                        ' <div class="col-1"> </div> ' +
-                        ' <div class="col-1" text-center>onclick="deleteTemplate(\'' + addFields.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
-                        ' </div> '
-                    )
-                }
-    
-            });
-        } else {
-            let addFieldsKey = Object.keys(addFields)[0];
-            let currentEntityType = addFields[addFieldsKey];
-            const entriesFields = Object.entries(currentEntityType);
-            const associativeArray = [];
+        const complianceList = {
+            "demand": "отгрузка",
+            "counterparty": "контрагент",
+            "customerorder": "заказ покупателя",
+            "invoiceout": "счёт покупателя",
+            "salesreturn": "возврат покупателя",
+        };
 
-            for (const [name, uuid] of entriesFields) {
+        const entriesFields = Object.entries(addFields);
+        const associativeArray = [];
+
+        for (const [entityType, addFields] of entriesFields) {
+            for (let [name, uuid] of Object.entries(addFields)) {
                 $('#main').append(
-                    ' <div id="' + uuid + '" class="row"> ' +
-                    ' <div class="col"> ' + name + ' </div> ' +
-                    ' <div class="col"></div> ' +
-                    ` <div class="col-3 text-center"> ${addFieldsKey} </div> ` +
-                    ' <div  class="col-1"> </div> ' +
-                    ' <div onclick="deleteTemplate(\'' + uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
-                    ' </div> '
+                ' <div id="' + uuid + '" class="row"> ' +
+                ' <div class="col"> ' + name + ' </div> ' +
+                ' <div class="col"></div> ' +
+                ` <div class="col-3 text-center"> ${complianceList[entityType]} </div> ` +
+                ' <div  class="col-1"> </div> ' +
+                ' <div onclick="deleteTemplate(\'' + uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                ' </div> '
                 )
             }
         }
 
         function showHideCreate(val) {
             if (val === '1') {
-                $('#createOrganization').modal('toggle')
+                $('#createAddFields').modal('toggle')
                 isLoading(false)
-                messageEmployee.style.display = 'none'
-                messageEmployee.innerText = ''
-                nameTemplate.value = ''
-
-                // while (organizationSelect.firstChild) {
-                //     organizationSelect.removeChild(organizationSelect.firstChild);
-                // }
-
-                if (saveOrgan.length > 0) {
-                    saveOrgan.forEach((item) => {
-                        let option1 = document.createElement("option");
-                        option1.text = item.organName;
-                        option1.value = item.organId;
-
-                        // Проверяем, есть ли уже такая опция в селекте
-                        let optionExists = false;
-                        for (let i = 0; i < organizationSelect.options.length; i++) {
-                            if (organizationSelect.options[i].value === option1.value || organizationSelect.options[i].text === option1.text) {
-                                optionExists = true;
-                                break;
-                            }
-                        }
-
-                        if (!optionExists) {
-                            organizationSelect.appendChild(option1);
-                        }
-                    });
-                } else {
-                    messageEmployee.style.display = 'block';
-                    messageEmployee.innerText = 'Отсутствует связи с "Организации и линии"';
-
-                    saveOrgan.forEach((item) => {
-                        let option1 = document.createElement("option");
-                        option1.text = "Все организации";
-                        option1.value = "0";
-
-                        // Проверяем, есть ли уже такая опция в селекте
-                        let optionExists = false;
-                        for (let i = 0; i < organizationSelect.options.length; i++) {
-                            if (organizationSelect.options[i].value === option1.value || organizationSelect.options[i].text === option1.text) {
-                                optionExists = true;
-                                break;
-                            }
-                        }
-
-                        if (!optionExists) {
-                            organizationSelect.appendChild(option1);
-                        }
-                    });
+                messageAddField.style.display = 'none'
+                messageAddField.innerText = ''
+                nameAddField.value = ''
+                
+                while (msAddFieldSelect.firstChild) {
+                    msAddFieldSelect.removeChild(msAddFieldSelect.firstChild);
                 }
-                isLeading(true)
-                let idCreatePole = fields.responseJSON.data;
-                for (let key in idCreatePole) {
-                    let item = idCreatePole[key]
-                    element = createElementForIdUpdate(key, item)
-                    $("#idCreatePole").append(element);
+                
+                for (const [entityType, addFields] of Object.entries(availableFields)) {
+                    for (let field of addFields) {
+                        let option = document.createElement("option");
+                        option.id = field.id;
+                        option.text = `${complianceList[entityType]} → ${field.name}`;
+                        msAddFieldSelect.appendChild(option);
+                    }
                 }
+                isLoading(true)
             } else {
-                $("#idCreatePole").empty()
-                $('#createOrganization').modal('toggle')
+                $('#createAddFields').modal('toggle')
             }
         }
 

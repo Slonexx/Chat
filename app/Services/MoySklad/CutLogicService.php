@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\MoySklad\Entities;
+namespace App\Services\MoySklad;
 
 use App\Clients\NCANodeClient;
 use App\Clients\UdoClient;
@@ -12,7 +12,15 @@ use Laravel\Telescope\Telescope;
 use Exception, Error;
 use Illuminate\Support\Facades\Config;
 
-class CutService{
+class CutLogicService{
+    function cutArrayWithKeys(array $array, array $keysToKeep){
+        $prepAttrs = [];
+        foreach($array as $attrItem){
+            $prepAttrs[] = (object) array_intersect_key((array)$attrItem, array_flip($keysToKeep));
+        }
+        return $prepAttrs;
+    }
+    
     /**
      * specific f
      */

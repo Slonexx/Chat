@@ -34,6 +34,10 @@ Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationCon
 
 Route::get('/Setting/addFields/{accountId}', [AddFieldsController::class, 'getAddFields']);
 
+Route::post('/Setting/addFields/{accountId}', [AddFieldsController::class, 'saveAddFields']);
+
+
+
 // get list templates to front
 Route::post('/Setting/template/{accountId}', [templateController::class, 'postCreate']);
 Route::get('/Setting/template/{accountId}', [templateController::class, 'getCreated'])->name('template');

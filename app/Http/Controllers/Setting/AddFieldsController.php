@@ -7,6 +7,11 @@ use App\Models\MainSettings;
 use App\Services\HandlerService;
 use App\Services\MoySklad\Attributes\DemandS;
 use App\Services\MoySklad\AddFieldsService;
+use App\Services\MoySklad\Attributes\CounterpartyS;
+use App\Services\MoySklad\Attributes\CustomorderS;
+use App\Services\MoySklad\Attributes\InvoiceoutS;
+use App\Services\MoySklad\Attributes\SalesreturnS;
+use App\Services\MoySklad\CutLogicService;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -20,7 +25,11 @@ class AddFieldsController extends Controller
             $uid = $request->uid ?? "логин аккаунта";
 
             $services = [
-                "demand" => new DemandS($accountId)
+                "demand" => new DemandS($accountId),
+                "counterparty" => new CounterpartyS($accountId),
+                "customerorder" => new CustomorderS($accountId),
+                "invoiceout" => new InvoiceoutS($accountId),
+                "salesreturn" => new SalesreturnS($accountId),
             ];
 
             $addFieldsS = new AddFieldsService($accountId);
@@ -59,17 +68,15 @@ class AddFieldsController extends Controller
             $attrForDeleting = [];
             $attrSet = [];
 
-            $attributesWithoutFilled = [];
+            $attributesWithoutFilled = (array) $msAttr;
             
             //2)delete filled attributes from all available attributes
             foreach($attrSetAfterDeleting as $entityType => $attributeArray){
                 $attributesWithoutFilled[$entityType] = array_filter($msAttr->$entityType, fn($value)=> !in_array($value->id, $attributeArray));
                 $keysToKeep = [ 'id', 'name' ];
-                $prepAttrs = [];
-                foreach($attributesWithoutFilled[$entityType] as $attrItem){
-                    $prepAttrs[] = (object) array_intersect_key((array)$attrItem, array_flip($keysToKeep));
-                }
-                $attributesWithoutFilled[$entityType] = $prepAttrs;
+                $cutLogicS = new CutLogicService();
+                $cuttedAttrArray = $cutLogicS->cutArrayWithKeys($attributesWithoutFilled[$entityType], $keysToKeep);
+                $attributesWithoutFilled[$entityType] = $cuttedAttrArray;
             }
 
             
@@ -84,6 +91,15 @@ class AddFieldsController extends Controller
                 'fullName' => $fullName,
                 'uid' => $uid,
             ]);
+        } catch(Exception $e){
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    function saveAddFields(Request $request, $accountId){
+        try{
+            $handlerS = new HandlerService();
+            
         } catch(Exception $e){
             return response()->json($e->getMessage(), 500);
         }
