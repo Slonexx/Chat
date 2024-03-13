@@ -23,7 +23,7 @@ class AddFieldsService{
         $attrs = new stdClass();
 
         foreach($services as $key => $s){
-            $attrRes = $s->getAllAttributes();
+            $attrRes = $s->getAllAttributes(false);
             if(!$attrRes->status)
                 return $attrRes;
             $attrs->{$key} = $attrRes->data;

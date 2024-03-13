@@ -1,42 +1,44 @@
 <script>
 
 
-    function createOnClick(){
-
-        idCreatePoleUpdate.innerText = ''
-        idCreateAddPoleUpdate.innerText = ''
+    function createAddField(){
 
         isLoading(false)
         let req = true
 
-        if (nameTemplate.value === '') {
+        if (nameAddField.value === '') {
             messageAddField.style.display = 'block'
             messageAddField.innerText = 'Отсутствует название доп.поля'
             req = false
         }
 
         if (req) {
+            allOptions = msAddFieldSelect.options
+            index = msAddFieldSelect.selectedIndex
+            option = allOptions[index]
+            entityTypeFromSelectElement = option.getAttribute('data-value')
             let data = {
                 name:  nameAddField.value,
-                uuid: msAddFieldSelect.value,
+                entityType: entityTypeFromSelectElement,
+                uuid: option.id,
             };
 
-            let settings = ajax_settings_with_json(baseURL + `/Setting/addFields/${accountId}`, "POST", data);
-            $.ajax(settings).done(function (json) {
+            let settings = ajax_settings_with_json(baseURL + `Setting/addFields/${accountId}`, "POST", data);
+            $.ajax(settings).done(function (json, code, resObj) {
                 console.log(baseURL + `/Setting/addFields/${accountId} response ↓ `)
                 console.log(json)
 
-                if (json.status) {
+                if (resObj.status == 200) {
 
                     showHideCreate('2')
                     let callbackData = json.data
                     $('#main').append(
-                        ' <div id="' + callbackData.uuid + '" class="row"> ' +
+                        ' <div id="' + callbackData.msUuid + '" class="row"> ' +
                         ' <div class="col"> ' + data.name + ' </div> ' +
                         ' <div class="col"></div> ' +
-                        ` <div class="col-3 text-center"> ${complianceList[entityType]} </div> ` +
+                        ` <div class="col-3 text-center"> ${complianceList[entityTypeFromSelectElement]} </div> ` +
                         ' <div  class="col-1"> </div> ' +
-                        ' <div onclick="deleteTemplate(\'' + callbackData.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                        ' <div onclick="deleteAddField(\'' + callbackData.msUuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                         ' </div> '
                     )
 
@@ -50,80 +52,17 @@
                     isLoading(true)
                 }
 
+            }).fail(function (res) {
+                if(res.status == 400)
+                messageAddField.style.display = 'block'
+                messageAddField.innerText = res.responseJSON.message
+                isLoading(true)
             })
 
 
         }
         else isLoading(true)
     }
-
-    function createOnClickUpdate(){
-        isLeading(false)
-        let req = true
-
-        let pole_ = document.getElementById('idCreatePoleUpdate').querySelectorAll('[id^="pole_"]')
-        let poles = {}
-        for (let i = 0; i < pole_.length; i++) {
-            poles[ parseInt((pole_[i].id).match(/\d+/)[0]) ] = pole_[i].value
-        }
-
-        let add_pole_ = document.getElementById('idCreateAddPoleUpdate').querySelectorAll('[id^="add_pole_"]')
-        let add_poles = {}
-        for (let i = 0; i < add_pole_.length; i++) {
-            add_poles[ parseInt((add_pole_[i].id).match(/\d+/)[0]) ] = add_pole_[i].value
-        }
-
-        if (nameTemplateUpdate.value === '') {
-            messageEmployee.style.display = 'block'
-            messageEmployee.innerText = 'Отсутствует название шаблона'
-            req = false
-        }
-
-
-        if (messageTextAreaUpdate.value === '') {
-            messageEmployee.style.display = 'block'
-            messageEmployee.innerText = 'Отсутствует сообщение'
-            req = false
-        }
-
-        if (req) {
-            let templateId = document.getElementById("templateId").value;
-            let data = {
-                uuid: templateId,
-                name:  nameTemplateUpdate.value,
-                // organId: organizationSelectUpdate.value,
-                // idCreatePole: poles,
-                // idCreateAddPole: add_poles,
-                message: messageTextAreaUpdate.value
-            };
-
-            let settings = ajax_settings_with_json(baseURL + 'Setting/template/{accountId}' + accountId , "PUT", data);
-            $.ajax(settings).done(function (json) {
-                console.log(baseURL + 'Setting/template/' + accountId   + ' response ↓ ')
-                console.log(json)
-
-                if (json.status) {
-                    showHideCreateUpdate('2')
-                    isLeading(true)
-                }
-                else {
-                    messageEmployee.style.display = 'block'
-                    messageEmployee.innerText = json.message
-                    isLeading(true)
-                }
-
-            })
-
-
-        }
-
-
-
-
-    }
-
-
-
 
     function fuCreatePole() {
         let poles = document.getElementById('idCreatePole').querySelectorAll('[id^="dev_pole_"]');
@@ -272,12 +211,18 @@
 
     function deletePole(id){ window.document.getElementById(id).remove() }
 
-    function deleteTemplate(uuid){
-        let settings = ajax_settings_with_json(baseURL + `Setting/template/${accountId}/${uuid}` , "DELETE");
-        $.ajax(settings).done(function (json) {
-                console.log(baseURL + `Setting/template/${accountId}/${uuid}`   + ' response ↓ ')
+    function deleteAddField(uuid){
+        let settings = ajax_settings_with_json(baseURL + `Setting/addFields/${accountId}/${uuid}` , "DELETE");
+        $.ajax(settings)
+            .done(function (json) {
+                console.log(baseURL + `Setting/addFields/${accountId}/${uuid}`   + ' response ↓ ')
                 console.log(json)
 
+            })
+            .fail(function (res) {
+                if(res.status == 400)
+                messageAddField.style.display = 'block'
+                messageAddField.innerText = res.responseJSON.message
             })
         document.getElementById(uuid).remove() 
     }
@@ -337,14 +282,9 @@
 
     function isLoading(params) {
         if (params) {
-            updateGifOrImageHide.style.display = ""
-            updateImageOrGifHide.style.display = "none"
-
             GifOrImageHide.style.display = ""
             ImageOrGifHide.style.display = "none"
         } else {
-            updateGifOrImageHide.style.display = "none"
-            updateImageOrGifHide.style.display = ""
 
             GifOrImageHide.style.display = "none"
             ImageOrGifHide.style.display = ""

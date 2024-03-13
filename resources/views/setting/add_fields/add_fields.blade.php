@@ -83,7 +83,6 @@
                     </div>
 
                     <div class="modal-body">
-                        <input type="hidden" id="templateId">
                         <div id="messageAddField" class="alert alert-warning alert-primary fade show in text-center "
                              style="display: none"> Error
                         </div>
@@ -100,7 +99,7 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button id="create" onclick="createOnClick()" type="button"
+                        <button id="create" onclick="createAddField()" type="button"
                                 class="col-2 btn btn-outline-dark gradient_focus">Сохранить
                         </button>
                     </div>
@@ -136,11 +135,11 @@
             for (let [name, uuid] of Object.entries(addFields)) {
                 $('#main').append(
                 ' <div id="' + uuid + '" class="row"> ' +
-                ' <div class="col"> ' + name + ' </div> ' +
+                ` <div class="col"> ` + name + ' </div> ' +
                 ' <div class="col"></div> ' +
                 ` <div class="col-3 text-center"> ${complianceList[entityType]} </div> ` +
                 ' <div  class="col-1"> </div> ' +
-                ' <div onclick="deleteTemplate(\'' + uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                ' <div onclick="deleteAddField(\'' + uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                 ' </div> '
                 )
             }
@@ -163,6 +162,7 @@
                         let option = document.createElement("option");
                         option.id = field.id;
                         option.text = `${complianceList[entityType]} → ${field.name}`;
+                        option.setAttribute('data-value', entityType);
                         msAddFieldSelect.appendChild(option);
                     }
                 }

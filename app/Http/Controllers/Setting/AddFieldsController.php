@@ -12,8 +12,11 @@ use App\Services\MoySklad\Attributes\CustomorderS;
 use App\Services\MoySklad\Attributes\InvoiceoutS;
 use App\Services\MoySklad\Attributes\SalesreturnS;
 use App\Services\MoySklad\CutLogicService;
+use App\Services\Response;
 use Exception;
+use GuzzleHttp\HandlerStack;
 use Illuminate\Http\Request;
+use stdClass;
 
 class AddFieldsController extends Controller
 {
@@ -37,7 +40,7 @@ class AddFieldsController extends Controller
             $resAttrs = $addFieldsS->getAttrForEntities($services);
 
             if(!$resAttrs->status)
-                return $handlerS->responseHandler($resAttrs);
+                return $handlerS->responseHandler($resAttrs, true, false);
 
             //1)check irrelevant
             $attrSet = MainSettings::getGrouppedAttributes($accountId);
@@ -96,10 +99,80 @@ class AddFieldsController extends Controller
         }
     }
 
-    function saveAddFields(Request $request, $accountId){
+    function saveAddField(Request $request, $accountId){
         try{
+            $res = new Response();
             $handlerS = new HandlerService();
+            $setting = MainSettings::where('account_id', $accountId)->get();
+
+            if($setting->isEmpty()){
+                $er = $res->error($setting, 'Настройки по данному accountId не найдены');
+                return $handlerS->responseHandler($er, true, false);
+            }
+
+            $entity_type = $request->entityType ?? false;
+            $name = $request->name ?? false;
+            $attribute_id = $request->uuid ?? false;
+
+            if(empty($entity_type) || empty($name) || empty($attribute_id)){
+                $er = $res->error(
+                    [
+                        $entity_type,
+                        $name,
+                        $attribute_id
+                    ], 
+                "Один или несколько параметров пусты");
+                return $handlerS->responseHandler($er, true, false);
+            }
+
+            //добавить запрос на мой склад с проверкой на наличие такого доп.поля
+            $attribute = $setting->first()->attributes()->create([
+                "entity_type" => $entity_type,
+                "name" => $name,
+                "attribute_id" => $attribute_id,
+            ]);
+
+            $res = new stdClass();
+            $res->message = 'Успешно создано';
+            $res->data = new stdClass();
+            $res->data->msUuid = $attribute->attribute_id;
+            return response()->json($res);
+
+
+            //чисто теоретически клиент Б может добавить доп.поле клиенту А зная его UUID в моём складе. 
+            //Но так как клиенту выдаются только его доп.поля это не представляется возможным
+            //AttributeSettings::where("attribute_id", )
+
+            // // Предположим, у вас есть модель Role с полем uuid
+            // $roleUuids = ['uuid1', 'uuid2', 'uuid3']; // UUID ролей, которые вы хотите добавить к пользователю
+
+            // $rolesIds = Role::whereIn('uuid', $roleUuids)->pluck('id')->toArray();
+
+            // $user->roles()->attach($rolesIds);
             
+        } catch(Exception $e){
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+    
+    function deleteAddField($accountId, $uuid){
+        try{
+            $res = new Response();
+            $setting = MainSettings::where("account_id", $accountId)->get();
+
+            if($setting->isEmpty()){
+                $er = $res->error($setting, 'Настройки по данному accountId не найдены');
+                return response()->json($er);
+            }
+            $setting->first()
+                ->attributes()
+                ->where("attribute_id", $uuid)
+                ->delete();
+
+            $res = new stdClass();
+            $res->message = 'Успешно удалено';
+            $res->data = '';
+            return response()->json($res);
         } catch(Exception $e){
             return response()->json($e->getMessage(), 500);
         }

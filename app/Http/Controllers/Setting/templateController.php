@@ -448,7 +448,7 @@ class templateController extends Controller
             $res = new Response();
             $templates = MsEntityFields::pluck('keyword', 'name_RU')->unique();
             if($templates->isEmpty()){
-                $er = $res->error($templates->toArray(), "Не найден шаблон по данному uuid");
+                $er = $res->error($templates->toArray(), "Не найдены main fields");
                 return response()->json($er);
             } else {
                 $success = $res->success($templates->toArray());

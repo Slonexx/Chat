@@ -34,7 +34,9 @@ Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationCon
 
 Route::get('/Setting/addFields/{accountId}', [AddFieldsController::class, 'getAddFields']);
 
-Route::post('/Setting/addFields/{accountId}', [AddFieldsController::class, 'saveAddFields']);
+Route::post('/Setting/addFields/{accountId}', [AddFieldsController::class, 'saveAddField']);
+
+Route::delete('/Setting/addFields/{accountId}/{uuid}', [AddFieldsController::class, 'deleteAddField']);
 
 
 

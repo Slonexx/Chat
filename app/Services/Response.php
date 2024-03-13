@@ -54,7 +54,7 @@ class Response{
     public function error(mixed $data, ?string $message = null) : Response {
         $this->data = $data;
         $this->statusCode = 400;
-        $this->status = true;
+        $this->status = false;
         if($message !== null)
             $this->message = $message;
         return $this;
