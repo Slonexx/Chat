@@ -1,4 +1,5 @@
 @extends('popup.indexTemplate')
+@extends('popup.baseFunction')
 @section('content')
 
     <div class="main-container" style="height: 99%; width: 99%; margin-bottom: 50px">
@@ -36,7 +37,7 @@
                                 <div class="col-10"><i class="fas fa-user-circle"></i> &nbsp; <span id="nameAgent"> ИМЯ КОНТРАГЕНТА </span>
                                 </div>
                                 <div class="col-2"></div>
-                                <div class="col-10"><span id="phoneAgent"> номер телефона </span></div>
+                                <div class="col-10"><span id="phoneAgent"> номер телефона</span></div>
                             </div>
                             <div id="ImageOrGifHide" class="col d-flex justify-content-center rounded bg-white">
                                 <img src="{{ Config::get("Global.url").'loading.gif' }}" width="50%">
@@ -373,18 +374,7 @@
             })
         }
 
-        function createElementForIdUpdate(key, value) {
-            let newElement = $('<div id="dev_pole_' + value + '" class="mt-2 row">' +
-                '<div class="col-6">' + key + '</div>' +
-                '<div class="col-6">{' + value + '}</div>' +
-                '</div>');
-            return newElement
-        }
 
-
-    </script>
-
-    <script>
         function ajax_settings(url, method, data) {
             return {
                 "url": url,
@@ -415,11 +405,48 @@
         }
 
         function innerTemplateMessage(e) {
+            ImageOrGifHide.style.cssText = 'display: flex !important;'
+            const baseURL = '{{  ( Config::get("Global") )['url'] }}'
             uuid = e.currentTarget.id
             const currentTemplateRow = arrayMessageTemplate.filter(value => value.uuid == uuid);
             let content = currentTemplateRow.shift()?.content;
-            if(content != null)
-                window.document.getElementById('textMessage').value = content;
+            if(content != null){
+                document.getElementById('textMessage').value = content;
+
+            } else {
+                
+                let data = {
+                    'entityType': entity_type,
+                    'entityId': object_Id,
+                    'templateId': uuid
+                };
+
+                let settings = ajax_settings_with_json(baseURL + 'Setting/getTemplate/' + accountId, "POST", data);
+                $.ajax(settings)
+                    .done(function (json, code, resObj) {
+                        console.log(baseURL + 'Setting/getTemplate/' + accountId + ' response ↓ ');
+                        console.log(json);
+
+                        if (resObj.status == 200) {
+                            document.getElementById('textMessage').value = json.data;
+
+                            ImageOrGifHide.style.cssText = 'display: none !important;'
+                        } else {
+                            messageEmployee.style.display = 'block';
+                            messageEmployee.innerText = json.data.message;
+                            ImageOrGifHide.style.cssText = 'display: none !important;'
+                        }
+
+                    })
+                    .fail(function (res) {
+                        if(res.status == 400)
+                        messageAddField.style.display = 'block'
+                        messageAddField.innerText = res.responseJSON.message
+                        ImageOrGifHide.style.cssText = 'display: none !important;'
+                    });
+
+            }
+
         }
 
         function messengerName(value) {

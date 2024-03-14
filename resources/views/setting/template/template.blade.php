@@ -115,7 +115,7 @@
                         <div class="mt-1 rounded row gradient">
                             <div class="col-11 mt-1"> Дополнительные поля</div>
                             <div class="col form-check form-switch">
-                                <input id="idCreateAddPoleInput" onchange="idCreateAddPoleChecked(this.checked)"
+                                <input id="idCreateAddPoleInput" onchange="idCreatePoleChecked('idCreateAddPole', this.checked)"
                                        class="mt-2 form-check-input" type="checkbox">
                             </div>
                         </div>
@@ -199,7 +199,7 @@
                         <div class="mt-1 rounded row gradient">
                             <div class="col-11 mt-1"> Дополнительные поля</div>
                             <div class="col form-check form-switch">
-                                <input id="idCreateAddPoleInputUpdate" onchange="idCreateAddPoleChecked(this.checked)"
+                                <input id="idCreateAddPoleInputUpdate" onchange="idCreatePoleChecked('idCreateAddPoleUpdate', this.checked)"
                                        class="mt-2 form-check-input" type="checkbox">
                             </div>
                         </div>
@@ -230,6 +230,7 @@
         </div>
     </div>
 
+    @include('setting.template.requests')
     @include('setting.template.baseFunction')
     @include('setting.template.lite')
     @include('setting.template.update_lite')
@@ -240,6 +241,7 @@
         let saveOrgan = @json($saveOrgan);
         let saveTemplate = @json($template);
         let fields = getFields();
+        let addFields = getAddFields();
         let jsonMessage = @json($message);
 
 
@@ -277,8 +279,6 @@
                 messageEmployee.style.display = 'none'
                 messageEmployee.innerText = ''
                 nameTemplate.value = ''
-                //idCreatePole.innerText = ''
-                idCreateAddPole.innerText = ''
                 messageTextArea.value = ''
                 addPoles.click()
                 //pole_1.value = '1'
@@ -333,8 +333,45 @@
                 let idCreatePole = fields.responseJSON.data;
                 for (let key in idCreatePole) {
                     let item = idCreatePole[key]
-                    element = createElementForIdUpdate(key, item)
-                    $("#idCreatePole").append(element);
+                    element = createField(key, item)
+                    parentE = $("#idCreatePole").append(element);
+                    appenedE = parentE[0].lastElementChild
+                    appenedE.addEventListener('click', (e) => {
+                        let targetDivId = e.currentTarget.id;
+                        let targetId = targetDivId.split('_').pop();
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(targetId)
+                                .then(() => {
+                                    console.log('Текст скопирован в буфер обмена');
+                                })
+                        } else {
+                            let button = document.getElementById(`dev_button_${targetId}`)
+                            button.children[0].src = "{{  ( Config::get("Global") )['url'].'copied.svg' }}"
+                            //console.error('Копирование в буфер обмена не поддерживается в этом браузере.');
+                        }
+                    });
+                }
+
+                let idCreateAddPole = addFields.responseJSON.data;
+                for (let key in idCreateAddPole) {
+                    let item = idCreateAddPole[key]
+                    element = createAddField(key, item)
+                    parentE = $("#idCreatePole").append(element);
+                    appenedE = parentE[0].lastElementChild
+                    appenedE.addEventListener('click', (e) => {
+                        let targetDivId = e.currentTarget.id;
+                        let targetId = targetDivId.split('_').pop();
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(targetId)
+                                .then(() => {
+                                    console.log('Текст скопирован в буфер обмена');
+                                })
+                        } else {
+                            let button = document.getElementById(`dev_button_${targetId}`)
+                            button.children[0].src = "{{  ( Config::get("Global") )['url'].'copied.svg' }}"
+                            //console.error('Копирование в буфер обмена не поддерживается в этом браузере.');
+                        }
+                    });
                 }
             } else {
                 $("#idCreatePole").empty()

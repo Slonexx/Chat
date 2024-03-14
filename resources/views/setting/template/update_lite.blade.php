@@ -53,7 +53,7 @@
                 let idCreatePole = fields.responseJSON.data;
                 for (let key in idCreatePole) {
                     let item = idCreatePole[key]
-                    element = createElementForIdUpdate(key, item)
+                    element = createAddField(key, item)
                     $("#idCreatePoleUpdate").append(element);
                 }
 
@@ -155,102 +155,8 @@
             }
         }
     }
-
-
-    function createElementForIdUpdate(key, value) {
-        let newElement = $('<div id="dev_pole_' + value + '" class="mt-2 row">' +
-            '<div class="col-6">' + key + '</div>' +
-            '<div class="col-6">{' + value + '}</div>' +
-            '</div>');
-        return newElement
-    }
-    function createElementForIdAddUpdate(id, lastNumber) {
-        let newElement = $('<div id="dev_add_pole_' + id + '" class="mt-2 row">' +
-            '<div class="col-4">Выберите доп_поле_' + id + '</div>' +
-            '<select id="add_pole_' + id + '" class="col form-select">' +
-            '</select>' +
-            '<button onclick="deletePole(\'dev_add_pole_' + id + '\')" type="button" class="col-1 btn btn-outline-dark gradient_focus"><i class="far fa-times-circle"></i></button>' +
-            '</div>');
-
-        if (lastNumber === null) {
-            $('#idCreateAddPoleUpdate').prepend(newElement);
-        } else {
-            $('#dev_add_pole_' + lastNumber).after(newElement);
-        }
-        createElementForAddSelectUpdate('add_pole_'+id);
-    }
-
-
-    function createElementForAddSelectUpdate(id) {
-        if (!idCreateAddPoleInputUpdate.checked) { idCreateAddPoleInputUpdate.checked = true; idCreateAddPoleCheckedUpdate(idCreateAddPoleInputUpdate.checked) }
-
-        let select = window.document.getElementById(id)
-        while (select.firstChild) { select.removeChild(select.firstChild) }
-
-        if (counterparty !== null) counterparty.forEach((item) => {
-                let option1 = document.createElement("option")
-                option1.text = item.name + '(Контрагент)'
-                option1.value = item.id
-                select.appendChild(option1)
-            });
-
-        console.log(customerorder)
-
-        if (customerorder !== null) customerorder.forEach((item) => {
-                let option1 = document.createElement("option")
-                option1.text = item.name + '(Заказ покупателя)'
-                option1.value = item.id
-                select.appendChild(option1)
-            });
-        if (demand !== null) demand.forEach((item) => {
-                let option1 = document.createElement("option")
-                option1.text = item.name + '(Отгрузка)'
-                option1.value = item.id
-                select.appendChild(option1)
-            });
-        if (salesreturn !== null) salesreturn.forEach((item) => {
-                let option1 = document.createElement("option")
-                option1.text = item.name + '(Возврат покупателя)'
-                option1.value = item.id
-                select.appendChild(option1)
-            });
-
-
-        if (invoiceout !== null) invoiceout.forEach((item) => {
-                let option1 = document.createElement("option")
-                option1.text = item.name + '(Счет покупателя)'
-                option1.value = item.id
-                select.appendChild(option1)
-            });
-    }
-
-    function getFields(){
-        let settings = ajax_settings_with_json(baseURL + 'Setting/template/info/fields' , "GET");
-        return $.ajax(settings).done(function (json) {
-                console.log(baseURL + 'Setting/template/info/fields'   + ' response ↓ ')
-                console.log(json)
-
-            })
-        
-    }
-
-
-    function idCreatePoleCheckedUpdate(checked) {
-        if (checked) {
-            idCreatePoleUpdate.style.display = 'block';
-        } else {
-            idCreatePoleUpdate.style.display = 'none';
-        }
-    }
-    function idCreateAddPoleCheckedUpdate(checked){
-        if (checked) {
-            idCreateAddPoleUpdate.style.display = 'block';
-        } else {
-            idCreateAddPoleUpdate.style.display = 'none';
-        }
-    }
-
-
+    
+    
     function activateCloseDelete(){
         deleteButtonBool = false;
         window.document.getElementById('sleepInfoDelete').style.display = 'none';
@@ -259,12 +165,12 @@
         deleteButtonBool = true;
         window.document.getElementById('sleepInfoDelete').style.display = 'block';
         setTimeout(() => window.document.getElementById('messageInfoDelete').innerText = 'Удаление: ' + name + ' через ' + 5, 1000);
-
+        
         for (let i = 1; i < 7; i++) {
             let time = 7 - i;
             setTimeout(() => window.document.getElementById('messageInfoDelete').innerText = 'Удаление: ' + name + ' через ' + time, i * 1000);
         }
-
+        
         setTimeout(() => window.document.getElementById('sleepInfoDelete').style.display = 'none', 8 * 1000);
         setTimeout(() => onDeleteApi(id, name), 8 * 1000);
     }
@@ -277,7 +183,7 @@
         $.ajax(settings).done(function (json) {
             console.log(baseURL + 'Setting/template/delete/poles/' + accountId + ' response ↓ ');
             console.log(json);
-
+            
             if (json.status) {
                 window.document.getElementById(id).remove();
             } else {
@@ -287,6 +193,33 @@
         });
     }
 
+    function createField(key, value) {
+        let newElement = $('<div id="dev_pole_' + value + '" class="mt-2 row">' +
+        '<div class="col-6">' + key + '</div>' +
+            '<div class="col-4">{' + value + '}</div>' +
+            '<div class="col-2">'+
+                `<button class="btn btn-outline-secondary" id="dev_button_${value}">` +
+                    '<img src="{{  ( Config::get("Global") )['url'].'copy.svg' }}" width="100%" height="100%" alt="">' +
+                '</button>' +
+            '</div>' +
+        '</div>');
+            
+        return newElement
+    }
 
+    function createAddField(key, value) {
+        let newElement = $('<div id="dev_add_pole_' + value + '" class="mt-2 row">' +
+        '<div class="col-6">' + key + '</div>' +
+            '<div class="col-4">{' + value + '}</div>' +
+            '<div class="col-2">'+
+                `<button class="btn btn-outline-secondary" id="dev_add_${value}">` +
+                    '<img src="{{  ( Config::get("Global") )['url'].'copy.svg' }}" width="100%" height="100%" alt="">' +
+                '</button>' +
+            '</div>' +
+        '</div>');
+            
+        return newElement
+    }
+    
 
 </script>

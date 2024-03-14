@@ -246,52 +246,6 @@
 
 
 
-    function createElementForAddSelect(id) {
-        isLeading(false)
-        if (!idCreateAddPoleInput.checked) { idCreateAddPoleInput.checked = true; idCreateAddPoleChecked(idCreateAddPoleInput.checked) }
-
-        let select = window.document.getElementById(id)
-        while (select.firstChild) { select.removeChild(select.firstChild) }
-
-
-        if (counterparty !== null) counterparty.forEach((item) => {
-            let option1 = document.createElement("option")
-            option1.text = item.name + '(Контрагент)'
-            option1.value = item.id
-            select.appendChild(option1)
-        });
-
-        if (customerorder !== null) customerorder.forEach((item) => {
-            let option1 = document.createElement("option")
-            option1.text = item.name + '(Заказ покупателя)'
-            option1.value = item.id
-            select.appendChild(option1)
-        });
-        if (demand !== null) demand.forEach((item) => {
-            let option1 = document.createElement("option")
-            option1.text = item.name + '(Отгрузка)'
-            option1.value = item.id
-            select.appendChild(option1)
-        });
-        if (salesreturn !== null) salesreturn.forEach((item) => {
-            let option1 = document.createElement("option")
-            option1.text = item.name + '(Возврат покупателя)'
-            option1.value = item.id
-            select.appendChild(option1)
-        });
-
-
-        if (invoiceout !== null) invoiceout.forEach((item) => {
-            let option1 = document.createElement("option")
-            option1.text = item.name + '(Счет покупателя)'
-            option1.value = item.id
-            select.appendChild(option1)
-        });
-        isLeading(true)
-    }
-
-
-
     function deletePole(id){ window.document.getElementById(id).remove() }
 
     function deleteTemplate(uuid){

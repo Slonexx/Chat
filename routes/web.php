@@ -33,6 +33,7 @@ Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationCon
 
 
 Route::get('/Setting/addFields/{accountId}', [AddFieldsController::class, 'getAddFields']);
+Route::get('/Setting/filledAddFields/{accountId}', [AddFieldsController::class, 'getFilledAddFields']);
 
 Route::post('/Setting/addFields/{accountId}', [AddFieldsController::class, 'saveAddField']);
 

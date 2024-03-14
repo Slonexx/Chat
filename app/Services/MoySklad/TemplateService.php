@@ -8,6 +8,10 @@ use App\Models\MsEntities;
 use App\Models\OrderSettings;
 use App\Models\Templates;
 use App\Services\HandlerService;
+use App\Services\MoySklad\Attributes\CounterpartyS;
+use App\Services\MoySklad\Attributes\CustomorderS;
+use App\Services\MoySklad\Attributes\InvoiceoutS;
+use App\Services\MoySklad\Attributes\SalesreturnS;
 use App\Services\MoySklad\Entities\DemandService;
 use App\Services\Response;
 use Illuminate\Support\Facades\Config;
@@ -45,7 +49,11 @@ class TemplateService {
             "Один или несколько параметров пусты");
 
         $entityServices = [
-            "demand" => new DemandService($this->accountId)
+            "demand" => new DemandService($this->accountId),
+            "counterparty" => new CounterpartyS($this->accountId),
+            "customerorder" => new CustomorderS($this->accountId),
+            "invoiceout" => new InvoiceoutS($this->accountId),
+            "salesreturn" => new SalesreturnS($this->accountId),
         ];
 
         $service = $entityServices[$entityType];
@@ -80,11 +88,11 @@ class TemplateService {
         $objectWithNeededValues = $service->cutMsObjectFromReqExpand($expandedInfo, $expandParams);
 
         //3)getTemplate and replace 
-        $template = Templates::where('id', $templateId)
+        $template = Templates::where('uuid', $templateId)
             ->get();
 
         if($template->isEmpty())
-            $res->error("Шаблон по данному id не найден");
+            $res->error("", "Шаблон по данному id не найден");
         $content = $template->first()->content;
 
         $templateValues = $objectWithNeededValues->data;
@@ -96,7 +104,7 @@ class TemplateService {
         //тут я говорю найди мне все связанные атрибуты с данным шаблоном. если пусто, то шаблон simple
         $templatesWithAtttributes = Templates::join('variables', 'templates.id', '=', 'variables.template_id')
             ->join('attribute_settings', 'variables.attribute_settings_id', '=', 'attribute_settings.id')
-            ->where('templates.id', "=",  $templateId)
+            ->where('templates.uuid', "=",  $templateId)
             ->get()
             ->toArray();
         
@@ -105,7 +113,7 @@ class TemplateService {
             $templateAttributeValues = [];
             foreach($templatesWithAtttributes as $item){
                 $user_var = $item["name"];
-                $templateAttributeValues["{{$user_var}}"] = $item["attribute_id"];
+                $templateAttributeValues["!{{$user_var}}"] = $item["attribute_id"];
             }
 
             $resAttributes = $expandedInfo->attributes;
@@ -126,9 +134,9 @@ class TemplateService {
             //add only add. fields
             $readyTemplate = $templateLogicS->insertIn($readyTemplate, $templateAttributeValues);
             
-            return $res->success($readyTemplate);
         }
-
+        
+        return $res->success($readyTemplate);
     }
 
     function getTemplates($entityType, $entityId){
@@ -143,7 +151,11 @@ class TemplateService {
             "Один или несколько параметров пусты");
 
         $entityServices = [
-            "demand" => new DemandService($this->accountId)
+            "demand" => new DemandService($this->accountId),
+            "counterparty" => new CounterpartyS($this->accountId),
+            "customerorder" => new CustomorderS($this->accountId),
+            "invoiceout" => new InvoiceoutS($this->accountId),
+            "salesreturn" => new SalesreturnS($this->accountId),
         ];
 
         $service = $entityServices[$entityType];
@@ -182,7 +194,7 @@ class TemplateService {
             ->get();
 
         if($setting->isEmpty())
-            $res->error("Настройка по данному account_id не найдена");
+            $res->error("", "Настройка по данному account_id не найдена");
 
         $templateValues = $objectWithNeededValues->data;
 
@@ -218,7 +230,7 @@ class TemplateService {
                 $templateAttributeValues = [];
                 foreach($templatesWithAtttributes as $item){
                     $user_var = $item["name"];
-                    $templateAttributeValues["{{$user_var}}"] = $item["attribute_id"];
+                    $templateAttributeValues["!{{$user_var}}"] = $item["attribute_id"];
                 }
 
                 $resAttributes = $expandedInfo->attributes;

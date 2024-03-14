@@ -29,7 +29,7 @@ class ExampleSeeder extends Seeder
         // $templates = [
         //     ['title' => 'Уведомление о покупке(без доп поля)', 'content' => 'Здравствуйте, это компания {organization}, вы закали у нас товар на сумму {sum}.'],
         //     ['title' => 'Адрес доставки', 'content' => 'Здравствуйте, скажите это верный адрес {shipmentAddress} ?'],
-        //     ['title' => 'Тестовый шаблон', 'content' => 'Шаблон для отгрузки {name} {agent}, {name}, {organization}, {deliveryPlannedMoment}, {salesChannel}, {rate}, {store}, {contract}, {project}, {shipmentAddress}, {description}, {state}, {sum}, {positions}, это доп поле номер фискализации {фиска}'],
+        //     ['title' => 'Тестовый шаблон', 'content' => 'Шаблон для отгрузки {name} {agent}, {name}, {organization}, {deliveryPlannedMoment}, {salesChannel}, {rate}, {store}, {contract}, {project}, {shipmentAddress}, {description}, {state}, {sum}, {positions}, это доп поле номер фискализации !{фиска}'],
         // ];
 
         // $main_acc->templates()->createMany($templates);

@@ -99,6 +99,66 @@ class AddFieldsController extends Controller
         }
     }
 
+    function getFilledAddFields(Request $request, $accountId){
+        try{
+            $handlerS = new HandlerService();
+
+            $services = [
+                "demand" => new DemandS($accountId),
+                "counterparty" => new CounterpartyS($accountId),
+                "customerorder" => new CustomorderS($accountId),
+                "invoiceout" => new InvoiceoutS($accountId),
+                "salesreturn" => new SalesreturnS($accountId),
+            ];
+
+            $addFieldsS = new AddFieldsService($accountId);
+
+            $resAttrs = $addFieldsS->getAttrForEntities($services);
+
+            if(!$resAttrs->status)
+                return $handlerS->responseHandler($resAttrs, true, false);
+
+            //1)check irrelevant
+            $attrSet = MainSettings::getGrouppedAttributes($accountId);
+
+            $msAttr = $resAttrs->data;
+
+            $attrForDeleting = [];
+
+            $attrSetAfterDeleting = [];
+
+            foreach($attrSet as $entityType => $entityUuid){
+                $attrForDeleting = array_filter($entityUuid, function ($item) use ($msAttr, $entityType){
+                    $entityAttributes = $msAttr->$entityType;
+                    $findedAttributesImMs = array_filter($entityAttributes, fn($value) => $value->id == $item);
+                    return count($findedAttributesImMs) > 0 ? false : true;
+                });
+                $attrSetAfterDeleting[$entityType] = $entityUuid;
+                if(count($attrForDeleting) > 0)
+                    AttributeSettings::where("entity_type", $entityType)
+                        ->whereIn("attribute_id", $attrForDeleting)
+                        ->delete();
+                foreach($attrForDeleting as $key => $item){
+                    unset($attrSetAfterDeleting[$entityType][$key]);
+                }
+                
+            }
+
+            $attrForDeleting = [];
+            $attrSet = [];
+
+            $res = new stdClass();
+            $res->message = '';
+            $res->data = $attrSetAfterDeleting;
+            return response()->json($res);
+
+            
+
+        } catch(Exception $e){
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
     function saveAddField(Request $request, $accountId){
         try{
             $res = new Response();

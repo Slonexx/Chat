@@ -14,6 +14,7 @@ use App\Models\organizationModel;
 use App\Models\polesModel;
 use App\Models\templateModel;
 use App\Models\Templates;
+use App\Services\HandlerService;
 use App\Services\MoySklad\TemplateService;
 use App\Services\Response;
 use Exception;
@@ -385,7 +386,7 @@ class templateController extends Controller
     function getTemplate(Request $request, $accountId){
 
         try{
-
+            $handlerS = new HandlerService();
             $templateS = new TemplateService($accountId);
 
             $entityType = $request->entityType ?? false;
@@ -393,7 +394,11 @@ class templateController extends Controller
             $templateId = $request->templateId ?? false;
 
             $template = $templateS->getTemplate($entityType, $entityId, $templateId);
-            return $template->data;
+            if(!$template->status){
+                return $handlerS->responseHandler($template, true, false);
+            } else {
+                return $handlerS->responseHandler($template);
+            }
         } catch(Exception $e){
             return response()->json($e->getMessage(), 500);
         }

@@ -224,24 +224,7 @@
             });
     }
 
-    function getFields(){
-        let settings = ajax_settings_with_json(baseURL + 'Setting/template/info/fields' , "GET");
-        return $.ajax(settings).done(function (json) {
-                console.log(baseURL + 'Setting/template/info/fields'   + ' response ↓ ')
-                console.log(json)
 
-            })
-        
-    }
-
-
-    function idCreatePoleCheckedUpdate(checked) {
-        if (checked) {
-            idCreatePoleUpdate.style.display = 'block';
-        } else {
-            idCreatePoleUpdate.style.display = 'none';
-        }
-    }
     function idCreateAddPoleCheckedUpdate(checked){
         if (checked) {
             idCreateAddPoleUpdate.style.display = 'block';
