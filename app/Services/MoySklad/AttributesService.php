@@ -5,7 +5,7 @@ use App\Clients\MoySklad;
 use App\Services\Response;
 use stdClass;
 
-class AddFieldsService{
+class AttributesService{
 
     private MoySklad $msC;
 

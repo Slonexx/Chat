@@ -14,9 +14,12 @@ use App\Models\organizationModel;
 use App\Models\polesModel;
 use App\Models\templateModel;
 use App\Models\Templates;
+use App\Models\Variables;
 use App\Services\HandlerService;
+use App\Services\MoySklad\TemplateLogicService;
 use App\Services\MoySklad\TemplateService;
 use App\Services\Response;
+use Error;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -110,6 +113,7 @@ class templateController extends Controller
             $res = new Response();
             $name_uid = (string)Str::uuid();
 
+            
             $dataArray = [
                 'title' => $request->name ?? '',
                 'content' => $request->message ?? '',
@@ -121,14 +125,14 @@ class templateController extends Controller
             $data = json_decode(json_encode($dataArray));
             $idCreatePole = $request->idCreatePole ?? [];
             $idCreateAddPole = $request->idCreateAddPole ?? [];
-
-
+            
+            
             $model = new templateModel();
             
             $existingRecords = MainSettings::join("templates", "main_settings.id", "=", "templates.main_settings_id")
-            ->where("main_settings.account_id", $accountId)
-            ->where("templates.title", $data->title)
-            ->get("templates.*");
+                ->where("main_settings.account_id", $accountId)
+                ->where("templates.title", $data->title)
+                ->get("templates.*");
             
             if (!$existingRecords->isEmpty()) {
                 foreach($existingRecords as $record)
@@ -141,8 +145,32 @@ class templateController extends Controller
                 $er = $res->error($setting, 'Настройки по данному accountId не найдены');
                 return response()->json($er);
             }
+
+            $findedSetting = $setting->first();
             //из коллекции достали и сказали создай в шаблонах
-            $setting->first()->templates()->create($dataArray);
+            $createdTemplate = $findedSetting->templates()->create($dataArray);
+
+            //add relation with attributes
+            $templateLogicS = new TemplateLogicService($accountId);
+
+            $attributes = $templateLogicS->findAttributesFromTemplate($data->content);
+            
+            $attributesId = $findedSetting->attributes()
+                ->whereIn("name", $attributes)
+                ->pluck('id')
+                ->toArray();
+
+            $templateId = $createdTemplate->id;
+
+            $prepIdArray = [];
+            foreach($attributesId as $value){
+                $item = [
+                    'template_id' => $templateId, 
+                    'attribute_settings_id' => $value
+                ];
+                //added create Many
+                Variables::create($item);
+            }
 
             $success = $res->success($data, 'Успешно сохранено');
             return response()->json($success);
@@ -210,8 +238,8 @@ class templateController extends Controller
             //             $model->save();
             //         }
             //     }
-        } catch (Exception $e) {
-            return response()->json([
+        } catch (Exception | Error $e) {
+          return response()->json([
                 'status' => false,
                 'message' => $e->getMessage()
             ]);
@@ -228,6 +256,7 @@ class templateController extends Controller
     function getNameUIDPoles(Request $request, $accountId): JsonResponse
     {
         try {
+            $handlerS = new HandlerService();
             $res = new Response();
             $nameUID = $request->nameUID ?? "";
             //чисто теоретически клиент Б может поменять текст шаблона клиента А зная его UUID. 
@@ -237,7 +266,8 @@ class templateController extends Controller
                 ->get();
 
             if($template->isEmpty()){
-                return $res->error($template->first(), "Не найден шаблон по данному uuid");
+                $er = $res->error($template->first(), "Не найден шаблон по данному uuid");
+                return $handlerS->responseHandler($er);
             } else {
                 $templateContent = $template->first();
                 $templateRes = $res->success($templateContent);
@@ -436,7 +466,55 @@ class templateController extends Controller
                 return response()->json($er);
             } 
 
+            
             $template = $collectionTemplate->first();
+            $templateLogicS = new TemplateLogicService($accountId);
+
+            $attributes = $templateLogicS->findAttributesFromTemplate($content);
+
+            $setting = MainSettings::where("account_id", $accountId)->get();
+
+            if($setting->isEmpty()){
+                $er = $res->error($setting, 'Настройки по данному accountId не найдены');
+                return response()->json($er);
+            }
+            //получаем актуальные имена
+            $attributesNames = $setting->first()->attributes()
+                ->whereIn("name", $attributes)
+                ->pluck('name', "id")
+                ->toArray();
+
+            $attributesOfCurrentTemplate = $template->attributes()->pluck('name')->toArray();
+
+            $newAttributes = array_filter($attributesNames, fn($name) => !in_array($name, $attributesOfCurrentTemplate));
+
+            foreach ($newAttributes as $key => $item) {
+                Variables::updateOrCreate(
+                    [
+                        'template_id' => $template->id, 
+                        'attribute_settings_id' => $key
+                    ],
+                    [
+                        'template_id' => $template->id, 
+                        'attribute_settings_id' => $key
+                    ]
+                );
+            }
+            
+            // foreach($newAttributes as $attribute){
+            //     $attribute->id
+            // }
+            // $templateId = $createdTemplate->id;
+
+            // $prepIdArray = [];
+            // foreach($attributesId as $value){
+            //     $item = [
+            //         'template_id' => $templateId, 
+            //         'attribute_settings_id' => $value
+            //     ];
+            //     //added create Many
+            //     Variables::create($item);
+            // }
             //$template->title = $title;
             $template->content = $content;
             $template->save();

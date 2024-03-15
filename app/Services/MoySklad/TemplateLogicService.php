@@ -47,5 +47,11 @@ class TemplateLogicService {
         return $preparedFields;
     }
 
+    function findAttributesFromTemplate($templateContent){
+        $pattern = '/!\{(.*?)\}/';
+        preg_match_all($pattern, $templateContent, $matches);
+        return $matches[1];
+    }
+
 
 }

@@ -119,7 +119,7 @@
                 message: messageTextAreaUpdate.value
             };
 
-            let settings = ajax_settings_with_json(baseURL + 'Setting/template/{accountId}' + accountId , "PUT", data);
+            let settings = ajax_settings_with_json(baseURL + 'Setting/template/' + accountId , "PUT", data);
             $.ajax(settings).done(function (json) {
                 console.log(baseURL + 'Setting/template/' + accountId   + ' response ↓ ')
                 console.log(json)
@@ -134,7 +134,12 @@
                     isLeading(true)
                 }
 
-            })
+            }).fail(function (res) {
+                if(res.status == 400)
+                messageAddField.style.display = 'block'
+                messageAddField.innerText = res.responseJSON.message
+                ImageOrGifHide.style.cssText = 'display: none !important;'
+            });
 
 
         }
