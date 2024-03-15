@@ -238,6 +238,16 @@
             }
         });
 
+        phoneOrName.addEventListener("blur", function(event) {
+            refreshInformation()
+        });
+
+        messenger.addEventListener("change", function(event) {
+            refreshInformation()
+        });
+
+        
+
 
         function sendMessage() {
             errorMessageInContent.style.display = 'none'
