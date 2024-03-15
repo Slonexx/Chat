@@ -129,12 +129,12 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button id="addPoles" onclick="" type="button"
+                        <!-- <button id="addPoles" onclick="" type="button"
                                 class="col-3 btn btn-outline-dark gradient_focus">Добавить поле
                         </button>
                         <button onclick="fuCreateAddPole()" type="button"
                                 class="col-3 btn btn-outline-dark gradient_focus">Добавить доп поле
-                        </button>
+                        </button> -->
                         <div class="col"></div>
                         <button id="btn_createOnClick" onclick="createOnClick()" type="button"
                                 class="col-2 btn btn-outline-dark gradient_focus">Сохранить
@@ -213,12 +213,12 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button id="addPolesUpdate" onclick="fuCreatePoleUpdate()" type="button"
+                        <!-- <button id="addPolesUpdate" onclick="fuCreatePoleUpdate()" type="button"
                                 class="col-3 btn btn-outline-dark gradient_focus">Добавить поле
                         </button>
                         <button onclick="fuCreateAddPoleUpdate()" type="button"
                                 class="col-3 btn btn-outline-dark gradient_focus">Добавить доп поле
-                        </button>
+                        </button> -->
                         <div class="col"></div>
                         <button id="btn_createOnClickUpdate" onclick="createOnClickUpdate()" type="button"
                                 class="col-2 btn btn-outline-dark gradient_focus">Изменить
@@ -230,10 +230,14 @@
         </div>
     </div>
 
+
     @include('setting.template.requests')
+    @include('setting.template.fields')
     @include('setting.template.baseFunction')
     @include('setting.template.lite')
     @include('setting.template.update_lite')
+    @include('setting.template.logic')
+    
 
     <script>
         const baseURL = '{{  ( Config::get("Global") )['url'] }}'
@@ -280,7 +284,7 @@
                 messageEmployee.innerText = ''
                 nameTemplate.value = ''
                 messageTextArea.value = ''
-                addPoles.click()
+                //addPoles.click()
                 //pole_1.value = '1'
 
                 while (organizationSelect.firstChild) {
@@ -331,48 +335,9 @@
                 }
                 isLeading(true)
                 let idCreatePole = fields.responseJSON.data;
-                for (let key in idCreatePole) {
-                    let item = idCreatePole[key]
-                    element = createField(key, item)
-                    parentE = $("#idCreatePole").append(element);
-                    appenedE = parentE[0].lastElementChild
-                    appenedE.addEventListener('click', (e) => {
-                        let targetDivId = e.currentTarget.id;
-                        let targetId = targetDivId.split('_').pop();
-                        if (navigator.clipboard && navigator.clipboard.writeText) {
-                            navigator.clipboard.writeText(targetId)
-                                .then(() => {
-                                    console.log('Текст скопирован в буфер обмена');
-                                })
-                        } else {
-                            let button = document.getElementById(`dev_button_${targetId}`)
-                            button.children[0].src = "{{  ( Config::get("Global") )['url'].'copied.svg' }}"
-                            //console.error('Копирование в буфер обмена не поддерживается в этом браузере.');
-                        }
-                    });
-                }
-
+                appendFields(idCreatePole, 'idCreatePole')
                 let idCreateAddPole = addFields.responseJSON.data;
-                for (let key in idCreateAddPole) {
-                    let item = idCreateAddPole[key]
-                    element = createAddField(key, item)
-                    parentE = $("#idCreatePole").append(element);
-                    appenedE = parentE[0].lastElementChild
-                    appenedE.addEventListener('click', (e) => {
-                        let targetDivId = e.currentTarget.id;
-                        let targetId = targetDivId.split('_').pop();
-                        if (navigator.clipboard && navigator.clipboard.writeText) {
-                            navigator.clipboard.writeText(targetId)
-                                .then(() => {
-                                    console.log('Текст скопирован в буфер обмена');
-                                })
-                        } else {
-                            let button = document.getElementById(`dev_button_${targetId}`)
-                            button.children[0].src = "{{  ( Config::get("Global") )['url'].'copied.svg' }}"
-                            //console.error('Копирование в буфер обмена не поддерживается в этом браузере.');
-                        }
-                    });
-                }
+                appendAddFields(idCreateAddPole, 'idCreateAddPole')
             } else {
                 $("#idCreatePole").empty()
                 $('#createOrganization').modal('toggle')
@@ -432,6 +397,12 @@
                         }
                     });
                 }
+                let idCreatePole = fields.responseJSON.data;
+                appendFields(idCreatePole, 'idCreatePoleUpdate')
+                let idCreateAddPole = addFields.responseJSON.data;
+                appendAddFields(idCreateAddPole, 'idCreateAddPoleUpdate')
+
+                
                 isLeading(true)
             } else {
                 $('#updateOrganization').modal('toggle')

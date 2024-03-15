@@ -11,9 +11,9 @@
     }
 
     function getAddFields(){
-        let settings = ajax_settings_with_json(baseURL + `Setting/filledAddFields/${accountId}` , "GET");
+        let settings = ajax_settings_with_json(baseURL + `Setting/getAttributes/${accountId}` , "GET");
         return $.ajax(settings).done(function (json) {
-            console.log(baseURL + `/Setting/filledAddFields/${accountId}`   + ' response ↓ ')
+            console.log(baseURL + `Setting/getAttributes/${accountId}`   + ' response ↓ ')
             console.log(json)
 
         })

@@ -50,12 +50,12 @@
                 //organizationSelectUpdate.value = json.data.organId;
                 messageTextAreaUpdate.value = json.data.content;
 
-                let idCreatePole = fields.responseJSON.data;
-                for (let key in idCreatePole) {
-                    let item = idCreatePole[key]
-                    element = createAddField(key, item)
-                    $("#idCreatePoleUpdate").append(element);
-                }
+                // let idCreatePole = fields.responseJSON.data;
+                // for (let key in idCreatePole) {
+                //     let item = idCreatePole[key]
+                //     element = createAddField(key, item)
+                //     $("#idCreatePoleUpdate").append(element);
+                // }
 
                 // let idCreateAddPoleUpdate = json.data.idCreateAddPole;
                 // for (let key in idCreateAddPoleUpdate) {
@@ -88,72 +88,6 @@
 
         });
 
-    }
-
-
-    function fuCreatePoleUpdate() {
-
-        let poles = document.getElementById('idCreatePoleUpdate').querySelectorAll('[id^="dev_pole_"]');
-        let lastNumber = null;
-        let parentElement = $('#idCreatePoleUpdate');
-        let creating = true;
-
-        for (let i = 0; i < poles.length; i++) {
-            let currentId = poles[i].id;
-            let currentNumber = parseInt(currentId.match(/\d+/)[0]);
-            if (lastNumber !== null && currentNumber - lastNumber > 1) {
-                for (let j = lastNumber + 1; j < currentNumber && j <= 10; j++) {
-                    createElementForIdUpdate(j, lastNumber);
-                }
-                creating = false;
-                break;
-            }
-            lastNumber = currentNumber;
-        }
-
-        console.log(creating);
-
-        if (creating) {
-            let nextNumber = lastNumber + 1;
-            if (nextNumber <= 10) {
-                createElementForIdUpdate(nextNumber, lastNumber);
-                console.log(nextNumber);
-            } else {
-                messageEmployee.style.display = 'block';
-                messageEmployee.innerText = 'Ограничение по созданию полей. На данный момент можно создать только 10 полей';
-            }
-        }
-    }
-    function fuCreateAddPoleUpdate(){
-        let poles = document.getElementById('idCreateAddPoleUpdate').querySelectorAll('[id^="dev_add_pole_"]');
-        let lastNumber = null;
-        let parentElement = $('#idCreateAddPoleUpdate');
-        let creating = true;
-
-        for (let i = 0; i < poles.length; i++) {
-            let currentId = poles[i].id;
-            let currentNumber = parseInt(currentId.match(/\d+/)[0]);
-
-            if (lastNumber !== null && currentNumber - lastNumber > 1) {
-                for (let j = lastNumber + 1; j < currentNumber && j <= 10; j++) {
-                    createElementForIdAddUpdate(j, lastNumber);
-                }
-                creating = false;
-                break;
-            }
-
-            lastNumber = currentNumber;
-        }
-
-        if (creating) {
-            let nextNumber = lastNumber + 1;
-            if (nextNumber <= 10) {
-                createElementForIdAddUpdate(nextNumber, lastNumber);
-            } else {
-                messageEmployee.style.display = 'block';
-                messageEmployee.innerText = 'Ограничение по созданию дополнительных полей. На данный момент можно создать только 10 дополнительных полей';
-            }
-        }
     }
     
     
@@ -193,33 +127,70 @@
         });
     }
 
-    function createField(key, value) {
-        let newElement = $('<div id="dev_pole_' + value + '" class="mt-2 row">' +
-        '<div class="col-6">' + key + '</div>' +
-            '<div class="col-4">{' + value + '}</div>' +
-            '<div class="col-2">'+
-                `<button class="btn btn-outline-secondary" id="dev_button_${value}">` +
-                    '<img src="{{  ( Config::get("Global") )['url'].'copy.svg' }}" width="100%" height="100%" alt="">' +
-                '</button>' +
-            '</div>' +
-        '</div>');
-            
-        return newElement
-    }
+    // function fuCreatePoleUpdate() {
 
-    function createAddField(key, value) {
-        let newElement = $('<div id="dev_add_pole_' + value + '" class="mt-2 row">' +
-        '<div class="col-6">' + key + '</div>' +
-            '<div class="col-4">{' + value + '}</div>' +
-            '<div class="col-2">'+
-                `<button class="btn btn-outline-secondary" id="dev_add_${value}">` +
-                    '<img src="{{  ( Config::get("Global") )['url'].'copy.svg' }}" width="100%" height="100%" alt="">' +
-                '</button>' +
-            '</div>' +
-        '</div>');
-            
-        return newElement
-    }
+    //     let poles = document.getElementById('idCreatePoleUpdate').querySelectorAll('[id^="dev_pole_"]');
+    //     let lastNumber = null;
+    //     let parentElement = $('#idCreatePoleUpdate');
+    //     let creating = true;
+
+    //     for (let i = 0; i < poles.length; i++) {
+    //         let currentId = poles[i].id;
+    //         let currentNumber = parseInt(currentId.match(/\d+/)[0]);
+    //         if (lastNumber !== null && currentNumber - lastNumber > 1) {
+    //             for (let j = lastNumber + 1; j < currentNumber && j <= 10; j++) {
+    //                 createElementForIdUpdate(j, lastNumber);
+    //             }
+    //             creating = false;
+    //             break;
+    //         }
+    //         lastNumber = currentNumber;
+    //     }
+
+    //     console.log(creating);
+
+    //     if (creating) {
+    //         let nextNumber = lastNumber + 1;
+    //         if (nextNumber <= 10) {
+    //             createElementForIdUpdate(nextNumber, lastNumber);
+    //             console.log(nextNumber);
+    //         } else {
+    //             messageEmployee.style.display = 'block';
+    //             messageEmployee.innerText = 'Ограничение по созданию полей. На данный момент можно создать только 10 полей';
+    //         }
+    //     }
+    // }
+    // function fuCreateAddPoleUpdate(){
+    //     let poles = document.getElementById('idCreateAddPoleUpdate').querySelectorAll('[id^="dev_add_pole_"]');
+    //     let lastNumber = null;
+    //     let parentElement = $('#idCreateAddPoleUpdate');
+    //     let creating = true;
+
+    //     for (let i = 0; i < poles.length; i++) {
+    //         let currentId = poles[i].id;
+    //         let currentNumber = parseInt(currentId.match(/\d+/)[0]);
+
+    //         if (lastNumber !== null && currentNumber - lastNumber > 1) {
+    //             for (let j = lastNumber + 1; j < currentNumber && j <= 10; j++) {
+    //                 createElementForIdAddUpdate(j, lastNumber);
+    //             }
+    //             creating = false;
+    //             break;
+    //         }
+
+    //         lastNumber = currentNumber;
+    //     }
+
+    //     if (creating) {
+    //         let nextNumber = lastNumber + 1;
+    //         if (nextNumber <= 10) {
+    //             createElementForIdAddUpdate(nextNumber, lastNumber);
+    //         } else {
+    //             messageEmployee.style.display = 'block';
+    //             messageEmployee.innerText = 'Ограничение по созданию дополнительных полей. На данный момент можно создать только 10 дополнительных полей';
+    //         }
+    //     }
+    // }
     
 
 </script>

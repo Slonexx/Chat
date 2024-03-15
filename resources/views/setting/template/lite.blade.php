@@ -146,67 +146,6 @@
 
 
 
-
-    function fuCreatePole() {
-        let poles = document.getElementById('idCreatePole').querySelectorAll('[id^="dev_pole_"]');
-        let lastNumber = null;
-        let parentElement = $('#idCreatePole');
-        let creating = true;
-
-        for (let i = 0; i < poles.length; i++) {
-            let currentId = poles[i].id;
-            let currentNumber = parseInt(currentId.match(/\d+/)[0]);
-            if (lastNumber !== null && currentNumber - lastNumber > 1) {
-                for (let j = lastNumber + 1; j < currentNumber && j <= 10; j++) { createElementForId(j, lastNumber); }
-                creating = false;
-                break;
-            }
-            lastNumber = currentNumber;
-        }
-
-        if (creating) {
-            let nextNumber = lastNumber + 1;
-            if (nextNumber <= 10) { createElementForId(nextNumber, lastNumber);}
-            else {
-                messageEmployee.style.display = 'block'
-                messageEmployee.innerText = 'Ограничение по создание полей. На данный момент можно создать только 10 полей'
-            }
-        }
-    }
-    function fuCreateAddPole(){
-        let poles = document.getElementById('idCreateAddPole').querySelectorAll('[id^="dev_add_pole_"]');
-        let lastNumber = null;
-        let parentElement = $('#idCreatePole');
-        let creating = true;
-
-        for (let i = 0; i < poles.length; i++) {
-            let currentId = poles[i].id;
-            let currentNumber = parseInt(currentId.match(/\d+/)[0]);
-
-            if (lastNumber !== null && currentNumber - lastNumber > 1) {
-                for (let j = lastNumber + 1; j < currentNumber && j <= 10; j++) {
-                    createElementForIdAdd(j, lastNumber);
-                }
-                creating = false;
-                break;
-            }
-
-            lastNumber = currentNumber;
-        }
-
-        if (creating) {
-            let nextNumber = lastNumber + 1;
-            if (nextNumber <= 10) {
-                createElementForIdAdd(nextNumber, lastNumber);
-            } else {
-                messageEmployee.style.display = 'block'
-                messageEmployee.innerText = 'Ограничение по создание доп полей. На данный момент можно создать только 10 доп полей'
-            }
-        }
-    }
-
-
-
     function createElementForId(id, lastNumber) {
         let newElement = $('<div id="dev_pole_' + id + '" class="mt-2 row">' +
             '<div class="col-4">Выберите поле_' + id + '</div>' +
@@ -256,19 +195,6 @@
 
             })
         document.getElementById(uuid).remove() 
-    }
-
-
-    function idCreateAddPoleChecked(checked){
-        if (checked) {
-            idCreateAddPole.style.display = 'block'
-        } else idCreateAddPole.style.display = 'none'
-    }
-    function idCreatePoleChecked(e, checked) {
-        if (checked)
-            $(`#${e}`).toggle()
-        else 
-            $(`#${e}`).hide()
     }
 
 
@@ -326,4 +252,62 @@
             ImageOrGifHide.style.display = ""
         }
     }
+
+    // function fuCreatePole() {
+    //     let poles = document.getElementById('idCreatePole').querySelectorAll('[id^="dev_pole_"]');
+    //     let lastNumber = null;
+    //     let parentElement = $('#idCreatePole');
+    //     let creating = true;
+
+    //     for (let i = 0; i < poles.length; i++) {
+    //         let currentId = poles[i].id;
+    //         let currentNumber = parseInt(currentId.match(/\d+/)[0]);
+    //         if (lastNumber !== null && currentNumber - lastNumber > 1) {
+    //             for (let j = lastNumber + 1; j < currentNumber && j <= 10; j++) { createElementForId(j, lastNumber); }
+    //             creating = false;
+    //             break;
+    //         }
+    //         lastNumber = currentNumber;
+    //     }
+
+    //     if (creating) {
+    //         let nextNumber = lastNumber + 1;
+    //         if (nextNumber <= 10) { createElementForId(nextNumber, lastNumber);}
+    //         else {
+    //             messageEmployee.style.display = 'block'
+    //             messageEmployee.innerText = 'Ограничение по создание полей. На данный момент можно создать только 10 полей'
+    //         }
+    //     }
+    // }
+    // function fuCreateAddPole(){
+    //     let poles = document.getElementById('idCreateAddPole').querySelectorAll('[id^="dev_add_pole_"]');
+    //     let lastNumber = null;
+    //     let parentElement = $('#idCreatePole');
+    //     let creating = true;
+
+    //     for (let i = 0; i < poles.length; i++) {
+    //         let currentId = poles[i].id;
+    //         let currentNumber = parseInt(currentId.match(/\d+/)[0]);
+
+    //         if (lastNumber !== null && currentNumber - lastNumber > 1) {
+    //             for (let j = lastNumber + 1; j < currentNumber && j <= 10; j++) {
+    //                 createElementForIdAdd(j, lastNumber);
+    //             }
+    //             creating = false;
+    //             break;
+    //         }
+
+    //         lastNumber = currentNumber;
+    //     }
+
+    //     if (creating) {
+    //         let nextNumber = lastNumber + 1;
+    //         if (nextNumber <= 10) {
+    //             createElementForIdAdd(nextNumber, lastNumber);
+    //         } else {
+    //             messageEmployee.style.display = 'block'
+    //             messageEmployee.innerText = 'Ограничение по создание доп полей. На данный момент можно создать только 10 доп полей'
+    //         }
+    //     }
+    // }
 </script>

@@ -4,6 +4,7 @@ use App\Http\Controllers\Setting\AddFieldsController;
 use App\Http\Controllers\Entity\PopapController;
 use App\Http\Controllers\Entity\widgetController;
 use App\Http\Controllers\initialization\indexController;
+use App\Http\Controllers\Setting\AttributeController;
 use App\Http\Controllers\Setting\CreateAuthTokenController;
 use App\Http\Controllers\Setting\organizationController;
 use App\Http\Controllers\Setting\templateController;
@@ -38,6 +39,8 @@ Route::get('/Setting/filledAddFields/{accountId}', [AddFieldsController::class, 
 Route::post('/Setting/addFields/{accountId}', [AddFieldsController::class, 'saveAddField']);
 
 Route::delete('/Setting/addFields/{accountId}/{uuid}', [AddFieldsController::class, 'deleteAddField']);
+
+Route::get('/Setting/getAttributes/{accountId}', [AttributeController::class, 'getAttributes']);
 
 
 
