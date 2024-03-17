@@ -13,7 +13,7 @@
                 </div>
                 <div class="mt-3 mb-3 mx-1">
                     <div class="input-group">
-                        <input type="search" id="search" class="form-control"/>
+                        <input type="search" id="search" oninput="search(this)" class="form-control"/>
                         <button onclick="searchTemplate()" type="button" class="btn btn-primary">
                             <i class="fas fa-search"></i>
                         </button>
@@ -246,7 +246,65 @@
             refreshInformation()
         });
 
-        
+        function search(search) {
+            let searchValue = transliterate(search.value.toLowerCase().trim())
+
+            // Get all elements to search within
+            let elements = Array.from(toc.children)
+
+            // Loop through each element
+            elements.forEach(function(element) {
+                var text = element.textContent.toLowerCase(); // Get element's text content in lowercase
+
+                if (text.startsWith(searchValue)) {
+                    element.style.display = 'block'; // Show the element if it matches
+                } else {
+                    element.style.display = 'none'; // Hide the element if it doesn't match
+                }
+            });
+        };
+
+        function transliterate(text) {
+            const translitMap = {
+                "q": "й",
+                "w": "ц",
+                "e": "у",
+                "r": "к",
+                "t": "е",
+                "y": "н",
+                "u": "г",
+                "i": "ш",
+                "o": "щ",
+                "p": "з",
+                "[": "х",
+                "]": "ъ",
+                "a": "ф",
+                "s": "ы",
+                "d": "в",
+                "f": "а",
+                "g": "п",
+                "h": "р",
+                "j": "о",
+                "k": "л",
+                "l": "д",
+                ";": "ж",
+                "'": "э",
+                "z": "я",
+                "x": "ч",
+                "c": "с",
+                "v": "м",
+                "b": "и",
+                "n": "т",
+                "m": "ь",
+                ",": "б",
+                ".": "ю",
+                "/": "."
+            };
+
+            return text.split('').map(char => {
+                return translitMap[char.toLowerCase()] || char;
+            }).join('');
+        }
 
 
         function sendMessage() {
