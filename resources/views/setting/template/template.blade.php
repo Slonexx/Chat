@@ -247,6 +247,7 @@
         let fields = getFields();
         let addFields = getAddFields();
         let jsonMessage = @json($message);
+        
 
 
         if (jsonMessage !== '') {

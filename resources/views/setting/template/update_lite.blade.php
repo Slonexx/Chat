@@ -28,7 +28,8 @@
 
         //idCreatePole.innerText = ''
         idCreateAddPole.innerText = ''
-
+        messageEmployeeUpdate.style.display = 'none';
+        messageEmployeeUpdate.innerText = ''
         isLeading(false);
         showHideCreateUpdate('1');
 

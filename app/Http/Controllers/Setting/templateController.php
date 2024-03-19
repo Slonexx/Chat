@@ -110,6 +110,7 @@ class templateController extends Controller
     {
 
         try {
+            $handlerS = new HandlerService();
             $res = new Response();
             $name_uid = (string)Str::uuid();
 
@@ -144,6 +145,12 @@ class templateController extends Controller
             if($setting->isEmpty()){
                 $er = $res->error($setting, 'Настройки по данному accountId не найдены');
                 return response()->json($er);
+            }
+            $templateS = new TemplateService($accountId);
+
+            $uniqueFields = $templateS->checkTemplate($data->content);
+            if(!$uniqueFields->status){
+                return $handlerS->responseHandler($uniqueFields);
             }
 
             $findedSetting = $setting->first();
@@ -453,6 +460,7 @@ class templateController extends Controller
 
     function putTemplateByUuid(Request $request, $accountId){
         try{
+            $handlerS = new HandlerService();
             $res = new Response();
             $UUID = $request->uuid ?? "";
             // при желании можно сделать обновление названия
@@ -465,6 +473,13 @@ class templateController extends Controller
                 $er = $res->error($collectionTemplate->first(), "Не найден шаблон по данному uuid");
                 return response()->json($er);
             } 
+
+            $templateS = new TemplateService($accountId);
+
+            $uniqueFields = $templateS->checkTemplate($content);
+            if(!$uniqueFields->status){
+                return $handlerS->responseHandler($uniqueFields);
+            }
 
             
             $template = $collectionTemplate->first();

@@ -53,5 +53,12 @@ class TemplateLogicService {
         return $matches[1];
     }
 
+    function findAllInputForReplace($templateContent){
+        $pattern = '/(?:!)?\{(.*?)\}/';
+        preg_match_all($pattern, $templateContent, $matches);
+        $unique_matches = array_unique($matches[1]); 
+        return $unique_matches;
+    }
+
 
 }

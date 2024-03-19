@@ -72,7 +72,12 @@
                     isLeading(true)
                 }
 
-            })
+            }).fail(function (res) {
+                if(res.status == 400)
+                    messageEmployee.style.display = 'block'
+                    messageEmployee.innerText = res.responseJSON.message
+                    isLeading(true)
+            });
 
 
         }
@@ -129,16 +134,16 @@
                     isLeading(true)
                 }
                 else {
-                    messageEmployee.style.display = 'block'
-                    messageEmployee.innerText = json.message
+                    messageEmployeeUpdate.style.display = 'block'
+                    messageEmployeeUpdate.innerText = json.message
                     isLeading(true)
                 }
 
             }).fail(function (res) {
                 if(res.status == 400)
-                messageAddField.style.display = 'block'
-                messageAddField.innerText = res.responseJSON.message
-                ImageOrGifHide.style.cssText = 'display: none !important;'
+                messageEmployeeUpdate.style.display = 'block'
+                messageEmployeeUpdate.innerText = res.responseJSON.message
+                isLeading(true)
             });
 
 

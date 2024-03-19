@@ -7,9 +7,13 @@
     let item = '@yield('item')'
 
     window.document.getElementById(item).classList.add('active_sprint')
-    if (item.replace(/[^+\d]/g, '') > 1 && item.replace(/[^+\d]/g, '') <= 6) {
+    if (item.replace(/[^+\d]/g, '') > 1 && item.replace(/[^+\d]/g, '') <= 9) {
         this_click(window.document.getElementById('btn_1'))
+        if (item.replace(/[^+\d]/g, '') > 3 && item.replace(/[^+\d]/g, '') <= 5) {
+        this_click(window.document.getElementById('btn_2'))
     }
+    }
+    
 
     function this_click(btn) {
         btn.classList.toggle("active");

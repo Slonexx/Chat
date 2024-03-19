@@ -216,25 +216,9 @@
                         ErrorMessage.innerText = json.data
                     }
                 })
-                setTimeout(() => getMessenger(data), 1 * 1000)
+                getMessenger(data)
 
-
-                setTimeout(() => data = {
-                    accountId: accountId,
-                    object_Id: object_Id,
-                    entity_type: entity_type,
-
-                    license_id: license_id,
-                    license_full: license_full,
-                    employee: employee_id,
-
-                    phoneOrName: phoneOrName.value,
-                    messenger: messenger.value,
-                    linesId: linesId.value,
-                    agent: agent,
-                    phone: phone,
-                }, 4.9 * 1000)
-                setTimeout(() => getInformation(data), 5 * 1000)
+                getInformation(data)
             }
         });
 

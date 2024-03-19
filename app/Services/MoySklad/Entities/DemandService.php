@@ -69,11 +69,11 @@ class DemandService {
 
             $contract = $objectMs->contract ?? false;
             if(!empty($contract))
-                $preppedChangeList["{contract}"] = $contract;
+                $preppedChangeList["{contract}"] = $contract->name;
 
             $project = $objectMs->project ?? false;
             if(!empty($project))
-                $preppedChangeList["{project}"] = $project;
+                $preppedChangeList["{project}"] = $project->name;
 
             $shipmentAddress = $objectMs->shipmentAddress ?? false;
             if(!empty($shipmentAddress))

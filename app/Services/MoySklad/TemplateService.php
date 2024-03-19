@@ -127,6 +127,10 @@ class TemplateService {
                 );
                 if(count($findedAttribute) > 0){
                     $firstAttributeById = array_shift($findedAttribute);
+                    if($firstAttributeById->type == "customentity")
+                        $templateAttributeValues[$key] = $firstAttributeById->value->name;
+                    else
+                        $templateAttributeValues[$key] = $firstAttributeById->value;
                     $templateAttributeValues[$key] = $firstAttributeById->value;
                 }
 
@@ -244,7 +248,10 @@ class TemplateService {
                     );
                     if(count($findedAttribute) > 0){
                         $firstAttributeById = array_shift($findedAttribute);
-                        $templateAttributeValues[$key] = $firstAttributeById->value;
+                        if($firstAttributeById->type == "customentity")
+                            $templateAttributeValues[$key] = $firstAttributeById->value->name;
+                        else
+                            $templateAttributeValues[$key] = $firstAttributeById->value;
                     }
 
                 }
@@ -266,5 +273,20 @@ class TemplateService {
             
         return $res->success($allTemplates);
 
+    }
+
+    function checkTemplate($content){
+        $res = new Response();
+        $templateLogicS = new TemplateLogicService($this->accountId);
+
+        $uniqueFields = $templateLogicS->findAllInputForReplace($content);
+
+        if(count($uniqueFields) >= 10){
+            $uniqRes = $res->error($content, "Возможно использовать не больше 10 уникальных полей");
+            return $uniqRes;
+        } else {
+            $uniqRes = $res->success($content);
+            return $uniqRes;
+        }
     }
 }
