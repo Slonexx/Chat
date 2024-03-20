@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\employeeModel;
 use App\Models\MainSettings;
 use App\Models\MsEntities;
 use App\Models\MsEntityFields;
@@ -52,15 +53,28 @@ class ExampleSeeder extends Seeder
         //     "lineName" => "123",
         // ]);
 
+        // employeeModel::create([
+        //     "accountId" => "1",
+        //     "employeeId" => "1",
+        //     "employeeName" => "1",
+        //     "email" => "1",
+        //     "password" => "1",
+        //     "appId" => "1",
+        //     "access" => "0",
+        //     "cabinetUserId" => "1",
+        //     "accessToken" => "ffr",
+        //     "refreshToken" => "fff",
+        // ]);
+
         $msEntities = [
             (object)[
                 'keyword' => 'demand',
                 'name_RU' => 'Отгрузка',
                 'fields' => [
-                    ['keyword' => 'agent', 'name_RU' => 'Имя контрагента', 'expand_filter' => 'agent'],
+                    ['keyword' => 'agent', 'name_RU' => 'Наименование контрагента', 'expand_filter' => 'agent'],
+                    ['keyword' => 'agentFIO', 'name_RU' => 'ФИО контрагента', 'expand_filter' => null],
                     ['keyword' => 'name', 'name_RU' => 'Название документа', 'expand_filter' => null],
                     ['keyword' => 'organization', 'name_RU' => 'Организация', 'expand_filter' => 'organization'],
-                    //['keyword' => 'deliveryPlannedMoment', 'name_RU' => 'Планируемая дата отгрузки', 'expand_filter' => null],
                     ['keyword' => 'salesChannel', 'name_RU' => 'Канал продаж', 'expand_filter' => 'salesChannel'],
                     ['keyword' => 'rate', 'name_RU' => 'Валюта', 'expand_filter' => "rate.currency"],
                     ['keyword' => 'store', 'name_RU' => 'Склад', 'expand_filter' => 'store'],
@@ -73,14 +87,75 @@ class ExampleSeeder extends Seeder
                     ['keyword' => 'positions', 'name_RU' => 'Список товаров', 'expand_filter' => 'positions.assortment'],
                 ],
             ],
-            // (object)[
-            //     'keyword' => 'customerorder',
-            //     'name_RU' => 'Заказ покупателя',
-            //     'fields' => [
-            //         ['keyword' => 'agent', 'name_RU' => 'Имя контрагента', 'expand_filter' => 'agent'],
-            //         ['keyword' => 'name', 'name_RU' => 'Название документа', 'expand_filter' => null],
-            //     ],
-            // ],
+            (object)[
+                'keyword' => 'customerorder',
+                'name_RU' => 'Заказ покупателя',
+                'fields' => [
+                    ['keyword' => 'agent', 'name_RU' => 'Наименование контрагента', 'expand_filter' => 'agent'],
+                    ['keyword' => 'agentFIO', 'name_RU' => 'ФИО контрагента', 'expand_filter' => null],
+                    ['keyword' => 'name', 'name_RU' => 'Название документа', 'expand_filter' => null],
+                    ['keyword' => 'organization', 'name_RU' => 'Организация', 'expand_filter' => 'organization'],
+                    ['keyword' => 'deliveryPlannedMoment', 'name_RU' => 'Планируемая дата отгрузки', 'expand_filter' => null],
+                    ['keyword' => 'salesChannel', 'name_RU' => 'Канал продаж', 'expand_filter' => 'salesChannel'],
+                    ['keyword' => 'rate', 'name_RU' => 'Валюта', 'expand_filter' => "rate.currency"],
+                    ['keyword' => 'store', 'name_RU' => 'Склад', 'expand_filter' => 'store'],
+                    ['keyword' => 'contract', 'name_RU' => 'Договор', 'expand_filter' => 'contract'],
+                    ['keyword' => 'project', 'name_RU' => 'Проект', 'expand_filter' => 'project'],
+                    ['keyword' => 'shipmentAddress', 'name_RU' => 'Адрес доставки', 'expand_filter' => null],
+                    ['keyword' => 'description', 'name_RU' => 'Комментарий', 'expand_filter' => null],
+                    ['keyword' => 'state', 'name_RU' => 'Статус документа', 'expand_filter' => 'state'],
+                    ['keyword' => 'sum', 'name_RU' => 'Общая сумма товаров', 'expand_filter' => null],
+                    ['keyword' => 'positions', 'name_RU' => 'Список товаров', 'expand_filter' => 'positions.assortment'],
+                ],
+            ],
+            (object)[
+                'keyword' => 'salesreturn',
+                'name_RU' => 'Возврат покупателя',
+                'fields' => [
+                    ['keyword' => 'agent', 'name_RU' => 'Наименование контрагента', 'expand_filter' => 'agent'],
+                    ['keyword' => 'agentFIO', 'name_RU' => 'ФИО контрагента', 'expand_filter' => null],
+                    ['keyword' => 'name', 'name_RU' => 'Название документа', 'expand_filter' => null],
+                    ['keyword' => 'organization', 'name_RU' => 'Организация', 'expand_filter' => 'organization'],
+                    ['keyword' => 'salesChannel', 'name_RU' => 'Канал продаж', 'expand_filter' => 'salesChannel'],
+                    ['keyword' => 'rate', 'name_RU' => 'Валюта', 'expand_filter' => "rate.currency"],
+                    ['keyword' => 'store', 'name_RU' => 'Склад', 'expand_filter' => 'store'],
+                    ['keyword' => 'contract', 'name_RU' => 'Договор', 'expand_filter' => 'contract'],
+                    ['keyword' => 'project', 'name_RU' => 'Проект', 'expand_filter' => 'project'],
+                    ['keyword' => 'description', 'name_RU' => 'Комментарий', 'expand_filter' => null],
+                    ['keyword' => 'state', 'name_RU' => 'Статус документа', 'expand_filter' => 'state'],
+                    ['keyword' => 'sum', 'name_RU' => 'Общая сумма товаров', 'expand_filter' => null],
+                    ['keyword' => 'positions', 'name_RU' => 'Список товаров', 'expand_filter' => 'positions.assortment'],
+                ],
+            ],
+            (object)[
+                'keyword' => 'invoiceout',
+                'name_RU' => 'Счет покупателю',
+                'fields' => [
+                    ['keyword' => 'agent', 'name_RU' => 'Наименование контрагента', 'expand_filter' => 'agent'],
+                    ['keyword' => 'agentFIO', 'name_RU' => 'ФИО контрагента', 'expand_filter' => null],
+                    ['keyword' => 'name', 'name_RU' => 'Название документа', 'expand_filter' => null],
+                    ['keyword' => 'organization', 'name_RU' => 'Организация', 'expand_filter' => 'organization'],
+                    ['keyword' => 'paymentPlannedMoment', 'name_RU' => 'Планируемая дата оплаты', 'expand_filter' => null],
+                    ['keyword' => 'salesChannel', 'name_RU' => 'Канал продаж', 'expand_filter' => 'salesChannel'],
+                    ['keyword' => 'rate', 'name_RU' => 'Валюта', 'expand_filter' => "rate.currency"],
+                    ['keyword' => 'store', 'name_RU' => 'Склад', 'expand_filter' => 'store'],
+                    ['keyword' => 'contract', 'name_RU' => 'Договор', 'expand_filter' => 'contract'],
+                    ['keyword' => 'project', 'name_RU' => 'Проект', 'expand_filter' => 'project'],
+                    ['keyword' => 'description', 'name_RU' => 'Комментарий', 'expand_filter' => null],
+                    ['keyword' => 'state', 'name_RU' => 'Статус документа', 'expand_filter' => 'state'],
+                    ['keyword' => 'sum', 'name_RU' => 'Общая сумма товаров', 'expand_filter' => null],
+                    ['keyword' => 'positions', 'name_RU' => 'Список товаров', 'expand_filter' => 'positions.assortment'],
+                ],
+            ],
+            (object)[
+                'keyword' => 'counterparty',
+                'name_RU' => 'Контрагент',
+                'fields' => [
+                    ['keyword' => 'agent', 'name_RU' => 'Наименование контрагента', 'expand_filter' => 'agent'],
+                    ['keyword' => 'agentFIO', 'name_RU' => 'ФИО контрагента', 'expand_filter' => null],
+                    ['keyword' => 'description', 'name_RU' => 'Комментарий', 'expand_filter' => null],
+                ],
+            ],
         ];
         
         foreach ($msEntities as $entityItem) {

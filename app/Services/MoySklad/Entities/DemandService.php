@@ -57,7 +57,22 @@ class DemandService {
         try{
             $preppedChangeList = [];
 
-            $preppedChangeList["{agent}"] = $objectMs->agent->name;
+            if ($objectMs->meta->type != "counterparty"){
+                $preppedChangeList["{agent}"] = $objectMs->agent->name;
+                if($objectMs->agent->companyType == "individual"){
+                    $preppedChangeList["{agentFIO}"] = $objectMs->agent->legalTitle ?? "{agentFIO}";
+                } else {
+                    $preppedChangeList["{agentFIO}"] = "{agentFIO}";
+                }
+            } else {
+                $preppedChangeList["{agent}"] = $objectMs->name;
+                if($objectMs->companyType == "individual"){
+                    $preppedChangeList["{agentFIO}"] = $objectMs->legalTitle ?? "{agentFIO}";
+                } else {
+                    $preppedChangeList["{agentFIO}"] = "{agentFIO}";
+                }
+            }
+
             $preppedChangeList["{name}"] = $objectMs->name;
             $preppedChangeList["{organization}"] = $objectMs->organization->name;
             
