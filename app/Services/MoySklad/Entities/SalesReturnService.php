@@ -1,41 +1,114 @@
 <?php
-namespace App\Services\Entity;
+namespace App\Services\MoySklad\Entities;
 
-use App\client\MsClient;
-use Illuminate\Http\Response;
+use App\Clients\MoySklad;
+use App\Services\Response;
+use Exception;
 use Illuminate\Support\Facades\Config;
+use stdClass;
 
 class SalesReturnService {
-    private MsClient $msClient;
+
+    private MoySklad $msC;
+
+    public string $accountId;
+
+    private Response $res;
+
+    private const URL_IDENTIFIER = "salesreturn";
 
     function __construct($accountId) {
-        $this->msClient = new MsClient($accountId);
+        $this->msC = new MoySklad($accountId);
+        $this->res = new Response();
+        $this->accountId = $accountId;
     }
 
     public function getById(string $id) {
-        $urlIdentifier = "salesreturnURL";
-        $obj = $this->msClient->getById($urlIdentifier, $id);
-        $data = $obj->data;       
-        $statusCode = $obj->statusCode;
-        return response()->json($data, $statusCode);
+        $res = $this->msC->getById(self::URL_IDENTIFIER, $id);
+        if(!$res->status)
+            return $res->addMessage("Ошибка при получении возврата покупателя");
+        else
+            return $res;
     }
 
-    function send($data) {
-        $urlIdentifier = "salesreturnURL";
-
-        $obj = $this->msClient->post($urlIdentifier, $data);
-        $data = $obj->data;
-        $statusCode = $obj->statusCode;
-        return response()->json($data, $statusCode);
+    public function getByIdWithExpand(string $id, array $expandParams) {
+        $invoiceoutUrl = Config::get("Global")[self::URL_IDENTIFIER];
+        $preppedUrl = $invoiceoutUrl . $id . "?expand=";
+        if(count($expandParams) == 0){
+            return $this->res->error($expandParams, "Нет параметров для expand");
+        }
+        foreach($expandParams as $param){
+            if($param != null)
+            $preppedUrl = "{$preppedUrl}{$param},";
+        }
+        $expandedRes = $this->msC->getByUrl($preppedUrl);
+        if(!$expandedRes->status)
+            return $expandedRes->addMessage("Ошибка при получении расширенного возврата покупателя");
+        else
+            return $expandedRes;
     }
-    
-    public function change($data, $id){
-        $urlIdentifier = "salesreturnURL";
-        //dd($urlIdentifier, $data, $id);
-        $obj = $this->msClient->put($urlIdentifier, $data, $id);
-        $data = $obj->data;       
-        $statusCode = $obj->statusCode;
-        return response()->json($data, $statusCode);
-    }
 
+    /**
+     * specific f
+     */
+    function cutMsObjectFromReqExpand($objectMs){
+        try{
+            $preppedChangeList = [];
+
+            $preppedChangeList["{agent}"] = $objectMs->agent->name;
+            if($objectMs->agent->companyType == "individual"){
+                $preppedChangeList["{agentFIO}"] = $objectMs->agent->legalTitle ?? "{agentFIO}";
+            } else {
+                $preppedChangeList["{agentFIO}"] = "{agentFIO}";
+            }
+
+            $preppedChangeList["{name}"] = $objectMs->name;
+            $preppedChangeList["{organization}"] = $objectMs->organization->name;
+            
+            $salesChannel = $objectMs->salesChannel ?? false;
+            if(!empty($salesChannel))
+                $preppedChangeList["{salesChannel}"] = $salesChannel;
+            $preppedChangeList["{rate}"] = $objectMs->rate->currency->name;
+            $preppedChangeList["{store}"] = $objectMs->store->name;
+
+            $contract = $objectMs->contract ?? false;
+            if(!empty($contract))
+                $preppedChangeList["{contract}"] = $contract->name;
+
+            $project = $objectMs->project ?? false;
+            if(!empty($project))
+                $preppedChangeList["{project}"] = $project->name;
+
+            $description = $objectMs->description ?? false;
+            if(!empty($description))
+                $preppedChangeList["{description}"] = $description;
+
+            $state = $objectMs->state ?? false;
+            if(!empty($state))
+                $preppedChangeList["{state}"] = $state->name;
+
+            $preppedChangeList["{sum}"] = $objectMs->sum;
+
+            $arrayPositions = $objectMs->positions->rows;
+
+            $preppedChangeList["{positions}"] = [];
+            if(count($arrayPositions) > 0)
+            foreach($arrayPositions as $position){
+                $temp = new stdClass();
+                $temp->price = $position->price;
+                $temp->count = $position->quantity;
+                $temp->name = $position->assortment->name;
+                $preppedChangeList["{positions}"][] = $temp;
+            }
+
+            $res = new Response();
+
+            return $res->success($preppedChangeList);
+
+        } catch (Exception $e){
+            $res = new Response();
+            $answer = $res->error($e, $e->getMessage());
+            return $answer;
+        }
+    }
 }

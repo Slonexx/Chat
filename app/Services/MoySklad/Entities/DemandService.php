@@ -2,8 +2,6 @@
 namespace App\Services\MoySklad\Entities;
 
 use App\Clients\MoySklad;
-use App\Clients\MsClient;
-use App\Services\HandlerService;
 use App\Services\Response;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -53,26 +51,17 @@ class DemandService {
     /**
      * specific f
      */
-    function cutMsObjectFromReqExpand($objectMs, $expandParams){
+    function cutMsObjectFromReqExpand($objectMs){
         try{
             $preppedChangeList = [];
 
-            if ($objectMs->meta->type != "counterparty"){
-                $preppedChangeList["{agent}"] = $objectMs->agent->name;
-                if($objectMs->agent->companyType == "individual"){
-                    $preppedChangeList["{agentFIO}"] = $objectMs->agent->legalTitle ?? "{agentFIO}";
-                } else {
-                    $preppedChangeList["{agentFIO}"] = "{agentFIO}";
-                }
+            $preppedChangeList["{agent}"] = $objectMs->agent->name;
+            if($objectMs->agent->companyType == "individual"){
+                $preppedChangeList["{agentFIO}"] = $objectMs->agent->legalTitle ?? "{agentFIO}";
             } else {
-                $preppedChangeList["{agent}"] = $objectMs->name;
-                if($objectMs->companyType == "individual"){
-                    $preppedChangeList["{agentFIO}"] = $objectMs->legalTitle ?? "{agentFIO}";
-                } else {
-                    $preppedChangeList["{agentFIO}"] = "{agentFIO}";
-                }
+                $preppedChangeList["{agentFIO}"] = "{agentFIO}";
             }
-
+            
             $preppedChangeList["{name}"] = $objectMs->name;
             $preppedChangeList["{organization}"] = $objectMs->organization->name;
             
