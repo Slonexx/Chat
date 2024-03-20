@@ -7,13 +7,11 @@ use App\Models\MainSettings;
 use App\Models\MsEntities;
 use App\Models\OrderSettings;
 use App\Models\Templates;
-use App\Services\Entity\CounterpartyService;
-use App\Services\HandlerService;
-use App\Services\MoySklad\Attributes\CounterpartyS;
-use App\Services\MoySklad\Attributes\CustomorderS;
-use App\Services\MoySklad\Attributes\InvoiceoutS;
-use App\Services\MoySklad\Attributes\SalesreturnS;
+use App\Services\MoySklad\Entities\CounterpartyService;
+use App\Services\MoySklad\Entities\CustomOrderService;
 use App\Services\MoySklad\Entities\DemandService;
+use App\Services\MoySklad\Entities\InvoiceoutService;
+use App\Services\MoySklad\Entities\SalesReturnService;
 use App\Services\Response;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Database\QueryException;
@@ -52,9 +50,9 @@ class TemplateService {
         $entityServices = [
             "demand" => new DemandService($this->accountId),
             "counterparty" => new CounterpartyService($this->accountId),
-            "customerorder" => new CustomorderS($this->accountId),
-            "invoiceout" => new InvoiceoutS($this->accountId),
-            "salesreturn" => new SalesreturnS($this->accountId),
+            "customerorder" => new CustomOrderService($this->accountId),
+            "invoiceout" => new InvoiceoutService($this->accountId),
+            "salesreturn" => new SalesReturnService($this->accountId),
         ];
 
         $service = $entityServices[$entityType];
@@ -158,9 +156,9 @@ class TemplateService {
         $entityServices = [
             "demand" => new DemandService($this->accountId),
             "counterparty" => new CounterpartyService($this->accountId),
-            "customerorder" => new CustomorderS($this->accountId),
-            "invoiceout" => new InvoiceoutS($this->accountId),
-            "salesreturn" => new SalesreturnS($this->accountId),
+            "customerorder" => new CustomOrderService($this->accountId),
+            "invoiceout" => new InvoiceoutService($this->accountId),
+            "salesreturn" => new SalesReturnService($this->accountId),
         ];
 
         $service = $entityServices[$entityType];
