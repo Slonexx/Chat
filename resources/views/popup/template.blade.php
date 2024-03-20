@@ -47,7 +47,7 @@
 
                         <div class="mt-3 row p-2">
                             <div id="phoneOrNameDiv" class="col-4">Номер телефона</div>
-                            <input id="phoneOrName" class="form-control col" type="text" name="phoneOrName" value="">
+                            <input id="phoneOrName" oninput="deleteSpaces(this)" class="form-control col" type="text" name="phoneOrName" value="">
                         </div>
                         <div class="mt-3 row p-2">
                             <div class="col-4">Мессенджер</div>
@@ -288,6 +288,11 @@
             return text.split('').map(char => {
                 return translitMap[char.toLowerCase()] || char;
             }).join('');
+        }
+
+        function deleteSpaces(e){
+            const arrayDivided = e.value.split(" ");
+            phoneOrName.value = arrayDivided.join("");
         }
 
 
