@@ -15,7 +15,7 @@ class CustomOrderService {
 
     private Response $res;
 
-    private const URL_IDENTIFIER = "customorder";
+    private const URL_IDENTIFIER = "customerorder";
 
     function __construct($accountId) {
         $this->msC = new MoySklad($accountId);
