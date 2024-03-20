@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\vendor\getSettingVendorController;
 use App\Http\Controllers\vendor\Lib;
 use App\Http\Controllers\vendor\VendorApiController;
+use App\Models\MainSettings;
 use App\Models\settingModel;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Contracts\Foundation\Application;
@@ -56,6 +57,7 @@ class indexController extends Controller
         $uid = $request->uid ?? "логин аккаунта";
 
         $setting = new getSettingVendorController($accountId);
+        MainSettings::updateOrInsert(['accountId' => $accountId], ['account_id' => $accountId, 'ms_token' => $setting->TokenMoySklad]);
         $existingRecord = settingModel::find($accountId);
 
         if ($existingRecord == null) {
