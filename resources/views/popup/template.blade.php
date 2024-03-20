@@ -107,7 +107,7 @@
         let arrayMessageTemplate
 
 
-        let receivedMessage = {
+        /*let receivedMessage = {
             "name":"OpenPopup",
             "messageId":1,
             "popupName":"TemplateMessage",
@@ -126,10 +126,10 @@
                     "phone":"+77777492857",
 
             }
-        };
+        };*/
 
         window.addEventListener("message", function(event) {
-        //let receivedMessage = event.data
+        const receivedMessage = event.data
             search.value = '';
             //toc.innerText = '';
             textMessage.value = '';
@@ -152,7 +152,7 @@
 
                 nameAgent.innerText = agent
                 phoneAgent.innerText = phone
-            receivedMessage = []
+            //receivedMessage = []
 
                 let data = {
                     accountId: accountId,
@@ -193,7 +193,7 @@
                             const button = document.createElement('button');
                             button.id = item.uuid;
                             button.onclick = innerTemplateMessage
-                            button.type = "button" 
+                            button.type = "button"
                             button.className= "btn"
                             button.innerText = item.title
 
@@ -466,7 +466,7 @@
                 document.getElementById('textMessage').value = content;
 
             } else {
-                
+
                 let data = {
                     'entityType': entity_type,
                     'entityId': object_Id,
