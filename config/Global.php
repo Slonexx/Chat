@@ -3,6 +3,7 @@ $MsURL = "https://api.moysklad.ru/api/remap/1.2/";
 //$restartCommand = "c:\OSPanel\Open Server Panel.exe" /restart;
 return [
 
+    "agent" => "{$MsURL}entity/counterparty/",
     "agentMetadataAttributes" => "{$MsURL}entity/counterparty/metadata/attributes/",
 
     "cashinMetadataAttributes" => "{$MsURL}entity/cashin/metadata/attributes/",
@@ -21,6 +22,7 @@ return [
     "factureout" => "{$MsURL}entity/factureout/",
 
     "invoiceoutMetadataAttributes" => "{$MsURL}entity/invoiceout/metadata/attributes/",
+    "invoiceout" => "{$MsURL}entity/invoiceout/",
 
     'moyskladJsonApiEndpointUrl' =>  "{$MsURL}",
 
