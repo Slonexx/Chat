@@ -18,12 +18,12 @@ return new class extends Migration
 
             $table->uuid('account_id')->nullable();
             $table->string("ms_token", 42);
-            $table->string("app_id", 20);
-            $table->string("login", 255);
-            $table->string("password", 255);
+            $table->string("app_id", 20)->nullable();
+            $table->string("login", 255)->nullable();
+            $table->string("password", 255)->nullable();
 
             //$table->string("token", 128)->nullable();
-            $table->boolean("is_activate");
+            $table->boolean("is_activate")->nullable();
 
             $table->timestamps();
         });
