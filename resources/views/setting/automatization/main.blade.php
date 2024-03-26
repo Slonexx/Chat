@@ -27,35 +27,34 @@
         </div>
 
         <form action="/Setting/automationSetting/{{$accountId}}?isAdmin={{$isAdmin}}" method="post" class="mt-2 ml-5 mr-5">
-        @csrf <!-- {{ csrf_field() }} -->
-        <div class="box mt-1 mb-4 columns p-0 gradient_layout_invert">
-            <div class="column is-11 "> Создать сценарий</div>
-            <div onclick="createScript()" class="col-1 has-text-right" style="font-size: 30px; cursor: pointer">
-                <i class="fas fa-plus-circle"></i> &nbsp;
-            </div>
-        </div>
-
-        <div class="box">
-
-            <div class="mb-3 columns has-background-primary rounded text-white">
-                <div class="column"> Код группы (касса) </div>
-                <div class="column"> Тип документа</div>
-                <div class="column"> Статус</div>
-                <div class="column"> Тип оплаты</div>
-                <div class="column"> Канал продаж</div>
-                <div class="column"> Проект</div>
-                <div class="column is-1"> Удалить</div>
-            </div>
-            <div id="mainCreate">
-
-
+            @csrf <!-- {{ csrf_field() }} -->
+            <div class="box mt-1 mb-4 columns p-0 gradient_layout_invert">
+                <div onclick="createScript()" class="col-1 has-text-right" style="font-size: 30px; cursor: pointer">
+                    <i class="fas fa-plus-circle"></i> &nbsp;
+                </div>
             </div>
 
-        </div>
+            <div class="box">
+
+                <div class="mb-3 columns has-background-primary rounded text-white">
+                    <div class="column"> Код группы (касса) </div>
+                    <div class="column"> Тип документа</div>
+                    <div class="column"> Статус</div>
+                    <div class="column"> Тип оплаты</div>
+                    <div class="column"> Канал продаж</div>
+                    <div class="column"> Проект</div>
+                    <div class="column is-1"> Удалить</div>
+                </div>
+                <div id="mainCreate">
 
 
-        <button class="button is-outlined gradient_focus"> сохранить</button>
-    </form>
+                </div>
+
+            </div>
+
+
+            <button class="button is-outlined gradient_focus"> сохранить</button>
+        </form>
 
 
         <form class="mt-3"
@@ -66,14 +65,20 @@
             <div class="">
 
                 <div class="row bg-info rounded text-white">
-                    <div class="col-3"> Название</div>
+                    <div class="col-1 entity"> Тип сущности</div>
                     <div class="col"></div>
-                    <div class="col-1 text-center"> Изменить</div>
+                    <div class="col-1 text-center status"> Статус</div>
+                    <div class="col-1"></div>
+                    <div class="col-1 text-center channel"> Канал продаж</div>
+                    <div class="col-1"></div>
+                    <div class="col-1 text-center project"> Проект</div>
+                    <div class="col-1"></div>
+                    <div class="col-1 text-center"> Шаблон</div>
                     <div class="col-1"></div>
                     <div class="col-1 text-center"> Удалить</div>
                 </div>
 
-                <div id="main" class="mt-3"></div>
+                <div id="mainAutomation" class="mt-3"></div>
             </div>
 
 
@@ -93,172 +98,6 @@
             </div>
 
         </form>
-
-
-        <div id="createOrganization" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
-             aria-labelledby="createOrganization" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <div class="modal-title" style="font-size: 16px">
-                            <span id="GifAndImage">
-                                <img id="GifOrImageHide" src="{{  ( Config::get("Global") )['url'].'client.svg' }}"
-                                     width="15%" alt="">
-                                <img id="ImageOrGifHide" src="{{  ( Config::get("Global") )['url'].'loading.gif' }}"
-                                     width="15%" alt="" style="display: none">
-                            </span>
-                            <span>Создание шаблона сообщений</span>
-                        </div>
-
-                        <button onclick="showHideCreate('2')" type="button"
-                                class="close btn btn-outline-dark gradient_focus" data-dismiss="modal"
-                                aria-label="Close">
-                            <span aria-hidden="true">x</span>
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-                        <input type="hidden" id="templateId">
-                        <div id="messageEmployee" class="alert alert-warning alert-primary fade show in text-center "
-                             style="display: none"> Error
-                        </div>
-
-                        <div class="mt-2 row">
-                            <div class="col-4">Название</div>
-                            <input id="nameTemplate" class="form-control col" type="text"
-                                   placeholder="Придумайте название для шаблона">
-                        </div>
-                        <div class="mt-2 row">
-                            <div class="col-4">Организация</div>
-                            <select id="organizationSelect" class="col form-select"> </select>
-                        </div>
-                        <hr>
-
-                        <div class="rounded row gradient">
-                            <div class="col-11 mt-1">Основные поля</div>
-                            <div class="col form-check form-switch">
-                                <input onchange="idCreatePoleChecked('idCreatePole', this.checked)" class="mt-2 form-check-input"
-                                       type="checkbox" checked>
-                            </div>
-                        </div>
-                        <div id="idCreatePole" class="mt-2" style="display: block"></div>
-                        <div class="mt-1 rounded row gradient">
-                            <div class="col-11 mt-1"> Дополнительные поля</div>
-                            <div class="col form-check form-switch">
-                                <input id="idCreateAddPoleInput" onchange="idCreatePoleChecked('idCreateAddPole', this.checked)"
-                                       class="mt-2 form-check-input" type="checkbox">
-                            </div>
-                        </div>
-                        <div id="idCreateAddPole" class="mt-2" style="display: none"></div>
-
-                        <hr>
-                        <textarea id="messageTextArea" class="form-control" rows="3"
-                                  placeholder="Пример: 'Здравствуйте, это компания поле_1, хотите сделать еще заказ ?'"></textarea>
-
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <!-- <button id="addPoles" onclick="" type="button"
-                                class="col-3 btn btn-outline-dark gradient_focus">Добавить поле
-                        </button>
-                        <button onclick="fuCreateAddPole()" type="button"
-                                class="col-3 btn btn-outline-dark gradient_focus">Добавить доп поле
-                        </button> -->
-                        <div class="col"></div>
-                        <button id="btn_createOnClick" onclick="createOnClick()" type="button"
-                                class="col-2 btn btn-outline-dark gradient_focus">Сохранить
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <div id="updateOrganization" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
-             aria-labelledby="updateOrganization" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <div class="modal-title" style="font-size: 16px">
-                            <span id="GifAndImage">
-                                <img id="updateGifOrImageHide"
-                                     src="{{  ( Config::get("Global") )['url'].'client.svg' }}"
-                                     width="15%" alt="">
-                                <img id="updateImageOrGifHide"
-                                     src="{{  ( Config::get("Global") )['url'].'loading.gif' }}"
-                                     width="15%" alt="" style="display: none">
-                            </span>
-                            <span>Изменения шаблона</span>
-                        </div>
-
-                        <button onclick="showHideCreateUpdate('2')" type="button"
-                                class="close btn btn-outline-dark gradient_focus" data-dismiss="modal"
-                                aria-label="Close">
-                            <span aria-hidden="true">x</span>
-                        </button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div id="messageEmployeeUpdate"
-                             class="alert alert-warning alert-primary fade show in text-center " style="display: none">
-                            Error
-                        </div>
-
-                        <div class="mt-2 row">
-                            <div class="col-4">Название</div>
-                            <input id="nameTemplateUpdate" class="form-control col" type="text"
-                                   placeholder="Придумайте название для шаблона" disabled>
-                        </div>
-                        <div class="mt-2 row">
-                            <div class="col-4">Организация</div>
-                            <select id="organizationSelectUpdate" class="col form-select"> </select>
-                        </div>
-                        <hr>
-
-                        <div class="rounded row gradient">
-                            <div class="col-11 mt-1"> Основные поля</div>
-                            <div class="col form-check form-switch">
-                                <input id="idCreatePoleInputUpdate" onchange="idCreatePoleChecked('idCreatePoleUpdate', this.checked)"
-                                       class="mt-2 form-check-input" type="checkbox" checked>
-                            </div>
-                        </div>
-                        <div id="idCreatePoleUpdate" class="mt-2" style="display: block"></div>
-
-                        <div class="mt-1 rounded row gradient">
-                            <div class="col-11 mt-1"> Дополнительные поля</div>
-                            <div class="col form-check form-switch">
-                                <input id="idCreateAddPoleInputUpdate" onchange="idCreatePoleChecked('idCreateAddPoleUpdate', this.checked)"
-                                       class="mt-2 form-check-input" type="checkbox">
-                            </div>
-                        </div>
-                        <div id="idCreateAddPoleUpdate" class="mt-2" style="display: none"></div>
-
-                        <hr>
-                        <textarea id="messageTextAreaUpdate" class="form-control" rows="3"
-                                  placeholder="Пример: 'Здравствуйте, это компания поле_1, хотите сделать еще заказ ?'"></textarea>
-
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <!-- <button id="addPolesUpdate" onclick="fuCreatePoleUpdate()" type="button"
-                                class="col-3 btn btn-outline-dark gradient_focus">Добавить поле
-                        </button>
-                        <button onclick="fuCreateAddPoleUpdate()" type="button"
-                                class="col-3 btn btn-outline-dark gradient_focus">Добавить доп поле
-                        </button> -->
-                        <div class="col"></div>
-                        <button id="btn_createOnClickUpdate" onclick="createOnClickUpdate()" type="button"
-                                class="col-2 btn btn-outline-dark gradient_focus">Изменить
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
     </div>
 
 
@@ -273,6 +112,37 @@
     <script>
         const baseURL = '{{  ( Config::get("Global") )['url'] }}'
         let accountId = '{{ $accountId }}'
+        let savedAuto = @json($savedAuto);
+
+        document.addEventListener('DOMContentLoaded', function () {
+            savedAuto.forEach((item) => {
+
+                $('#mainAutomation').append(
+                    ' <div id="' + item.uuid + '" class="row"> ' +
+                    ' <div class="col"> ' + item.entity + ' </div> ' +
+                    ' <div class="col"></div> ' +
+                    `<div class="col-1 text-center status"> ${item.status}</div>` +
+                    '<div class="col-1"></div>' +
+                    `<div class="col-1 text-center channel"> ${item.channel}</div>` +
+                    '<div class="col-1"></div>' +
+                    `<div class="col-1 text-center project"> ${item.project}</div>` +
+                    '<div class="col-1"></div>' +
+                    '<div class="col-1 text-center"> Шаблон</div>' +
+                    '<div class="col-1"></div>' +
+                    ' <div onclick="deleteTemplate(\'' + item.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                    ' </div> '
+                )
+
+            });
+
+            const entityTypeSelect = document.getElementById('entity_type');
+            const projectSelect = document.getElementById('project');
+            const salesChannelSelect = document.getElementById('sales_channel');
+            const templateSelect = document.getElementById('template');
+            const statusesSelect = document.getElementById('status');
+        })
+
+
         // let saveOrgan = {{--@json($saveOrgan); --}}
         // let saveTemplate = {{--@json($template);--}}
         // let fields = getFields();
@@ -293,7 +163,7 @@
         // if (saveTemplate.length > 0) {
         //     saveTemplate.forEach((item) => {
 
-        //         $('#main').append(
+        //         $('#mainAutomation').append(
         //             ' <div id="' + item.uuid + '" class="row"> ' +
         //             ' <div class="col"> ' + item.title + ' </div> ' +
         //             ' <div class="col"></div> ' +

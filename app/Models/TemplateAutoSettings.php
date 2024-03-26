@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class TemplateAutoSettings extends Model
 {
-    use HasFactory;
+    public $guarded = [];
 }

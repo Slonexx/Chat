@@ -30,8 +30,9 @@ return [
 
     "paymentinMetadataAttributes" => "{$MsURL}entity/paymentin/metadata/attributes/",
     "productMetadataAttributes" => "{$MsURL}entity/product/metadata/attributes/",
+    "project" => "{$MsURL}entity/project/",
 
-
+    "saleschannel" => "{$MsURL}entity/saleschannel/",
     "salesreturnMetadataAttributes" => "{$MsURL}entity/salesreturn/metadata/attributes/",
     "salesreturn" => "{$MsURL}entity/salesreturn/",
 

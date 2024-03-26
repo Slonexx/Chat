@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -15,6 +16,7 @@ return new class extends Migration
     {
         Schema::create('template_auto_settings', function (Blueprint $table) {
             $table->id();
+            $table->uuid("uuid")->default(DB::raw('(UUID())'));
             $table->string("entity", 64);
             $table->uuid("status");
             $table->uuid("channel")->nullable();

@@ -116,4 +116,26 @@ class InvoiceoutService {
             return $answer;
         }
     }
+
+    function getStatuses(){
+        try{
+            $url = Config::get("Global")[self::URL_IDENTIFIER] . "metadata/";
+            $statusesRes = $this->msC->getByUrl($url);
+            
+            $res = new Response();
+            
+            if($statusesRes->status){
+                $statuses = $statusesRes->data->states;
+                $statesWithName = collect($statuses)->pluck("name", "id")->toArray();
+                return $res->success($statesWithName);
+            }
+            else
+                return $res->error($statusesRes, "Невозможно получить статусы счёта покупателя");
+
+        } catch (Exception $e){
+            $res = new Response();
+            $answer = $res->error($e, $e->getMessage());
+            return $answer;
+        }
+    }
 }
