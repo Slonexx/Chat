@@ -11,7 +11,10 @@
         this_click(window.document.getElementById('btn_1'))
         if (item.replace(/[^+\d]/g, '') > 3 && item.replace(/[^+\d]/g, '') <= 5) {
         this_click(window.document.getElementById('btn_2'))
-    }
+        }
+        if (item.replace(/[^+\d]/g, '') >= 6 && item.replace(/[^+\d]/g, '') <= 7) {
+        this_click(window.document.getElementById('btn_2'))
+        }
     }
     
 

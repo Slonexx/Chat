@@ -5,6 +5,7 @@ use App\Http\Controllers\Entity\PopapController;
 use App\Http\Controllers\Entity\widgetController;
 use App\Http\Controllers\initialization\indexController;
 use App\Http\Controllers\Setting\AttributeController;
+use App\Http\Controllers\Setting\AutomatizationController;
 use App\Http\Controllers\Setting\CreateAuthTokenController;
 use App\Http\Controllers\Setting\organizationController;
 use App\Http\Controllers\Setting\templateController;
@@ -71,6 +72,8 @@ Route::post('/Setting/getTemplate/{accountId}', [templateController::class, 'get
 
 Route::get('/Setting/template/get/attributes/{accountId}', [templateController::class, 'getAttributes']);
 Route::get('/Setting/template/delete/poles/{accountId}', [templateController::class, 'deletePoles']);
+
+Route::get('/Setting/automatization/{accountId}', [AutomatizationController::class, 'getPage']);
 
 
 //Widget
