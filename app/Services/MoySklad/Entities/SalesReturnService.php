@@ -123,8 +123,7 @@ class SalesReturnService {
                 $statuses = $statusesRes->data->states ?? null;
                 if($statuses === null)
                     return $res->success([]);
-                $statesWithName = collect($statuses)->pluck("name", "id")->toArray();
-                return $res->success($statesWithName);
+                return $res->success($statuses);
             }
             else
                 return $res->error($statusesRes, "Невозможно получить статусы возврата покупателя");

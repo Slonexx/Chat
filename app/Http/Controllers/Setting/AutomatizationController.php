@@ -48,35 +48,76 @@ class AutomatizationController extends Controller{
             ->get()
             ->toArray();
 
-            $uniqueEntities = collect($savedAuto)->pluck("entity")->unique()->values()->all();
             $statuses = [];
-            foreach($uniqueEntities as $item){
-                $entityServices = [
-                    "demand" => new DemandService($accountId),
-                    "customerorder" => new CustomOrderService($accountId),
-                    "invoiceout" => new InvoiceoutService($accountId),
-                    "salesreturn" => new SalesReturnService($accountId),
-                ];
-                $service = $entityServices[$item];
+            $entityServices = [
+                "demand" => new DemandService($accountId),
+                "customerorder" => new CustomOrderService($accountId),
+                "invoiceout" => new InvoiceoutService($accountId),
+                "salesreturn" => new SalesReturnService($accountId),
+            ];
+
+            foreach($entityServices as $entityType => $service){
                 $statusesRes = $service->getStatuses();
                 if(!$statusesRes->status){
-                    return $handlerS->responseHandler($statusesRes, true, false);
+                    return $handlerS->responseHandler($statusesRes, true, false);       
                 }
-                if(empty($statusesRes->data)){
-                    $needDelete = MainSettings::join('chatapp_employees as e', 'e.main_settings_id', "=", "main_settings.id")
-                    ->join('template_auto_settings as auto_s', 'auto_s.employee_id', "=", "e.id")
-                    ->where("account_id", $accountId)
-                    ->where("entity", $item)
-                    ->select("auto_s.uuid")
-                    ->get()
-                    ->all();
-                    foreach($needDelete as $item){
-                        TemplateAutoSettings::where("uuid", $item->uuid)->get()->first()->delete();
-                    }
-
-                } else
-                    $statuses[$item] = $statusesRes->data;
+                $statuses[$entityType] = $statusesRes->data;
             }
+
+            $prepStatuses = [];
+            foreach($statuses as $entityType => $states){
+                $autos = array_filter($savedAuto, fn($value) => $value["entity"] == $entityType);
+                foreach($states as $state){
+                    $selects = [];
+                    // array_filter($savedAuto, fn($value) => $value["entity"] == $entityType
+                    //         && $value["status"] == $state->id);
+                    if(count($autos) == 0){
+                        foreach($states as $state){
+                            $obj = new stdClass();
+                            $obj->id = $state->id;
+                            $obj->name = $state->name;
+                            $obj->selected = false;
+                            $prepStatuses[$entityType][] = $obj;
+                        }
+                        $obj = new stdClass();
+                        $obj->id = null;
+                        $obj->name = "Не выбрано";
+                        $obj->selected = true;
+                        $prepStatuses[$entityType][] = $obj;
+                        break;
+                    } else {
+
+                        for($i = 0; $i < count($autos); $i++){
+                            $select = [];
+                            $obj = new stdClass();
+                            $obj->id = $state->id;
+                            $obj->name = $state->name;
+                            $obj->selected = true;
+                            $select[] = $obj;
+                            //$prepStatuses[$entityType][$i][] = $obj;
+                            $f = array_filter($states, fn($value) => $value->id != $state->id);
+                            foreach($f as $unmarked){
+                                $obj = new stdClass();
+                                $obj->id = $unmarked->id;
+                                $obj->name = $unmarked->name;
+                                $obj->selected = false;
+                                $select[] = $obj;
+                            }
+                            $selects = $select;
+                        }
+                        $prepStatuses[$entityType][] = $selects;
+                    }
+                }
+            }
+
+            // $autoWithStatus = array_map(function ($item) use ($statuses){
+
+            // }, $savedAuto);
+
+            foreach($savedAuto as $autoItem){
+
+            }
+
             $projectS = new ProjectService($accountId);
             $allProjRes = $projectS->getAll();
             if(!$allProjRes->status){
@@ -90,6 +131,26 @@ class AutomatizationController extends Controller{
             }
             $saleschannel = $allSalesChanRes->data;
             $project = $allProjRes->data;
+
+
+            //$uniqueEntities = collect($savedAuto)->pluck("entity")->unique()->values()->all();
+            // foreach($statuses as $entityType =>$item){
+            //     if(count($item)){
+            //         $needDelete = MainSettings::join('chatapp_employees as e', 'e.main_settings_id', "=", "main_settings.id")
+            //         ->join('template_auto_settings as auto_s', 'auto_s.employee_id', "=", "e.id")
+            //         ->where("account_id", $accountId)
+            //         ->where("entity", $entityType)
+            //         ->select("auto_s.uuid")
+            //         ->get()
+            //         ->all();
+            //         foreach($needDelete as $item){
+            //             TemplateAutoSettings::where("uuid", $item->uuid)->get()->first()->delete();
+            //         }
+
+            //     } else
+                
+                
+            // }
 
             $autoWithStatus = array_map(function ($item) use ($statuses, $saleschannel, $project){
                 $status = array_filter($statuses[$item['entity']], function($key) use ($item){

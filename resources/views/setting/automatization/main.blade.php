@@ -116,20 +116,27 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             savedAuto.forEach((item) => {
+                const select = document.createElement("select");
+
+                
 
                 $('#mainAutomation').append(
                     ' <div id="' + item.uuid + '" class="row"> ' +
-                    ' <div class="col"> ' + item.entity + ' </div> ' +
-                    ' <div class="col"></div> ' +
-                    `<div class="col-1 text-center status"> ${item.status}</div>` +
-                    '<div class="col-1"></div>' +
-                    `<div class="col-1 text-center channel"> ${item.channel}</div>` +
-                    '<div class="col-1"></div>' +
-                    `<div class="col-1 text-center project"> ${item.project}</div>` +
-                    '<div class="col-1"></div>' +
-                    '<div class="col-1 text-center"> Шаблон</div>' +
-                    '<div class="col-1"></div>' +
-                    ' <div onclick="deleteTemplate(\'' + item.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                        ' <div class="col"> ' +
+                            '<option value="0">Заказ покупателя</option>' + 
+                            '<option value="1">Отгрузки</option>' + 
+                            '<option value="2">Возврат покупателя</option>' +
+                        + item.entity + ' </div> ' +
+                        ' <div class="col"></div> ' +
+                        `<div class="col-1 text-center status"> ${item.status}</div>` +
+                        '<div class="col-1"></div>' +
+                        `<div class="col-1 text-center channel"> ${item.channel}</div>` +
+                        '<div class="col-1"></div>' +
+                        `<div class="col-1 text-center project"> ${item.project}</div>` +
+                        '<div class="col-1"></div>' +
+                        '<div class="col-1 text-center"> Шаблон</div>' +
+                        '<div class="col-1"></div>' +
+                        ' <div onclick="deleteTemplate(\'' + item.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
                     ' </div> '
                 )
 

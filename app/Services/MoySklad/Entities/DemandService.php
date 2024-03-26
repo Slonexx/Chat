@@ -2,6 +2,7 @@
 namespace App\Services\MoySklad\Entities;
 
 use App\Clients\MoySklad;
+use App\Services\MoySklad\CutLogicService;
 use App\Services\Response;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -124,9 +125,11 @@ class DemandService {
             $res = new Response();
             
             if($statusesRes->status){
-                $statuses = $statusesRes->data->states;
-                $statesWithName = collect($statuses)->pluck("name", "id")->toArray();
-                return $res->success($statesWithName);
+                $statuses = $statusesRes->data->states ?? null;
+                if($statuses === null)
+                    return $res->success([]);
+                else
+                    return $res->success($statuses);
             }
             else
                 return $res->error($statusesRes, "Невозможно получить статусы отгрузки");
