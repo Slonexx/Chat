@@ -78,7 +78,9 @@
                     <div class="col-1 text-center"> Удалить</div>
                 </div>
 
-                <div id="mainAutomation" class="mt-3"></div>
+                <div id="" class="container mt-2">
+                    <div id="mainAutomation" class="row">
+                </div>
             </div>
 
 
@@ -115,30 +117,117 @@
         let savedAuto = @json($savedAuto);
 
         document.addEventListener('DOMContentLoaded', function () {
-            savedAuto.forEach((item) => {
-                const select = document.createElement("select");
+            savedAuto.forEach((itemAuto) => {
+                const autoDivRow = document.createElement("div");
+                autoDivRow.className = "row";
+                const autoDivCol = document.createElement("div");
+                autoDivCol.className = "col";
 
+                const entitySelect = document.createElement("select");
+                let cl = ["w-5"];
+                entitySelect.classList.add(...cl);
+                entitySelect.id = `entity_${itemAuto.uuid}`;
+                
+                itemAuto.entity.forEach((itemEntity) => {
+                    const option = document.createElement("option");
+                    option.innerText = itemEntity.name;
+                    option.selected = itemEntity.selected;
+                    entitySelect.appendChild(option);
+                })
+
+                const statusSelect = document.createElement("select");
+                statusSelect.classList.add(...cl);
+                statusSelect.id = `status_${itemAuto.uuid}`;
+
+                itemAuto.status.forEach((itemStatus) => {
+                    const option = document.createElement("option");
+                    option.id = itemStatus.id;
+                    option.innerText = itemStatus.name;
+                    option.selected = itemStatus.selected;
+                    statusSelect.appendChild(option);
+                })
+
+                const channelSelect = document.createElement("select");
+                channelSelect.classList.add(...cl);
+                channelSelect.id = `channel_${itemAuto.uuid}`;
+
+                itemAuto.channel.forEach((itemChannel) => {
+                    const option = document.createElement("option");
+                    option.id = itemChannel.id;
+                    option.innerText = itemChannel.name;
+                    option.selected = itemChannel.selected;
+                    channelSelect.appendChild(option);
+                })
+
+                const projectSelect = document.createElement("select");
+                projectSelect.classList.add(...cl);
+                projectSelect.id = `project_${itemAuto.uuid}`;
+
+                itemAuto.channel.forEach((itemProject) => {
+                    const option = document.createElement("option");
+                    option.id = itemProject.id;
+                    option.innerText = itemProject.name;
+                    option.selected = itemProject.selected;
+                    projectSelect.appendChild(option);
+                })
+
+                cl = ["select", "w-100", "is-small"];
+
+                const selectDivEntity = document.createElement("div");
+                selectDivEntity.classList.add(...cl);
+                selectDivEntity.appendChild(entitySelect)
+
+                const selectDivStatus = document.createElement("div");
+                selectDivStatus.classList.add(...cl);
+                selectDivStatus.appendChild(statusSelect)
+
+                const selectDivChannel = document.createElement("div");
+                selectDivChannel.classList.add(...cl);
+                selectDivChannel.appendChild(channelSelect)
+
+                const selectDivProject = document.createElement("div");
+                selectDivProject.classList.add(...cl);
+                selectDivEntity.appendChild(projectSelect);
+
+                autoDivCol.appendChild(selectDivEntity);
+                autoDivCol.appendChild(selectDivStatus);
+                autoDivCol.appendChild(selectDivChannel);
+                autoDivCol.appendChild(selectDivProject);
+
+                // autoDivFormGroupEntity.appendChild(entitySelect);
+                // autoDivFormGroupStatus.appendChild(statusSelect);
+                // autoDivFormGroupChannel.appendChild(channelSelect);
+                // autoDivFormGroupProject.appendChild(projectSelect);
+
+                // autoDivCol.appendChild(autoDivFormGroupEntity);
+                // autoDivCol.appendChild(autoDivFormGroupStatus);
+                // autoDivCol.appendChild(autoDivFormGroupChannel);
+                // autoDivCol.appendChild(autoDivFormGroupProject);
+
+                //autoDivRow.appendChild(autoDivCol);
+
+                mainAutomation.appendChild(autoDivCol);
                 
 
-                $('#mainAutomation').append(
-                    ' <div id="' + item.uuid + '" class="row"> ' +
-                        ' <div class="col"> ' +
-                            '<option value="0">Заказ покупателя</option>' + 
-                            '<option value="1">Отгрузки</option>' + 
-                            '<option value="2">Возврат покупателя</option>' +
-                        + item.entity + ' </div> ' +
-                        ' <div class="col"></div> ' +
-                        `<div class="col-1 text-center status"> ${item.status}</div>` +
-                        '<div class="col-1"></div>' +
-                        `<div class="col-1 text-center channel"> ${item.channel}</div>` +
-                        '<div class="col-1"></div>' +
-                        `<div class="col-1 text-center project"> ${item.project}</div>` +
-                        '<div class="col-1"></div>' +
-                        '<div class="col-1 text-center"> Шаблон</div>' +
-                        '<div class="col-1"></div>' +
-                        ' <div onclick="deleteTemplate(\'' + item.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
-                    ' </div> '
-                )
+                // $('#mainAutomation').append(
+                //     ' <div id="' + item.uuid + '" class="row"> ' +
+                //         ' <div class="col"> ' +
+                //             '<option value="0">Заказ покупателя</option>' + 
+                //             '<option value="1">Отгрузки</option>' + 
+                //             '<option value="2">Возврат покупателя</option>' +
+                //         + item.entity + ' </div> ' +
+                //         ' <div class="col"></div> ' +
+                //         `<div class="col-1 text-center status"> ${item.status}</div>` +
+                //         '<div class="col-1"></div>' +
+                //         `<div class="col-1 text-center channel"> ${item.channel}</div>` +
+                //         '<div class="col-1"></div>' +
+                //         `<div class="col-1 text-center project"> ${item.project}</div>` +
+                //         '<div class="col-1"></div>' +
+                //         '<div class="col-1 text-center"> Шаблон</div>' +
+                //         '<div class="col-1"></div>' +
+                //         ' <div onclick="deleteTemplate(\'' + item.uuid + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div> ' +
+                //     ' </div> '
+                // )
 
             });
 

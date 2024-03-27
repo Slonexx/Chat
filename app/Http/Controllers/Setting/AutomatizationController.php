@@ -47,7 +47,8 @@ class AutomatizationController extends Controller{
                 )
             ->get()
             ->toArray();
-
+            
+            $automation = [];
             $statuses = [];
             $entityServices = [
                 "demand" => new DemandService($accountId),
@@ -64,59 +65,83 @@ class AutomatizationController extends Controller{
                 $statuses[$entityType] = $statusesRes->data;
             }
 
-            $prepStatuses = [];
+            ////////////STATUSES////////////
+            //$prepStatuses = [];
             foreach($statuses as $entityType => $states){
                 $autos = array_filter($savedAuto, fn($value) => $value["entity"] == $entityType);
                 foreach($states as $state){
-                    $selects = [];
-                    // array_filter($savedAuto, fn($value) => $value["entity"] == $entityType
-                    //         && $value["status"] == $state->id);
-                    if(count($autos) == 0){
-                        foreach($states as $state){
-                            $obj = new stdClass();
-                            $obj->id = $state->id;
-                            $obj->name = $state->name;
-                            $obj->selected = false;
-                            $prepStatuses[$entityType][] = $obj;
-                        }
-                        $obj = new stdClass();
-                        $obj->id = null;
-                        $obj->name = "Не выбрано";
-                        $obj->selected = true;
-                        $prepStatuses[$entityType][] = $obj;
+                    if(count($autos) == 0)
                         break;
-                    } else {
+                    $fA = array_filter($autos, fn($value) => $value['status'] == $state->id);
+                    $shftedAuto = array_shift($fA);
 
-                        for($i = 0; $i < count($autos); $i++){
-                            $select = [];
-                            $obj = new stdClass();
-                            $obj->id = $state->id;
-                            $obj->name = $state->name;
-                            $obj->selected = true;
-                            $select[] = $obj;
-                            //$prepStatuses[$entityType][$i][] = $obj;
-                            $f = array_filter($states, fn($value) => $value->id != $state->id);
-                            foreach($f as $unmarked){
-                                $obj = new stdClass();
-                                $obj->id = $unmarked->id;
-                                $obj->name = $unmarked->name;
-                                $obj->selected = false;
-                                $select[] = $obj;
-                            }
-                            $selects = $select;
-                        }
-                        $prepStatuses[$entityType][] = $selects;
+                    $fSEqueal = array_filter($states, fn($value) => $value->id == $shftedAuto['status']);
+                    $fSNotEqueal = array_filter($states, fn($value) => $value->id != $shftedAuto['status']);
+
+                    $stateEqual = array_shift($fSEqueal);
+
+                    $obj = new stdClass();
+                    $obj->id = $stateEqual->id;
+                    $obj->name = $stateEqual->name;
+                    $obj->selected = true;
+
+                    $shftedAuto['status'] = [];
+                    $shftedAuto['status'][] = $obj;
+
+                    foreach($fSNotEqueal as $state){
+                        $obj = new stdClass();
+                        $obj->id = $state->id;
+                        $obj->name = $state->name;
+                        $obj->selected = false;
+                        $shftedAuto['status'][] = $obj;
                     }
+                    $automation[] = $shftedAuto;
+                    // $selects = [];
+                    // if(count($autos) == 0){
+                    //     foreach($states as $state){
+                    //         $obj = new stdClass();
+                    //         $obj->id = $state->id;
+                    //         $obj->name = $state->name;
+                    //         $obj->selected = false;
+                    //         $prepStatuses[$entityType][] = $obj;
+                    //     }
+                    //     $obj = new stdClass();
+                    //     $obj->id = null;
+                    //     $obj->name = "Не выбрано";
+                    //     $obj->selected = true;
+                    //     $prepStatuses[$entityType][] = $obj;
+                    //     break;
+                    // } else {
+                        
+
+
+                        // for($i = 0; $i < count($autos); $i++){
+                        //     $select = [];
+                            
+                        //     $obj = new stdClass();
+                        //     $obj->id = $state->id;
+                        //     $obj->name = $state->name;
+                        //     $obj->selected = true;
+                        //     $select[] = $obj;
+                        //     //$prepStatuses[$entityType][$i][] = $obj;
+                        //     // foreach($f as $unmarked){
+                        //     //     $obj = new stdClass();
+                        //     //     $obj->id = $unmarked->id;
+                        //     //     $obj->name = $unmarked->name;
+                        //     //     $obj->selected = false;
+                        //     //     $select[] = $obj;
+                        //     // }
+                        //     // $selects = $select;
+                        // }
+                        // $prepStatuses[$entityType][] = $selects;
+                    //}
                 }
-            }
-
-            // $autoWithStatus = array_map(function ($item) use ($statuses){
-
-            // }, $savedAuto);
-
-            foreach($savedAuto as $autoItem){
 
             }
+            ////////////STATUSES////////////
+
+            $availableEntities = array_keys($entityServices);
+
 
             $projectS = new ProjectService($accountId);
             $allProjRes = $projectS->getAll();
@@ -129,8 +154,169 @@ class AutomatizationController extends Controller{
             if(!$allSalesChanRes->status){
                 return $handlerS->responseHandler($allSalesChanRes, true, false);
             }
+
             $saleschannel = $allSalesChanRes->data;
             $project = $allProjRes->data;
+
+            for($i = 0; $i< count($automation); $i++){
+                ////////////ENTITIES////////////
+                $currentEntity = $automation[$i]['entity'];
+                $obj = new stdClass();
+                $obj->name = $currentEntity;
+                $obj->selected = true;
+                $automation[$i]['entity'] = [];
+                $automation[$i]['entity'][] = $obj;
+
+                $fENotEqueal = array_filter($availableEntities, fn($value) => $value != $currentEntity);
+                foreach($fENotEqueal as $item){
+                    $obj = new stdClass();
+                    $obj->name = $item;
+                    $obj->selected = false;
+                    $automation[$i]['entity'][] = $obj;
+                }
+                ////////////ENTITIES////////////
+
+                ////////////CHANNEL////////////
+                $autoChannel = $automation[$i]['channel'];
+                $automation[$i]['channel'] = [];
+                if($autoChannel !== null){
+                    $fChEqueal = array_filter($saleschannel, function($key) use ($autoChannel){
+                        return $key == $autoChannel;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $fChNotEqueal = array_filter($saleschannel, function($key) use ($autoChannel){
+                        return $key != $autoChannel;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $chValue = array_shift($fChEqueal);
+
+                    $obj = new stdClass();
+                    $obj->id = $autoChannel;
+                    $obj->name = $chValue;
+                    $obj->selected = true;
+
+                    $automation[$i]['channel'][] = $obj;
+
+                    foreach($fChNotEqueal as $key =>  $item){
+                        $obj = new stdClass();
+                        $obj->id = $key;
+                        $obj->name = $item;
+                        $obj->selected = false;
+                        $automation[$i]['channel'][] = $obj;
+                    }
+
+                } else {
+                    $obj = new stdClass();
+                    $obj->id = null;
+                    $obj->name = "Не выбрано";
+                    $obj->selected = true;
+                    $automation[$i]['channel'][] = $obj;
+                    foreach($saleschannel as $key => $chItem){
+                        $obj = new stdClass();
+                        $obj->id = $key;
+                        $obj->name = $chItem;
+                        $obj->selected = false;
+                        $automation[$i]['channel'][] = $obj;
+                    }
+                }
+                ////////////CHANNEL////////////
+
+                ////////////PROJECT////////////
+                $autoProject = $automation[$i]['project'];
+                $automation[$i]['project'] = [];
+                if($autoProject !== null){
+                    $fPEqueal = array_filter($project, function($key) use ($autoProject){
+                        return $key == $autoProject;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $fPNotEqueal = array_filter($project, function($key) use ($autoProject){
+                        return $key != $autoProject;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $pValue = array_shift($fPEqueal);
+
+                    $obj = new stdClass();
+                    $obj->id = $autoProject;
+                    $obj->name = $pValue;
+                    $obj->selected = true;
+
+                    $automation[$i]['project'][] = $obj;
+
+                    foreach($fPNotEqueal as $key =>  $item){
+                        $obj = new stdClass();
+                        $obj->id = $key;
+                        $obj->name = $item;
+                        $obj->selected = false;
+                        $automation[$i]['project'][] = $obj;
+                    }
+
+                } else {
+                    $obj = new stdClass();
+                    $obj->id = null;
+                    $obj->name = "Не выбрано";
+                    $obj->selected = true;
+                    $automation[$i]['project'][] = $obj;
+                    foreach($project as $key => $chItem){
+                        $obj = new stdClass();
+                        $obj->id = $key;
+                        $obj->name = $chItem;
+                        $obj->selected = false;
+                        $automation[$i]['project'][] = $obj;
+                    }
+                }
+                ////////////PROJECT////////////
+                
+            }
+
+            return view('setting.automatization.main', [
+                'savedAuto' => $automation,
+                // 'template' => $templates,
+                // 'message' => $request->message ?? '',
+    
+                'accountId' => $accountId,
+                'isAdmin' => $isAdmin,
+                'fullName' => $fullName,
+                'uid' => $uid,
+            ]);
+            
+
+            // array_map(function ($item) use ($statuses, $saleschannel, $project){
+            //     $status = array_filter($statuses[$item['entity']], function($key) use ($item){
+            //         return $key == $item['status'];
+            //     }, ARRAY_FILTER_USE_KEY);
+            //     $stKey = array_shift($status);
+            //     $item['status'] = $stKey;
+
+            //     if($item['channel'] !== null){
+            //         $channel = array_filter($saleschannel, function($key) use ($item){
+            //             return $key == $item['channel'];
+            //         }, ARRAY_FILTER_USE_KEY);
+            //         $chKey = array_shift($channel);
+            //         $item['channel'] = $chKey;
+
+            //     }
+
+            //     // if($item['project'] !== null){
+            //     //     $project = array_filter($statuses[$item['project']], function($key) use ($item){
+            //     //         return $key == $item['project'];
+            //     //     }, ARRAY_FILTER_USE_KEY);
+            //     //     $projKey = array_shift($project);
+            //     //     $item['project'] = $projKey;
+
+            //     // }
+
+
+            //     return $item;
+            // }, (array) $savedAuto);
+
+
+            // array_map(function ($item) use ($availableEntities){
+            //     $obj = new stdClass();
+            //     $obj->name = $item->entity;
+            //     $obj->selected = true;
+
+            //     $shftedAuto['status'] = [];
+            //     $shftedAuto['status'][] = $obj;
+            
+            //     $fENotEqueal = array_filter($availableEntities, fn($value) => $value != $item->entity);
+            //     return $item;
+            // }, $automation);
 
 
             //$uniqueEntities = collect($savedAuto)->pluck("entity")->unique()->values()->all();
@@ -152,46 +338,10 @@ class AutomatizationController extends Controller{
                 
             // }
 
-            $autoWithStatus = array_map(function ($item) use ($statuses, $saleschannel, $project){
-                $status = array_filter($statuses[$item['entity']], function($key) use ($item){
-                    return $key == $item['status'];
-                }, ARRAY_FILTER_USE_KEY);
-                $stKey = array_shift($status);
-                $item['status'] = $stKey;
-
-                if($item['channel'] !== null){
-                    $channel = array_filter($saleschannel, function($key) use ($item){
-                        return $key == $item['channel'];
-                    }, ARRAY_FILTER_USE_KEY);
-                    $chKey = array_shift($channel);
-                    $item['channel'] = $chKey;
-
-                }
-
-                // if($item['project'] !== null){
-                //     $project = array_filter($statuses[$item['project']], function($key) use ($item){
-                //         return $key == $item['project'];
-                //     }, ARRAY_FILTER_USE_KEY);
-                //     $projKey = array_shift($project);
-                //     $item['project'] = $projKey;
-
-                // }
 
 
-                return $item;
-            }, (array) $savedAuto);
 
-
-            return view('setting.automatization.main', [
-                'savedAuto' => $autoWithStatus,
-                // 'template' => $templates,
-                // 'message' => $request->message ?? '',
-    
-                'accountId' => $accountId,
-                'isAdmin' => $isAdmin,
-                'fullName' => $fullName,
-                'uid' => $uid,
-            ]);
+            
             //->groupBy('entity')
 
 
