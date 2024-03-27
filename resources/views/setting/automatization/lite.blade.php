@@ -1,6 +1,8 @@
 <script>
 
+    function deleteAutomation(itemAuto){
 
+    }
     function createOnClick(){
 
         idCreatePoleUpdate.innerText = ''

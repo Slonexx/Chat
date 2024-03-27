@@ -22,8 +22,14 @@ return new class extends Migration
             $table->uuid("channel")->nullable();
             $table->uuid("project")->nullable();
 
+            $table->unsignedBigInteger('main_settings_id')->nullable();
+            $table->foreign('main_settings_id')->references('id')->on('main_settings')->onDelete('cascade');
+
             $table->unsignedBigInteger('employee_id')->nullable();
             $table->foreign('employee_id')->references('id')->on('chatapp_employees')->onDelete('cascade');
+
+            $table->unsignedBigInteger('template_id')->nullable();
+            $table->foreign('template_id')->references('id')->on('templates');
             $table->timestamps();
         });
     }

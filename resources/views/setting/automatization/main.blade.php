@@ -26,9 +26,9 @@
 
         </div>
 
-        <form action="/Setting/automationSetting/{{$accountId}}?isAdmin={{$isAdmin}}" method="post" class="mt-2 ml-5 mr-5">
-            @csrf <!-- {{ csrf_field() }} -->
-            <div class="box mt-1 mb-4 columns p-0 gradient_layout_invert">
+         <!--<form action="/Setting/automationSetting/{{$accountId}}?isAdmin={{$isAdmin}}" method="post" class="mt-2 ml-5 mr-5">-->
+            {{--@csrf--}} <!-- {{ csrf_field() }} -->
+        <!--    <div class="box mt-1 mb-4 columns p-0 gradient_layout_invert">
                 <div onclick="createScript()" class="col-1 has-text-right" style="font-size: 30px; cursor: pointer">
                     <i class="fas fa-plus-circle"></i> &nbsp;
                 </div>
@@ -54,7 +54,7 @@
 
 
             <button class="button is-outlined gradient_focus"> сохранить</button>
-        </form>
+        </form> -->
 
 
         <form class="mt-3"
@@ -65,17 +65,13 @@
             <div class="">
 
                 <div class="row bg-info rounded text-white">
-                    <div class="col-1 entity"> Тип сущности</div>
-                    <div class="col"></div>
-                    <div class="col-1 text-center status"> Статус</div>
-                    <div class="col-1"></div>
-                    <div class="col-1 text-center channel"> Канал продаж</div>
-                    <div class="col-1"></div>
-                    <div class="col-1 text-center project"> Проект</div>
-                    <div class="col-1"></div>
-                    <div class="col-1 text-center"> Шаблон</div>
-                    <div class="col-1"></div>
-                    <div class="col-1 text-center"> Удалить</div>
+                    <!-- <div class="col"></div> -->
+                    <div class="col-2 text-center entity"> Тип сущности</div>
+                    <div class="col-2 text-center status"> Статус</div>
+                    <div class="col-2 text-center channel"> Канал продаж</div>
+                    <div class="col-2 text-center project"> Проект</div>
+                    <div class="col-2 text-center"> Шаблон</div>
+                    <div class="col text-center"> Удалить</div>
                 </div>
 
                 <div id="" class="container mt-2">
@@ -119,12 +115,12 @@
         document.addEventListener('DOMContentLoaded', function () {
             savedAuto.forEach((itemAuto) => {
                 const autoDivRow = document.createElement("div");
-                autoDivRow.className = "row";
+                autoDivRow.className = "col-12";
                 const autoDivCol = document.createElement("div");
-                autoDivCol.className = "col";
+                autoDivCol.className = "col-12 row";
 
                 const entitySelect = document.createElement("select");
-                let cl = ["w-5"];
+                let cl = ["col", 'form-select', 'form-select-lg', 'mb-3'];
                 entitySelect.classList.add(...cl);
                 entitySelect.id = `entity_${itemAuto.uuid}`;
                 
@@ -163,13 +159,30 @@
                 projectSelect.classList.add(...cl);
                 projectSelect.id = `project_${itemAuto.uuid}`;
 
-                itemAuto.channel.forEach((itemProject) => {
+                itemAuto.project.forEach((itemProject) => {
                     const option = document.createElement("option");
                     option.id = itemProject.id;
                     option.innerText = itemProject.name;
                     option.selected = itemProject.selected;
                     projectSelect.appendChild(option);
                 })
+
+                const templateSelect = document.createElement("select");
+                templateSelect.classList.add(...cl);
+                templateSelect.id = `template_${itemAuto.uuid}`;
+
+                itemAuto.template.forEach((itemTemplate) => {
+                    const option = document.createElement("option");
+                    option.id = itemTemplate.id;
+                    option.innerText = itemTemplate.name;
+                    option.selected = itemTemplate.selected;
+                    templateSelect.appendChild(option);
+                })
+
+                const deleteButton = document.createElement("div");
+                deleteButton.onclick = deleteAutomation(itemAuto.uuid)
+                deleteButton.innerHTML = "Удалить <i class='fa-regular fa-circle-xmark'></i>"
+                deleteButton.className = "col-1 btn gradient_focus"
 
                 cl = ["select", "w-100", "is-small"];
 
@@ -189,10 +202,17 @@
                 selectDivProject.classList.add(...cl);
                 selectDivEntity.appendChild(projectSelect);
 
-                autoDivCol.appendChild(selectDivEntity);
-                autoDivCol.appendChild(selectDivStatus);
-                autoDivCol.appendChild(selectDivChannel);
-                autoDivCol.appendChild(selectDivProject);
+                // entitySelect.className = "form-select form-select-lg mb-3"
+                // entitySelect.className = "form-select form-select-lg mb-3"
+                // entitySelect.className = "form-select form-select-lg mb-3"
+                // entitySelect.className = "form-select form-select-lg mb-3"
+
+                autoDivCol.appendChild(entitySelect);
+                autoDivCol.appendChild(statusSelect);
+                autoDivCol.appendChild(channelSelect);
+                autoDivCol.appendChild(projectSelect);
+                autoDivCol.appendChild(templateSelect);
+                autoDivCol.appendChild(deleteButton);
 
                 // autoDivFormGroupEntity.appendChild(entitySelect);
                 // autoDivFormGroupStatus.appendChild(statusSelect);

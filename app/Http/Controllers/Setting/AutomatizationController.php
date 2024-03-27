@@ -35,15 +35,16 @@ class AutomatizationController extends Controller{
             $fullName = $request->fullName ?? "Имя аккаунта";
             $uid = $request->uid ?? "логин аккаунта";
 
-            $savedAuto = MainSettings::join('chatapp_employees as e', 'e.main_settings_id', "=", "main_settings.id")
-            ->join('template_auto_settings as auto_s', 'auto_s.employee_id', "=", "e.id")
+            $savedAuto = MainSettings::join('template_auto_settings as auto_s', 'auto_s.main_settings_id', "=", "main_settings.id")
+            ->join('templates as t', 't.id', "=", "auto_s.template_id")
             ->where("account_id", $accountId)
             ->select(
                 "auto_s.uuid",
                 "channel", 
                 "project", 
                 "status",
-                "entity"
+                "entity",
+                "t.uuid as template"
                 )
             ->get()
             ->toArray();
@@ -73,6 +74,8 @@ class AutomatizationController extends Controller{
                     if(count($autos) == 0)
                         break;
                     $fA = array_filter($autos, fn($value) => $value['status'] == $state->id);
+                    if(count($fA) == 0)
+                        continue;
                     $shftedAuto = array_shift($fA);
 
                     $fSEqueal = array_filter($states, fn($value) => $value->id == $shftedAuto['status']);
@@ -157,6 +160,15 @@ class AutomatizationController extends Controller{
 
             $saleschannel = $allSalesChanRes->data;
             $project = $allProjRes->data;
+
+            $templates = MainSettings::join('templates as t', 'main_settings.id', "=", "t.main_settings_id")
+            ->where("account_id", $accountId)
+            ->select(
+                "t.title",
+                "t.uuid")
+            ->get()
+            ->pluck("title", "uuid")
+            ->all();
 
             for($i = 0; $i< count($automation); $i++){
                 ////////////ENTITIES////////////
@@ -261,6 +273,49 @@ class AutomatizationController extends Controller{
                     }
                 }
                 ////////////PROJECT////////////
+
+                ////////////TEMPLATE////////////
+                $autoTemplate = $automation[$i]['template'];
+                $automation[$i]['template'] = [];
+                if($autoTemplate !== null){
+                    $fTEqueal = array_filter($templates, function($key) use ($autoTemplate){
+                        return $key == $autoTemplate;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $fTNotEqueal = array_filter($templates, function($key) use ($autoTemplate){
+                        return $key != $autoTemplate;
+                    }, ARRAY_FILTER_USE_KEY);
+                    $TValue = array_shift($fTEqueal);
+
+                    $obj = new stdClass();
+                    $obj->id = $autoTemplate;
+                    $obj->name = $TValue;
+                    $obj->selected = true;
+
+                    $automation[$i]['template'][] = $obj;
+
+                    foreach($fTNotEqueal as $key =>  $item){
+                        $obj = new stdClass();
+                        $obj->id = $key;
+                        $obj->name = $item;
+                        $obj->selected = false;
+                        $automation[$i]['template'][] = $obj;
+                    }
+
+                } else {
+                    $obj = new stdClass();
+                    $obj->id = null;
+                    $obj->name = "Не выбрано";
+                    $obj->selected = true;
+                    $automation[$i]['template'][] = $obj;
+                    foreach($templates as $key => $TItem){
+                        $obj = new stdClass();
+                        $obj->id = $key;
+                        $obj->name = $TItem;
+                        $obj->selected = false;
+                        $automation[$i]['template'][] = $obj;
+                    }
+                }
+                ////////////TEMPLATE////////////
                 
             }
 
