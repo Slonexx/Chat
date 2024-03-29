@@ -111,4 +111,11 @@
         -webkit-text-fill-color: transparent;
         -moz-text-fill-color: transparent;
     }
+
+    .autom_select {
+      height: auto; /* Сделаем высоту автоматической для правильного отображения */
+      padding: 0.25rem 0.5rem; /* Изменяем отступы внутри элемента */
+      font-size: 0.875rem; /* Изменяем размер шрифта */
+      margin: 0.975rem 0.9rem;
+    }
 </style>

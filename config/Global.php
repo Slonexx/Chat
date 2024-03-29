@@ -16,6 +16,7 @@ return [
     "demandMetadataAttributes" => "{$MsURL}entity/demand/metadata/attributes/",
     "demand" => "{$MsURL}entity/demand/",
 
+    "employee" => "{$MsURL}entity/employee",
     "employeeMetadataAttributes" => "{$MsURL}entity/employee/metadata/attributes/",
 
     "factureoutMetadataAttributes" => "{$MsURL}entity/factureout/metadata/attributes/",

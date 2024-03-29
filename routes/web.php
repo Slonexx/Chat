@@ -75,6 +75,8 @@ Route::get('/Setting/template/delete/poles/{accountId}', [templateController::cl
 
 Route::get('/Setting/automatization/{accountId}', [AutomatizationController::class, 'getPage']);
 
+Route::post('/automatization/{accountId}', [AutomatizationController::class, 'sendTemplate']);
+
 
 //Widget
 Route::get('/widget/{object}', [widgetController::class, 'widgetObject']);

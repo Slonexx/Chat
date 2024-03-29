@@ -26,10 +26,13 @@ return new class extends Migration
             $table->foreign('main_settings_id')->references('id')->on('main_settings')->onDelete('cascade');
 
             $table->unsignedBigInteger('employee_id')->nullable();
-            $table->foreign('employee_id')->references('id')->on('chatapp_employees')->onDelete('cascade');
+            $table->foreign('employee_id')->references('id')->on('employee_models')->onDelete('cascade');
 
             $table->unsignedBigInteger('template_id')->nullable();
             $table->foreign('template_id')->references('id')->on('templates');
+
+            $table->unsignedBigInteger('chatapp_employees_id')->nullable();
+            $table->foreign('chatapp_employees_id')->references('id')->on('chatapp_employees');
             $table->timestamps();
         });
     }

@@ -120,7 +120,7 @@
                 autoDivCol.className = "col-12 row";
 
                 const entitySelect = document.createElement("select");
-                let cl = ["col", 'form-select', 'form-select-lg', 'mb-3'];
+                let cl = ["col", 'form-select', 'mb-3', 'autom_select'];
                 entitySelect.classList.add(...cl);
                 entitySelect.id = `entity_${itemAuto.uuid}`;
                 

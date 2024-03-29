@@ -17,12 +17,14 @@ return new class extends Migration
         Schema::create('chatapp_employees', function (Blueprint $table) {
             $table->id();
 
-            $table->string("line", 64);
+            $table->string("lineId", 255);
+            $table->string("messenger", 255);
+            $table->string("chatId", 255);
 
-            $table->uuid('uuid')->default(DB::raw('(UUID())'));
+            //$table->uuid('uuid')->default(DB::raw('(UUID())'));
             
-            $table->unsignedBigInteger('main_settings_id')->nullable();
-            $table->foreign('main_settings_id')->references('id')->on('main_settings')->onDelete('cascade');
+            $table->unsignedBigInteger('employee_id')->nullable();
+            $table->foreign('employee_id')->references('id')->on('employee_models')->onDelete('cascade');
             $table->timestamps();
         });
     }
