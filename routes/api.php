@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CounterpartyController;
 use App\Http\Controllers\integration\connectController;
 use App\Http\Controllers\integration\entity\counterparty;
 use App\Http\Controllers\Setting\AutomatizationController;
@@ -16,5 +17,8 @@ Route::middleware('api')->get('integration/entity/counterparty/all/metadata', [c
 Route::get('integration/entity/counterparty', [counterparty::class, 'creatingAgent']);
 
 Route::post('/webhook', [AutomatizationController::class, 'sendTemplate']);
+
+//createCounterparty
+Route::get('counterparty/create/{accountId}', [CounterpartyController::class, 'create']);
 
 Route::get("check", [TestController::class, "check"]);

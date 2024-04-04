@@ -12,6 +12,9 @@ class counterparty extends Controller
     public MsClient $msClient;
     public function creatingAgent(Request $request){
 
+        $setAttrS = new SetAttributesService($accountId);
+        $resSetAttr = $setAttrS->setTypeSendingAndDocumentId($msEntityType, $msEntityId, $documentId, $typeDocument, $service);
+
         $settingModel = json_decode(json_encode($request->settingModel));
 
 

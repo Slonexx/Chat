@@ -238,6 +238,29 @@ class HandlerService{
         ];
         return $objectOfAttributes;
     }
+    /**
+     * @param string $entityType тип сущности аттрибута
+     * @param string $entityId id сущности аттрибута
+     * @param mixed $value значение аттрибута
+     */
+    // public function FormationAttributeElement(string $attrsUrlIdentifier, string $entityId, mixed $value) : object {
+    //     $valueHref = Config::get("Global")[$urlIdentifier];
+    //     $joinedUrlWithId = $valueHref . $attrId;
+        
+    //     $meta = (object)[
+    //         "href" => $joinedUrlWithId,
+    //         "type" => "attributemetadata"
+    //     ];
+    //     return $meta;
+    //     $attributeObj = $this->FormationMeta($attributeMeta);
+    //     $attributeObj->value = $value;
+    //     $objectOfAttributes = (object) [
+    //         "attributes" => [
+    //             $attributeObj
+    //         ]
+    //     ];
+    //     return $objectOfAttributes;
+    // }
 
     public function FormationFileAttribute(object $attributeMeta, mixed $value) : object {
         $attributeObj = $this->FormationMeta($attributeMeta);

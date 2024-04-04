@@ -4,6 +4,8 @@ namespace App\Clients;
 
 use App\Http\Controllers\getBaseTableByAccountId\getMainSettingBD;
 use App\Models\employeeModel;
+use App\Services\Response;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -141,6 +143,39 @@ class newClient
                 'text' => $text,
             ],
         ]);
+    }
+
+    public function chats($licenseId, $messengerType): Response
+    {
+        try{
+            $answer = $this->client->get($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/chats/',[
+                'headers' => [
+                    'Authorization' => $this->Setting->accessToken
+                ],
+                'http_errors' => false
+            ]);
+            return $this->ResponseHandler($answer);
+
+        } catch(Exception $e) {
+            return $this->ResponseExceptionHandler($e);
+        }
+    }
+
+    public function ResponseHandler($response){
+        $res = new Response();
+
+        $body = $response->getBody()->getContents();
+        $responseData = json_decode($body);
+        $statusCode = $response->getStatusCode();
+        $statusCondition = $statusCode < 400;
+
+        return $res->customResponse($responseData, $statusCode, $statusCondition);
+    }
+
+    public function ResponseExceptionHandler($e){
+        $res = new Response();
+
+        return $res->customResponse($e, 500, false, $e->getMessage());
     }
 
 

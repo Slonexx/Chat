@@ -36,5 +36,10 @@ class MainSettings extends Model
     {
         return $this->hasMany(ChatappEmployee::class);
     }
+
+    public function mesAttrs()
+    {
+        return $this->hasMany(MessengerAttributes::class);
+    }
     
 }

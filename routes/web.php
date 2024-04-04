@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CounterpartyController;
 use App\Http\Controllers\Setting\AddFieldsController;
 use App\Http\Controllers\Entity\PopapController;
 use App\Http\Controllers\Entity\widgetController;
@@ -64,6 +65,7 @@ Route::delete('Setting/template/{accountId}/{uuid}', [templateController::class,
 
 
 Route::get('/Setting/template/info/fields/', [templateController::class, 'getMainFields']);
+
 
 
 

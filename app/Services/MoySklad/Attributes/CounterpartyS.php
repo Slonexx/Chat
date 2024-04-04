@@ -35,4 +35,20 @@ class CounterpartyS {
         }
             
     }
+
+    public function getAttributesById($id){
+        $res = $this->msC->getById(self::ATTRIBUTES_URL_IDENTIFIER, $id);
+        if(!$res->status)
+            return $res->addMessage("Ошибка при получении organizationMetadataAttributes по id");
+        else
+            return $res;
+    }
+
+    public function createAttribute($body){
+        $res = $this->msC->post(self::ATTRIBUTES_URL_IDENTIFIER, $body);
+        if(!$res->status)
+            return $res->addMessage("Ошибка при создании organizationMetadataAttributes");
+        else
+            return $res;
+    }
 }
