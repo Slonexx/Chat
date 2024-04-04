@@ -31,5 +31,15 @@ class MainSettings extends Model
             })
             ->toArray();
     }
+
+    public function chatappEmployees()
+    {
+        return $this->hasMany(ChatappEmployee::class);
+    }
+
+    public function mesAttrs()
+    {
+        return $this->hasMany(MessengerAttributes::class);
+    }
     
 }

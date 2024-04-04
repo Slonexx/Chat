@@ -2,6 +2,8 @@
 namespace App\Services\MoySklad\Entities;
 
 use App\Clients\MoySklad;
+use App\Models\MessengerAttributes;
+use App\Services\MsFilterService;
 use App\Services\Response;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -28,6 +30,38 @@ class CounterpartyService{
             return $res->addMessage("Ошибка при получении контрагента");
         else
             return $res;
+    }
+
+    public function getByPhone(string $name, string $phone, string $addF, string $attribute_id) {
+
+        $filterS = new MsFilterService();
+        
+        $url = $filterS->prepareUrlWithParam(self::URL_IDENTIFIER, "name", $name);
+        $nameRes = $this->msC->getByUrl($url);
+        if(!$nameRes->status)
+            return $nameRes->addMessage("Ошибка при поиске контрагента по имени");
+
+        if(count($nameRes->data->rows) == 0){
+            $url = $filterS->prepareUrlWithParam(self::URL_IDENTIFIER, "phone", $phone);
+            $phoneRes = $this->msC->getByUrl($url);
+            if(!$phoneRes->status)
+                return $phoneRes->addMessage("Ошибка при поиске контрагента по номеру");
+
+            if(count($phoneRes->data->rows) == 0 && $addF != false){    
+                
+                $filterUrl = $filterS->prepareUrlForFilter(self::URL_IDENTIFIER, "agentMetadataAttributes", $attribute_id, $addF);
+                $res = $this->msC->getByUrl($filterUrl);
+                if(!$res->status)
+                    return $res->addMessage("Ошибка при поиске контрагента по доп полю");
+                else
+                    return $this->res->success($res->data->rows); 
+
+            } else
+                return $this->res->success($phoneRes->data->rows);
+                 
+        } else
+            return $this->res->success($nameRes->data->rows);
+
     }
 
     public function getByIdWithExpand(string $id, array $expandParams) {
@@ -76,5 +110,13 @@ class CounterpartyService{
             $answer = $res->error($e, $e->getMessage());
             return $answer;
         }
+    }
+
+    public function create($body){
+        $res = $this->msC->post(self::URL_IDENTIFIER, $body);
+        if(!$res->status)
+            return $res->addMessage("Ошибка при создании контрагента");
+        else
+            return $res;
     }
 }

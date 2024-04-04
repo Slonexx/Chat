@@ -16,6 +16,7 @@ return [
     "demandMetadataAttributes" => "{$MsURL}entity/demand/metadata/attributes/",
     "demand" => "{$MsURL}entity/demand/",
 
+    "employee" => "{$MsURL}entity/employee",
     "employeeMetadataAttributes" => "{$MsURL}entity/employee/metadata/attributes/",
 
     "factureoutMetadataAttributes" => "{$MsURL}entity/factureout/metadata/attributes/",
@@ -30,8 +31,9 @@ return [
 
     "paymentinMetadataAttributes" => "{$MsURL}entity/paymentin/metadata/attributes/",
     "productMetadataAttributes" => "{$MsURL}entity/product/metadata/attributes/",
+    "project" => "{$MsURL}entity/project/",
 
-
+    "saleschannel" => "{$MsURL}entity/saleschannel/",
     "salesreturnMetadataAttributes" => "{$MsURL}entity/salesreturn/metadata/attributes/",
     "salesreturn" => "{$MsURL}entity/salesreturn/",
 

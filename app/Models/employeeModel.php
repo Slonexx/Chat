@@ -26,4 +26,9 @@ class employeeModel extends Model
         'refreshToken',
     ];
 
+    public function chatAutoSet()
+    {
+        return $this->hasOne(ChatappEmployee::class, "employee_id", "id");
+    }
+
 }

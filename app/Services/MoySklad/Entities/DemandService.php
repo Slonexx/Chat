@@ -2,6 +2,7 @@
 namespace App\Services\MoySklad\Entities;
 
 use App\Clients\MoySklad;
+use App\Services\MoySklad\CutLogicService;
 use App\Services\Response;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -108,6 +109,30 @@ class DemandService {
             $res = new Response();
 
             return $res->success($preppedChangeList);
+
+        } catch (Exception $e){
+            $res = new Response();
+            $answer = $res->error($e, $e->getMessage());
+            return $answer;
+        }
+    }
+
+    function getStatuses(){
+        try{
+            $url = Config::get("Global")[self::URL_IDENTIFIER] . "metadata/";
+            $statusesRes = $this->msC->getByUrl($url);
+            
+            $res = new Response();
+            
+            if($statusesRes->status){
+                $statuses = $statusesRes->data->states ?? null;
+                if($statuses === null)
+                    return $res->success([]);
+                else
+                    return $res->success($statuses);
+            }
+            else
+                return $res->error($statusesRes, "Невозможно получить статусы отгрузки");
 
         } catch (Exception $e){
             $res = new Response();

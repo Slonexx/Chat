@@ -26,6 +26,11 @@
                     <a id="link_4" class="mt-1" href="/Setting/addFields/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}"> Дополнительные поля </a>
                     <a id="link_5" class="mt-1" href="/Setting/template/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}"> Создание шаблонов </a>
                 </div>
+                <button id="btn_3" class="mt-1 dropdown-btn">Автоматизация <i class="fa fa-caret-down"></i></button>
+                <div class="dropdown-container">
+                    <a id="link_6" class="mt-1" href="/Setting/automatization/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}"> Автоматизации </a>
+                    <!--<a id="link_7" class="mt-1" href="/Setting/template/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}"> Сотрудники </a>-->
+                </div>
             </div>
         </div>
 
