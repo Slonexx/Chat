@@ -7,6 +7,7 @@ use App\Services\MsFilterService;
 use App\Services\Response;
 use Exception;
 use Illuminate\Support\Facades\Config;
+use stdClass;
 
 class CounterpartyService{
 
@@ -116,6 +117,16 @@ class CounterpartyService{
         $res = $this->msC->post(self::URL_IDENTIFIER, $body);
         if(!$res->status)
             return $res->addMessage("Ошибка при создании контрагента");
+        else
+            return $res;
+    }
+
+    function addTags($id, $tags){
+        $body = new stdClass();
+        $body->tags = $tags;
+        $res = $this->msC->put(self::URL_IDENTIFIER, $body, $id);
+        if(!$res->status)
+            return $res->addMessage("Невозможно обновить теги контрагента");
         else
             return $res;
     }

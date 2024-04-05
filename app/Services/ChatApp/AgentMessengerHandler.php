@@ -47,6 +47,7 @@ class AgentMessengerHandler{
         else
             $body->name = $name;
         $body->phone = $phone;
+        $body->tags = ['chatapp', 'telegram'];
         
         $agentS = new CounterpartyService($this->accountId);
         return $agentS->create($body);
@@ -65,6 +66,7 @@ class AgentMessengerHandler{
 
         }
         $body->phone = $phone;
+        $body->tags = ['chatapp', 'whatsapp'];
         
         $agentS = new CounterpartyService($this->accountId);
         return $agentS->create($body);
