@@ -244,11 +244,7 @@
         let accountId = '{{ $accountId }}'
         let saveOrgan = @json($saveOrgan);
         let saveTemplate = @json($template);
-        let fields = getFields();
-        let addFields = getAddFields();
         let jsonMessage = @json($message);
-        
-
 
         if (jsonMessage !== '') {
             if (jsonMessage === 'Настройки сохранились') {
@@ -274,7 +270,7 @@
 
             });
         }
-
+        getInfoAndAppend()
         //getAttributes()
 
         function showHideCreate(val) {
@@ -334,11 +330,9 @@
                         }
                     });
                 }
+                
                 isLeading(true)
-                let idCreatePole = fields.responseJSON.data;
-                appendFields(idCreatePole, 'idCreatePole')
-                let idCreateAddPole = addFields.responseJSON.data;
-                appendAddFields(idCreateAddPole, 'idCreateAddPole')
+        
             } else {
                 $("#idCreatePole").empty()
                 $('#createOrganization').modal('toggle')
@@ -398,11 +392,7 @@
                         }
                     });
                 }
-                let idCreatePole = fields.responseJSON.data;
-                appendFields(idCreatePole, 'idCreatePoleUpdate')
-                let idCreateAddPole = addFields.responseJSON.data;
-                appendAddFields(idCreateAddPole, 'idCreateAddPoleUpdate')
-
+                getInfoAndAppendUpdate()
                 
                 isLeading(true)
             } else {
