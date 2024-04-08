@@ -20,8 +20,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use stdClass;
 
-use function PHPUnit\Framework\returnValueMap;
-
 class CounterpartyController extends Controller
 {
     function create(Request $request, $accountId){
@@ -42,7 +40,7 @@ class CounterpartyController extends Controller
                 $lineId = $item->lineId;
                 $chatsRes = $chatS->getAllChatForEmployee(50, $employeeId, $lineId);
                 if(!$chatsRes->status)  
-                return $handlerS->responseHandler($chatsRes, true, false);
+                    return $handlerS->responseHandler($chatsRes, true, false);
 
                 $agentH = new AgentMessengerHandler($accountId);
                 $agentFindS = new AgentFindService($accountId);
@@ -54,7 +52,7 @@ class CounterpartyController extends Controller
                         $phone = $chat->phone;
                         $username = $chat->username;
                         $name = $chat->name;
-                        $id = $chat->id;
+                        $chatId = $chat->id;
 
                         if(strlen($phone) < 11)
                             continue;
@@ -62,19 +60,27 @@ class CounterpartyController extends Controller
                         $phoneForFinding = "%2b{$phone}";
                         $agentFindRes = match($messenger){
                             "telegram" => $agentFindS->telegram($phoneForFinding, $name, $username, $attribute_id),
-                            "whatsapp" => $agentFindS->whatsapp($phoneForFinding, $name, $id, $attribute_id),
+                            "whatsapp" => $agentFindS->whatsapp($phoneForFinding, $name, $chatId, $attribute_id),
                         };
+                        $agents = $agentFindRes->data;
                         if(!$agentFindRes->status)
                             return $agentFindRes;
-                        else if(empty($agentFindRes->data)){
+                        else if(!empty($agents)){
+                            $id = $agents[0]->id;
+                            $tags = $agents[0]->tags;
+                            array_push($tags, "chatapp");
+                            array_push($tags, $messenger);
+                            $agentS = new CounterpartyService($accountId);
+                            $agentS->addTags($id, $tags);
+                            
+                        } else if(empty($agentFindRes->data)){
                     
                             match($messenger){
                                 "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMeta),
-                                "whatsapp" => $agentH->whatsapp($phoneForCreating, $id, $name, $attrMeta),
+                                "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMeta),
                             };
                             
-                        } else
-                            continue;
+                        }
                     }
                 }
 
