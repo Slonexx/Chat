@@ -59,7 +59,8 @@ class ChatService{
                 //chatapp/db
                 $compliances = [
                     "grWhatsApp" => "whatsapp",
-                    "telegram" => "telegram"
+                    "telegram" => "telegram",
+                    "email" => "email"
                 ];
                 $conversations = $chatsReq->data->data->items;
                 $chunks = array_chunk($conversations, $countConversation);

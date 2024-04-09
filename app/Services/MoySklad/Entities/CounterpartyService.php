@@ -65,6 +65,25 @@ class CounterpartyService{
 
     }
 
+    public function getByEmail(string $email, string $attribute_id) {
+
+        $filterS = new MsFilterService();
+    
+        if($email != false){    
+            
+            $filterUrl = $filterS->prepareUrlForFilter(self::URL_IDENTIFIER, "agentMetadataAttributes", $attribute_id, $email);
+            $res = $this->msC->getByUrl($filterUrl);
+            if(!$res->status)
+                return $res->addMessage("Ошибка при поиске контрагента по доп полю");
+            else
+                return $this->res->success($res->data->rows); 
+
+        } else
+            return $this->res->success([]);
+                
+
+    }
+
     public function getByIdWithExpand(string $id, array $expandParams) {
         $agentUrl = Config::get("Global")[self::URL_IDENTIFIER];
         $preppedUrl = $agentUrl . $id . "?expand=";

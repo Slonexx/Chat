@@ -53,14 +53,19 @@ class CounterpartyController extends Controller
                         $username = $chat->username;
                         $name = $chat->name;
                         $chatId = $chat->id;
+                        $email = $chat->email;
 
-                        if(strlen($phone) < 11)
-                            continue;
-                        $phoneForCreating = "+{$phone}";
-                        $phoneForFinding = "%2b{$phone}";
+
+                        if($messenger == "telegram" || $messenger == "whatsapp"){
+                            if(strlen($phone) < 11)
+                                continue;
+                            $phoneForCreating = "+{$phone}";
+                            $phoneForFinding = "%2b{$phone}";
+                        }
                         $agentFindRes = match($messenger){
                             "telegram" => $agentFindS->telegram($phoneForFinding, $name, $username, $attribute_id),
                             "whatsapp" => $agentFindS->whatsapp($phoneForFinding, $name, $chatId, $attribute_id),
+                            "email" => $agentFindS->email($email, $attribute_id),
                         };
                         $agents = $agentFindRes->data;
                         if(!$agentFindRes->status)
@@ -78,6 +83,7 @@ class CounterpartyController extends Controller
                             match($messenger){
                                 "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMeta),
                                 "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMeta),
+                                "email" => $agentH->email($email, $attrMeta),
                             };
                             
                         }

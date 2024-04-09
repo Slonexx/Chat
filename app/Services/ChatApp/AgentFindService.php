@@ -58,4 +58,11 @@ class AgentFindService{
         return $agentByPhoneRes;
     }
 
+    function email($email, $attribute_id){
+        $counterpartyS = new CounterpartyService($this->accountId);
+        $agentByEmailRes = $counterpartyS->getByEmail($email, $attribute_id);
+        return $agentByEmailRes;
+        
+    }
+
 }

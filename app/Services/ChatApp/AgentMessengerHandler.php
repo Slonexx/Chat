@@ -71,4 +71,15 @@ class AgentMessengerHandler{
         $agentS = new CounterpartyService($this->accountId);
         return $agentS->create($body);
     }
+
+    function email($email, $attrMeta){
+        $handlerS = new HandlerService();
+        $body = $handlerS->FormationAttribute($attrMeta, $email);
+
+        $body->name = $email;
+        $body->tags = ['chatapp', 'email'];
+        
+        $agentS = new CounterpartyService($this->accountId);
+        return $agentS->create($body);
+    }
 }
