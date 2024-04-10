@@ -15,12 +15,6 @@ return [
         'description' => 'Это дополнительное поле в интеграции '.$nameIntegration.'. Важно: не удаляйте его.'
     ],
 
-    "viber_bot" => (object) [
-        "name" => "Viber bot для {$nameIntegration}",
-        "type" => "string",
-        'description' => 'Это дополнительное поле в интеграции '.$nameIntegration.'. Важно: не удаляйте его.'
-    ],
-
     "avito" => (object) [
         "name" => "Avito для {$nameIntegration}",
         "type" => "string",
@@ -41,18 +35,6 @@ return [
 
     "email" => (object) [
         "name" => "Email для {$nameIntegration}",
-        "type" => "string",
-        'description' => 'Это дополнительное поле в интеграции '.$nameIntegration.'. Важно: не удаляйте его.'
-    ],
-
-    "CRM" => (object) [
-        "name" => "CRM для {$nameIntegration}",
-        "type" => "string",
-        'description' => 'Это дополнительное поле в интеграции '.$nameIntegration.'. Важно: не удаляйте его.'
-    ],
-
-    "altegio" => (object) [
-        "name" => "Altegio для {$nameIntegration}",
         "type" => "string",
         'description' => 'Это дополнительное поле в интеграции '.$nameIntegration.'. Важно: не удаляйте его.'
     ],

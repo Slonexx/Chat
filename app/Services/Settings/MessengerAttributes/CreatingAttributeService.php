@@ -1,31 +1,18 @@
 <?php
 namespace App\Services\Settings\MessengerAttributes;
 
-use App\Clients\MsClient;
-use App\Models\AttributeSettings;
 use App\Models\MainSettings;
 use App\Models\MessengerAttributes;
-use App\Services\Entities\OrganizationService;
-use App\Services\HandlerService;
 use App\Services\Response;
 use Exception;
 use Illuminate\Support\Facades\Config;
-use stdClass;
 
 class CreatingAttributeService {
 
-    private mixed $id;
-    private mixed $entity_type;
-    private mixed $upload;
-    private mixed $attribute_id;
-    private MsClient $msClient;
     private string $accountId;
-    private HandlerService $handlerS;
 
     function __construct($accountId) {
-        $this->msClient = new MsClient($accountId);
         $this->accountId = $accountId;
-        $this->handlerS = new HandlerService();
     }
     /**
      * создаёт аттрибуты

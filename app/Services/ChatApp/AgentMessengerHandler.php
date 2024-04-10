@@ -26,8 +26,9 @@ class AgentMessengerHandler{
 
     private Response $res;
 
-    function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+    function __construct($accountId, MoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+        else  $this->msC = $MoySklad;
         $this->accountId = $accountId;
         $this->res = new Response();
     }
@@ -37,7 +38,7 @@ class AgentMessengerHandler{
 
         $addFValue = null;
         if($username)
-            $addFValue = $username;
+            $addFValue = "@{$username}";
         else
             $addFValue = $name;
         $body = $handlerS->FormationAttribute($attrMeta, $addFValue);
@@ -49,7 +50,7 @@ class AgentMessengerHandler{
         $body->phone = $phone;
         $body->tags = ['chatapp', 'telegram'];
         
-        $agentS = new CounterpartyService($this->accountId);
+        $agentS = new CounterpartyService($this->accountId, $this->msC);
         return $agentS->create($body);
     }
 
@@ -68,7 +69,7 @@ class AgentMessengerHandler{
         $body->phone = $phone;
         $body->tags = ['chatapp', 'whatsapp'];
         
-        $agentS = new CounterpartyService($this->accountId);
+        $agentS = new CounterpartyService($this->accountId, $this->msC);
         return $agentS->create($body);
     }
 
@@ -79,7 +80,20 @@ class AgentMessengerHandler{
         $body->name = $email;
         $body->tags = ['chatapp', 'email'];
         
-        $agentS = new CounterpartyService($this->accountId);
+        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        return $agentS->create($body);
+    }
+
+    function vk($name, $chatId, $attrMeta){
+        $handlerS = new HandlerService();
+        if(ctype_digit($chatId))
+            $chatId = "id{$chatId}";
+        $body = $handlerS->FormationAttribute($attrMeta, $chatId);
+
+        $body->name = $name;
+        $body->tags = ['chatapp', 'vk'];
+        
+        $agentS = new CounterpartyService($this->accountId, $this->msC);
         return $agentS->create($body);
     }
 }

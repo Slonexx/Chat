@@ -2,34 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Clients\newClient;
-use App\Models\employeeModel;
+use App\Clients\MoySklad;
 use App\Models\MessengerAttributes;
 use App\Models\organizationModel;
-use App\Services\ChatApp\AgentFindService;
+use App\Services\MoySklad\AgentFindLogicService;
 use App\Services\ChatApp\AgentMessengerHandler;
 use App\Services\ChatApp\ChatService;
 use App\Services\HandlerService;
+use App\Services\MoySklad\AgentUpdateLogicService;
 use App\Services\MoySklad\Attributes\CounterpartyS;
-use App\Services\MoySklad\Entities\CounterpartyService;
-use App\Services\Response;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
 use Error;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use stdClass;
 
 class CounterpartyController extends Controller
 {
     function create(Request $request, $accountId){
         try{
+
             $handlerS = new HandlerService();
-            $setAttrS = new CreatingAttributeService($accountId);
+            $msC = new MoySklad($accountId);
+            $setAttrS = new CreatingAttributeService($accountId, $msC);
             //все добавленные в messengerAttributes будут созданы в мс
             $mesAttr = Config::get("messengerAttributes");
             $attrNames = array_keys($mesAttr);
-            $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, new CounterpartyS($accountId));
+            $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, new CounterpartyS($accountId, $msC));
             if(!$resAttr->status)
                 return $handlerS->responseHandler($resAttr, true, false);
 
@@ -42,8 +41,7 @@ class CounterpartyController extends Controller
                 if(!$chatsRes->status)  
                     return $handlerS->responseHandler($chatsRes, true, false);
 
-                $agentH = new AgentMessengerHandler($accountId);
-                $agentFindS = new AgentFindService($accountId);
+                $agentH = new AgentMessengerHandler($accountId, $msC);
                 foreach($chatsRes->data as $messenger => $chats){
                     $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $messenger);
                     $attribute_id = $attribute->attribute_id;
@@ -54,38 +52,31 @@ class CounterpartyController extends Controller
                         $name = $chat->name;
                         $chatId = $chat->id;
                         $email = $chat->email;
+                        $phoneForCreating = "+{$phone}";
 
-
-                        if($messenger == "telegram" || $messenger == "whatsapp"){
-                            if(strlen($phone) < 11)
-                                continue;
-                            $phoneForCreating = "+{$phone}";
-                            $phoneForFinding = "%2b{$phone}";
-                        }
-                        $agentFindRes = match($messenger){
-                            "telegram" => $agentFindS->telegram($phoneForFinding, $name, $username, $attribute_id),
-                            "whatsapp" => $agentFindS->whatsapp($phoneForFinding, $name, $chatId, $attribute_id),
-                            "email" => $agentFindS->email($email, $attribute_id),
-                        };
-                        $agents = $agentFindRes->data;
-                        if(!$agentFindRes->status)
-                            return $agentFindRes;
+                        $findLogicS = new AgentFindLogicService($accountId, $msC);
+                        $agentByRequisitesRes = $findLogicS->findByRequisites($messenger, $chatId, $username, $name, $phone, $email, $attribute_id);
+                        if(!isset($agentByRequisitesRes))
+                            continue;
+                        $agents = $agentByRequisitesRes->data;
+                        if(!$agentByRequisitesRes->status)
+                            return $handlerS->responseHandler($agentByRequisitesRes, true, false);
                         else if(!empty($agents)){
-                            $id = $agents[0]->id;
-                            $tags = $agents[0]->tags;
-                            array_push($tags, "chatapp");
-                            array_push($tags, $messenger);
-                            $agentS = new CounterpartyService($accountId);
-                            $agentS->addTags($id, $tags);
+                            $updateLogicS = new AgentUpdateLogicService($accountId, $msC);
+                            $updatedAgentRes = $updateLogicS->addTags($agents, $messenger);
+                            if(isset($updatedAgentRes) && !$updatedAgentRes->status)
+                                return $handlerS->responseHandler($updatedAgentRes, true, false);
                             
-                        } else if(empty($agentFindRes->data)){
+                        } else if(empty($agents)){
                     
-                            match($messenger){
+                            $createdAgent = match($messenger){
                                 "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMeta),
                                 "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMeta),
                                 "email" => $agentH->email($email, $attrMeta),
+                                "vk" => $agentH->vk($name, $chatId, $attrMeta),
                             };
-                            
+                            if(!$createdAgent->status)
+                                return $handlerS->responseHandler($createdAgent, true, false);
                         }
                     }
                 }

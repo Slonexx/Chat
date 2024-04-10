@@ -21,16 +21,10 @@ use stdClass;
 
 class ChatService{
 
-    private MoySklad $msC;
-
     private string $accountId;
 
-    private Response $res;
-
     function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
         $this->accountId = $accountId;
-        $this->res = new Response();
     }
 
     function getAllChatForEmployee($countConversation, $employeeId, $lineId){
@@ -60,7 +54,8 @@ class ChatService{
                 $compliances = [
                     "grWhatsApp" => "whatsapp",
                     "telegram" => "telegram",
-                    "email" => "email"
+                    "email" => "email",
+                    "vkontakte" => "vk"
                 ];
                 $conversations = $chatsReq->data->data->items;
                 $chunks = array_chunk($conversations, $countConversation);
