@@ -22,7 +22,7 @@ class AgentUpdateLogicService{
         $this->res = new Response();
     }
 
-    function addTags($agents, $messenger){
+    function addTagsAndAttr($agents, $messenger, $body){
         $id = $agents[0]->id;
         $tags = $agents[0]->tags;
         $wasUpdated = false;
@@ -37,12 +37,10 @@ class AgentUpdateLogicService{
         }
 
         if($wasUpdated == true){
-            $agentS = new CounterpartyService($this->accountId, $this->msC);
-            $body = new stdClass();
             $body->tags = $tags;
-            return $agentS->update($id, $body, "Невозможно обновить теги контрагента");
-        } else
-            return null;
+        }
+        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        return $agentS->update($id, $body, "Невозможно обновить теги контрагента");
 
     }
 }

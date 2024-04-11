@@ -32,6 +32,8 @@ class AgentFindLogicService{
             "whatsapp" => $agentFindS->whatsapp($phoneForFinding, $name, $chatId, $attribute_id),
             "email" => $agentFindS->email($email, $attribute_id),
             "vk" => $agentFindS->vk($name, $chatId, $attribute_id),
+            "instagram" => $agentFindS->inst($name, $username, $attribute_id),
+            "telegram_bot" => $agentFindS->tg_bot($name, $username, $attribute_id),
         };
         return $agentFindRes;
     }

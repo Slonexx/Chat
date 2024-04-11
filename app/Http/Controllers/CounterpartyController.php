@@ -63,8 +63,18 @@ class CounterpartyController extends Controller
                             return $handlerS->responseHandler($agentByRequisitesRes, true, false);
                         else if(!empty($agents)){
                             $updateLogicS = new AgentUpdateLogicService($accountId, $msC);
-                            $updatedAgentRes = $updateLogicS->addTags($agents, $messenger);
-                            if(isset($updatedAgentRes) && !$updatedAgentRes->status)
+                            $atUsername = "@{$username}";
+                            $addFieldValue = match($messenger){
+                                "telegram" => $atUsername,
+                                "whatsapp" => $chatId,
+                                "email" => $email,
+                                "vk" => ctype_digit($chatId) ? "id{$chatId}" : $chatId,
+                                "instagram" => $atUsername,
+                                "telegram_bot" => $atUsername,
+                            };
+                            $bodyWithAttr = $handlerS->FormationAttribute($attrMeta, $addFieldValue);
+                            $updatedAgentRes = $updateLogicS->addTagsAndAttr($agents, $messenger, $bodyWithAttr);
+                            if(!$updatedAgentRes->status)
                                 return $handlerS->responseHandler($updatedAgentRes, true, false);
                             
                         } else if(empty($agents)){
@@ -74,6 +84,8 @@ class CounterpartyController extends Controller
                                 "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMeta),
                                 "email" => $agentH->email($email, $attrMeta),
                                 "vk" => $agentH->vk($name, $chatId, $attrMeta),
+                                "instagram" => $agentH->inst($name, $username, $attrMeta),
+                                "telegram_bot" => $agentH->tg_bot($name, $username, $attrMeta),
                             };
                             if(!$createdAgent->status)
                                 return $handlerS->responseHandler($createdAgent, true, false);

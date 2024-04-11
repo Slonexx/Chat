@@ -45,7 +45,7 @@ class AgentFindService{
                 return $agentByPhoneRes;
             if(count($agentByPhoneRes->data) == 0){
                 $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
-                $agentByTgRes = $counterpartyAttributeS->getByAttribute($attribute_id, $addF, $this->addFieldError);
+                $agentByTgRes = $counterpartyAttributeS->getByAttribute($attribute_id, "@{$addF}", $this->addFieldError);
                 if(!$agentByTgRes->status)
                     return $agentByTgRes;
                 else
@@ -107,6 +107,8 @@ class AgentFindService{
         $agentByNameRes = $counterpartyS->getByParam("name", $name, $this->nameError);
         if(!$agentByNameRes->status)
             return $agentByNameRes;
+        if(ctype_digit($chatId))
+            $chatId = "id{$chatId}";
         if(count($agentByNameRes->data) == 0){
             $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
             $agentByEmailRes = $counterpartyAttributeS->getByAttribute($attribute_id, $chatId, $this->addFieldError);
@@ -114,6 +116,39 @@ class AgentFindService{
                 return $agentByEmailRes;
             else
                 return $this->res->success($agentByEmailRes->data);
+        } else
+            return $this->res->success($agentByNameRes->data);
+    }
+
+    function inst($name, $username, $attribute_id){
+        $counterpartyS = new CounterpartyService($this->accountId, $this->msC);
+        $agentByNameRes = $counterpartyS->getByParam("name", $name, $this->nameError);
+        if(!$agentByNameRes->status)
+            return $agentByNameRes;
+        if(count($agentByNameRes->data) == 0){
+            $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
+            $agentByEmailRes = $counterpartyAttributeS->getByAttribute($attribute_id, "@{$username}", $this->addFieldError);
+            if(!$agentByEmailRes->status)
+                return $agentByEmailRes;
+            else
+                return $this->res->success($agentByEmailRes->data);
+        } else
+            return $this->res->success($agentByNameRes->data);
+    }
+
+    function tg_bot($name, $username, $attribute_id){
+        $counterpartyS = new CounterpartyService($this->accountId, $this->msC);
+
+        $agentByNameRes = $counterpartyS->getByParam("name", $name, $this->nameError);
+        if(!$agentByNameRes->status)
+            return $agentByNameRes;
+        if(count($agentByNameRes->data) == 0){
+            $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
+            $agentByTgRes = $counterpartyAttributeS->getByAttribute($attribute_id, "@{$username}", $this->addFieldError);
+            if(!$agentByTgRes->status)
+                return $agentByTgRes;
+            else
+                return $this->res->success($agentByTgRes->data);
         } else
             return $this->res->success($agentByNameRes->data);
     }

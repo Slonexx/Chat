@@ -46,35 +46,6 @@ class checkCounterPartyFromConversations extends Command
                 CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
                 $this->info('Продолжение выполнения команды.');
                 
-
-                // $edoClient = new UdoClient($item->accountId, $item->ms_uid);
-                // $res = $edoClient->getAll("usersInfo");
-                // if($res->statusCode != 200){
-                //     $body = (object) [
-                //         "username" => $item->login,
-                //         "password" => $item->password,
-                //     ];
-                //     $res = $edoClient->postForm("accessToken", $body);
-                //     if(!$res->status)
-                //         Log::info("У пользователя {$item->accountId} неправильный логин и/или пароль");
-                //     else {
-                //         $users = Users::where("accountId", $item->accountId)
-                //             ->where("ms_uid", $item->ms_uid)
-                //             ->get();
-                //         if(count($users) == 0)
-                //             Log::info("Пользователь {$item->accountId} не найден");
-                //         if(count($users) > 1)
-                //             Log::info("У пользователя {$item->accountId} две одинаковых записи в Users");
-
-
-                //         $userInstance = $users->get(0);
-
-                //         $userInstance["udo_token"] = $res->data->access_token;
-            
-                //         $userInstance->save();
-
-                  //  }
-                //}
             } catch (Exception $e) {
                 Log::info('Непредвиденная ошибка' . $e->getMessage());
                 continue;

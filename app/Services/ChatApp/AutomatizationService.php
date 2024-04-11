@@ -14,7 +14,6 @@ use App\Services\MoySklad\Entities\SalesReturnService;
 use App\Services\MoySklad\TemplateService;
 use App\Services\Response;
 use GuzzleHttp\Exception\BadResponseException;
-use stdClass;
 
 class AutomatizationService{
 

@@ -1,23 +1,10 @@
 <?php
 namespace App\Services\ChatApp;
 
-use App\Clients\MoySklad;
 use App\Clients\newClient;
-use App\Models\ChatappEmployee;
-use App\Models\employeeModel;
-use App\Models\MainSettings;
-use App\Models\Templates;
-use App\Services\MoySklad\Entities\CounterpartyService;
-use App\Services\MoySklad\Entities\CustomOrderService;
-use App\Services\MoySklad\Entities\DemandService;
-use App\Services\MoySklad\Entities\InvoiceoutService;
-use App\Services\MoySklad\Entities\SalesReturnService;
-use App\Services\MoySklad\TemplateService;
 use App\Services\Response;
 use Exception;
-use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
-use stdClass;
 
 class ChatService{
 
@@ -55,7 +42,9 @@ class ChatService{
                     "grWhatsApp" => "whatsapp",
                     "telegram" => "telegram",
                     "email" => "email",
-                    "vkontakte" => "vk"
+                    "vkontakte" => "vk",
+                    "instagram" => "instagram",
+                    "telegramBot" => "telegram_bot"
                 ];
                 $conversations = $chatsReq->data->data->items;
                 $chunks = array_chunk($conversations, $countConversation);
