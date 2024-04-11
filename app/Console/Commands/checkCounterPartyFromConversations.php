@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Jobs\CheckCounterparty;
-use App\Models\employeeModel;
 use App\Models\MainSettings;
 use Exception;
 use Illuminate\Console\Command;

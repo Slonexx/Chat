@@ -2,24 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Clients\MoySklad;
-use App\Models\MessengerAttributes;
-use App\Models\organizationModel;
-use App\Services\MoySklad\AgentFindLogicService;
-use App\Services\ChatApp\AgentMessengerHandler;
-use App\Services\ChatApp\ChatService;
-use App\Services\HandlerService;
-use App\Services\MoySklad\AgentUpdateLogicService;
-use App\Services\MoySklad\Attributes\CounterpartyS;
-use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
 use Error;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 
-class CounterpartyController extends Controller
+class CustomerorderController extends Controller
 {
-    function create(Request $request, $accountId){
+    function create(Request $request, $accountId, $employeeId){
         try{
 
             $handlerS = new HandlerService();
@@ -38,7 +27,7 @@ class CounterpartyController extends Controller
                 $chatS = new ChatService($accountId, $employeeId);
                 $lineId = $item->lineId;
                 $chatsRes = $chatS->getAllChatForEmployee(50, $lineId);
-                //dd($chatsRes->data['avito']);
+                dd($chatsRes->data['avito']);
                 if(!$chatsRes->status)  
                     return $handlerS->responseHandler($chatsRes, true, false);
 

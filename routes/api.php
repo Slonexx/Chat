@@ -20,5 +20,6 @@ Route::post('/webhook', [AutomatizationController::class, 'sendTemplate']);
 
 //createCounterparty
 Route::get('counterparty/create/{accountId}', [CounterpartyController::class, 'create']);
+Route::get('customerorder/create/{$accountId}/{$employeeId}', [CounterpartyController::class, 'create']);
 
 Route::get("check", [TestController::class, "check"]);

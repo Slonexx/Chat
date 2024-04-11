@@ -10,16 +10,21 @@ class ChatService{
 
     private string $accountId;
 
-    function __construct($accountId) {
+    private string $employeeId;
+
+    private newClient $chatappC;
+
+    function __construct($accountId, $employeeId) {
+        $this->chatappC = new newClient($employeeId);
         $this->accountId = $accountId;
+        $this->employeeId = $employeeId;
     }
 
-    function getAllChatForEmployee($countConversation, $employeeId, $lineId){
+    function getAllChatForEmployee($countConversation, $lineId){
         
-        $chatappC = new newClient($employeeId);
         $res = new Response();
         try{
-            $licenseReq = $chatappC->licenses();
+            $licenseReq = $this->chatappC->licenses();
             $encoded_body = $licenseReq->getBody()->getContents();
             $body = json_decode($encoded_body);
             $lines = $body->data;
@@ -33,9 +38,34 @@ class ChatService{
 
             $resChat = [];
             foreach($mesengers as $item){
-                $chatsReq = $chatappC->chats($lineId, $item);
+                $chatsReq = $this->chatappC->chats($lineId, $item, $countConversation);
                 if(!$chatsReq->status){
                     return $chatsReq;
+                }
+                if($item == "avito"){
+                    $arrayChats = $chatsReq->data->data->items;
+                    array_map(function($value) use ($lineId, $item){
+                        $messageS = new MessageService($this->accountId, $this->employeeId, $this->chatappC);
+                        $errorMessage = "Ошибка при получении сообщений";
+                        $messages = $messageS->getAllMessagesFromChat($lineId, $item, $value->id, $errorMessage);
+                        if(!$messages->status){
+                            $value->fromUser = [];
+                            return $value;
+                        }
+                        $messages = $messages->data->data->items;
+                        if(count($messages) == 0)
+                            $value->fromUser = [];
+                        foreach($messages as $message){
+                            if(!$message->fromMe){
+                                $value->fromUser = $message->fromUser;
+                                break;
+                            }
+
+                        }
+                        return $value;
+
+                    }, $arrayChats);
+                    
                 }
                 //chatapp/db
                 $compliances = [
@@ -44,12 +74,12 @@ class ChatService{
                     "email" => "email",
                     "vkontakte" => "vk",
                     "instagram" => "instagram",
-                    "telegramBot" => "telegram_bot"
+                    "telegramBot" => "telegram_bot",
+                    "avito" => "avito"
                 ];
                 $conversations = $chatsReq->data->data->items;
-                $chunks = array_chunk($conversations, $countConversation);
 
-                $resChat[$compliances[$item]] = $chunks[0];
+                $resChat[$compliances[$item]] = $conversations;
 
                 
             }

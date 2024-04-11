@@ -145,10 +145,26 @@ class newClient
         ]);
     }
 
-    public function chats($licenseId, $messengerType): Response
+    public function chats($licenseId, $messengerType, $limit = 20): Response
     {
         try{
-            $answer = $this->client->get($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/chats/',[
+            $answer = $this->client->get($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/chats/'."?limit={$limit}",[
+                'headers' => [
+                    'Authorization' => $this->Setting->accessToken
+                ],
+                'http_errors' => false
+            ]);
+            return $this->ResponseHandler($answer);
+
+        } catch(Exception $e) {
+            return $this->ResponseExceptionHandler($e);
+        }
+    }
+
+    public function messages($licenseId, $messengerType, $chatId): Response
+    {
+        try{
+            $answer = $this->client->get($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/chats/'.$chatId."/messages",[
                 'headers' => [
                     'Authorization' => $this->Setting->accessToken
                 ],
