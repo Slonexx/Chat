@@ -72,6 +72,7 @@ class CounterpartyController extends Controller
                                 "vk" => ctype_digit($chatId) ? "id{$chatId}" : $chatId,
                                 "instagram" => $atUsername,
                                 "telegram_bot" => $atUsername,
+                                "avito" => $chatId
                             };
                             $bodyWithAttr = $handlerS->FormationAttribute($attrMeta, $addFieldValue);
                             $updatedAgentRes = $updateLogicS->addTagsAndAttr($agents, $messenger, $bodyWithAttr);
@@ -87,6 +88,7 @@ class CounterpartyController extends Controller
                                 "vk" => $agentH->vk($name, $chatId, $attrMeta),
                                 "instagram" => $agentH->inst($name, $username, $attrMeta),
                                 "telegram_bot" => $agentH->tg_bot($name, $username, $attrMeta),
+                                "avito" => $agentH->avito($name, $chatId, $attrMeta),
                             };
                             if(!$createdAgent->status)
                                 return $handlerS->responseHandler($createdAgent, true, false);

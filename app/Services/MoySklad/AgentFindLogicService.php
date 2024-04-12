@@ -27,13 +27,15 @@ class AgentFindLogicService{
                 return null;
             $phoneForFinding = "%2b{$phone}";
         }
+
         $agentFindRes = match($messenger){
             "telegram" => $agentFindS->telegram($phoneForFinding, $name, $username, $attribute_id),
             "whatsapp" => $agentFindS->whatsapp($phoneForFinding, $name, $chatId, $attribute_id),
             "email" => $agentFindS->email($email, $attribute_id),
-            "vk" => $agentFindS->vk($name, $chatId, $attribute_id),
-            "instagram" => $agentFindS->inst($name, $username, $attribute_id),
-            "telegram_bot" => $agentFindS->tg_bot($name, $username, $attribute_id),
+            "vk" => $agentFindS->vk($chatId, $attribute_id),
+            "instagram" => $agentFindS->inst($username, $attribute_id),
+            "telegram_bot" => $agentFindS->tg_bot($username, $attribute_id),
+            "avito" => $agentFindS->avito($chatId, $attribute_id),
         };
         return $agentFindRes;
     }

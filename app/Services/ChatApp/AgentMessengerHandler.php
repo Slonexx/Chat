@@ -111,4 +111,15 @@ class AgentMessengerHandler{
         $agentS = new CounterpartyService($this->accountId, $this->msC);
         return $agentS->create($body);
     }
+
+    function avito($name, $chatId, $attrMeta){
+        $handlerS = new HandlerService();
+
+        $body = $handlerS->FormationAttribute($attrMeta, $chatId);
+        $body->name = $name;
+        $body->tags = ['chatapp', 'avito'];
+        
+        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        return $agentS->create($body);
+    }
 }

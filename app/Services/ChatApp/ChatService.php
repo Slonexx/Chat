@@ -14,8 +14,9 @@ class ChatService{
 
     private newClient $chatappC;
 
-    function __construct($accountId, $employeeId) {
-        $this->chatappC = new newClient($employeeId);
+    function __construct($accountId, $employeeId, newClient $chatappC = null) {
+        if ($chatappC == null) $this->chatappC = new newClient($employeeId);
+        else  $this->chatappC = $chatappC;
         $this->accountId = $accountId;
         $this->employeeId = $employeeId;
     }
@@ -49,15 +50,19 @@ class ChatService{
                         $errorMessage = "Ошибка при получении сообщений";
                         $messages = $messageS->getAllMessagesFromChat($lineId, $item, $value->id, $errorMessage);
                         if(!$messages->status){
-                            $value->fromUser = [];
+                            $value->id = null;
+                            $value->name = null;
                             return $value;
                         }
                         $messages = $messages->data->data->items;
-                        if(count($messages) == 0)
-                            $value->fromUser = [];
+                        if(count($messages) == 0){
+                            $value->id = null;
+                            $value->name = null;
+                        }
                         foreach($messages as $message){
                             if(!$message->fromMe){
-                                $value->fromUser = $message->fromUser;
+                                $value->id = $message->fromUser->id;
+                                $value->name = $message->fromUser->name;
                                 break;
                             }
 

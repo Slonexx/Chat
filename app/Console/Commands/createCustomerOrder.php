@@ -34,33 +34,24 @@ class createCustomerOrder extends Command
      */
     public function handle()
     {
-        
-        $org = organizationModel::all()->all();
-        $empl = employeeModel::all()->all();
-        $lid = Lid::all()->all();
-        foreach($org as $orgItem){
-            $lidSetting = array_filter($lid, fn($val)=> $val->account_id == $orgItem->accountId
-                && $val->is_activity_settings == true);
-            if(count($lidSetting) == 0)
-                continue;
+        $mainSet = MainSettings::where("is_activate", true)->get()->pluck("account_id")->all();
 
-            $employeesCurrentOrg = array_filter($empl, fn($val)=> $val->employeeId == $orgItem->employeeId);
-            $employees = [];
-            $employees[] = (array)$employeesCurrentOrg;
-        }
         $params = [
             "headers" => [
                 'Content-Type' => 'application/json'
                 ]
             ];
-            
-        foreach ($employees as $item) {
+        $lids = Lid::whereIn("accountId", $mainSet)->pluck("is_activity_settings", "account_id")->all();
+        foreach($lids as $key => $item){
             try {
-                $accountId = $item->accountId;
-                $employeeId = $item->employeeId;
-                $url = /*Config::get('Global.url')*/ '' . "api/customerorder/create/${$accountId}/${$employeeId}";
-                //CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
-                $this->info('Продолжение выполнения команды.');
+                if($item){
+                    $accountId = $item->account_id;
+                    $url = /*Config::get('Global.url')*/ '' . "api/customerorder/create/${$key}";
+                    //CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
+                    
+                    $this->info('Продолжение выполнения команды.');
+
+                }
                 
             } catch (Exception $e) {
                 Log::info('Непредвиденная ошибка' . $e->getMessage());
