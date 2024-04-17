@@ -94,7 +94,7 @@ class AutomationController extends Controller
         $uid = $request->uid ?? "логин аккаунта";
 
         //dd($request->all());
-        if ($request->employee_id == null) to_route('automation', [
+        if ($request->employee_id == null) return to_route('automation', [
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
             'fullName' => $fullName,
@@ -109,12 +109,14 @@ class AutomationController extends Controller
 
         if ($request->is_default == '1' and $isAutomation->toArray != null) {
             foreach ($isAutomation->toArray as $item) {
-                if ($item['is_default'] == '1' or $item['is_default'] == 1) $is_default = true;
+                if ($item['is_default'] == '1' and $request->employee_id != $item['employee_id'] ) $is_default = true;
             }
 
         }
 
-        if ($is_default) to_route('automation', [
+        //dd($is_default);
+
+        if ($is_default) return to_route('automation', [
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
             'fullName' => $fullName,

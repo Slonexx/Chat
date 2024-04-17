@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Ramsey\Uuid\Uuid;
 
 class Automation extends Model
 {
@@ -50,21 +51,23 @@ class Automation extends Model
         $is_bool = !empty($data['id']);
 
         if ($is_bool){
+            $id = $data['id']['id'];
             $model = Automation::find($data['id']['id']);
-
-            foreach (Automation_scenario::getInformation($model->get()->toArray()[0]['id'])->query as $item) $item->delete();
+            foreach (Automation_scenario::getInformation($model->toArray()['id'])->query as $item) $item->delete();
         }
-        else $model = new Automation();
+        else {
+            $id = Uuid::uuid4()->toString();
+            $model = new Automation();
+        }
 
+
+        $model->id = $id;
         $model->accountId = $accountId;
         $model->line = $data['line'];
         $model->messenger = $data['messenger'];
         $model->is_default = $data['is_default'];
         $model->employee_id  = $data['employee_id'];
         $model->save();
-
-        $id = $model->get()->toArray()[0]['id'];
-
 
 
 
