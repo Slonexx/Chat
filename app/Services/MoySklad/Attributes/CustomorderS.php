@@ -2,6 +2,7 @@
 namespace App\Services\MoySklad\Attributes;
 
 use App\Clients\MoySklad;
+use App\Services\HandlerService;
 use App\Services\Response;
 
 class CustomorderS {
@@ -34,5 +35,27 @@ class CustomorderS {
             }
         }
             
+    }
+
+    /**
+     * возращает аттрибуты, которых нет в моём складе
+     */
+    function checkCreateArrayAttributes($attributes){
+        $handlerS = new HandlerService();
+        $attributesRes = $this->getAllAttributes(false);
+        if(!$attributesRes->status)
+            return $attributesRes;
+        $attrubutesForCreating = [];
+
+        foreach($attributes as $addFieldMs){
+            $findedAttribute = array_filter($attributesRes->data, fn($attribute)=> $attribute->name == $addFieldMs->name);
+            if(count($findedAttribute) == 0)
+                $attrubutesForCreating[] = $addFieldMs;
+        }
+        if(empty($attrubutesForCreating))
+            return null;
+        else{
+            return $handlerS->createResponse(true, $attrubutesForCreating);
+        }
     }
 }

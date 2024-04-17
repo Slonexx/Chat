@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('lids', function (Blueprint $table) {
             $table->id();
             $table->uuid("accountId");
-            $table->bool("is_activity_settings");
-            $table->bool("is_activity_order");
+            $table->boolean("is_activity_settings");
+            $table->boolean("is_activity_order");
             $table->uuid("lid");
             $table->string("responsible", 2);
             $table->uuid("responsible_uuid", 2)->nullable();

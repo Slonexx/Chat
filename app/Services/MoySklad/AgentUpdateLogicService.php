@@ -2,10 +2,11 @@
 namespace App\Services\MoySklad;
 
 use App\Clients\MoySklad;
-use App\Services\ChatApp\AgentFindService;
+use App\Services\MoySklad\Attributes\CounterpartyS;
 use App\Services\MoySklad\Entities\CounterpartyService;
+use App\Services\MoySklad\Entities\CustomEntityService;
+use App\Services\MoySklad\RequestBody\Attributes\UpdateValuesService;
 use App\Services\Response;
-use stdClass;
 
 class AgentUpdateLogicService{
 
@@ -42,5 +43,24 @@ class AgentUpdateLogicService{
         $agentS = new CounterpartyService($this->accountId, $this->msC);
         return $agentS->update($id, $body, "Невозможно обновить теги контрагента");
 
+    }
+
+    function agentUpdateLidAttribute($agentId, $lidName, $valueName, UpdateValuesService $updateValuesS, CustomEntityService $customEntityS){
+        $agentAttrS = new CounterpartyS($this->accountId, $this->msC);
+        $agentAttrRes = $agentAttrS->getAllAttributes(true);
+        if(!$agentAttrRes->status)
+            return $agentAttrRes;
+        $agentAllAttributes = $agentAttrRes->data;
+        $agentLidAttr = array_filter($agentAllAttributes, fn($value)=> $value->name == $lidName);
+        $agentAttr = array_shift($agentLidAttr);
+
+        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        
+        $bodyRes = $updateValuesS->dictionary($customEntityS, $agentAttr, $valueName);
+        if(!$bodyRes->status)
+            return $bodyRes;
+
+        $bodyForAgentUpdate = $bodyRes->data;
+        return $agentS->update($agentId, $bodyForAgentUpdate, "Ошибка при обновлении контрагента во время создания заказа");  
     }
 }

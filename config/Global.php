@@ -16,7 +16,7 @@ return [
     "demandMetadataAttributes" => "{$MsURL}entity/demand/metadata/attributes/",
     "demand" => "{$MsURL}entity/demand/",
 
-    "employee" => "{$MsURL}entity/employee",
+    "employee" => "{$MsURL}entity/employee/",
     "employeeMetadataAttributes" => "{$MsURL}entity/employee/metadata/attributes/",
 
     "factureoutMetadataAttributes" => "{$MsURL}entity/factureout/metadata/attributes/",
@@ -28,6 +28,7 @@ return [
     'moyskladJsonApiEndpointUrl' =>  "{$MsURL}",
 
     "organizationMetadataAttributes" => "{$MsURL}entity/organization/metadata/attributes/",
+    "organization" => "{$MsURL}entity/organization/",
 
     "paymentinMetadataAttributes" => "{$MsURL}entity/paymentin/metadata/attributes/",
     "productMetadataAttributes" => "{$MsURL}entity/product/metadata/attributes/",

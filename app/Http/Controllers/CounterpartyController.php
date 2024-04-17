@@ -38,7 +38,7 @@ class CounterpartyController extends Controller
                 $chatS = new ChatService($accountId, $employeeId);
                 $lineId = $item->lineId;
                 $chatsRes = $chatS->getAllChatForEmployee(50, $lineId);
-                //dd($chatsRes->data['avito']);
+
                 if(!$chatsRes->status)  
                     return $handlerS->responseHandler($chatsRes, true, false);
 
