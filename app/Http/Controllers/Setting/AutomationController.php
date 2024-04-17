@@ -19,7 +19,7 @@ class AutomationController extends Controller
         $uid = $request->uid ?? "логин аккаунта";
         $main = employeeModel::getAllEmpl($accountId);
 
-        if ($main->toArray == null) {
+        if ($main->toArray == null)
             return to_route('creatEmployee', [
                 'accountId' => $accountId,
                 'isAdmin' => $isAdmin,
@@ -27,40 +27,38 @@ class AutomationController extends Controller
                 'uid' => $uid,
                 'message' => 'Сначала пройдите настройки подключение'
             ]);
-        }
 
 
         $list_template = Scenario::getInformationALLAcc($accountId);
-        if ($list_template->toArray == null) {
+        if ($list_template->toArray == null)
             return to_route('scenario', [
                 'isAdmin' => $isAdmin,
                 'fullName' => $fullName,
                 'uid' => $uid,
                 'message' => 'Сначала создайте сценарии'
             ]);
-        }
+
 
         $automation = Automation::getInformationALLAcc($accountId);
         $lines = [];
 
 
-        foreach ($main->toArray as $item){
+        foreach ($main->toArray as $item) {
             $chatAppClient = new newClient($item['employeeId']);
             $req = $chatAppClient->licenses();
-            if ($req->getStatusCode() == 200){
+            if ($req->getStatusCode() == 200) {
                 $is_line = (json_decode($req->getBody()->getContents()))->data;
-                foreach ($is_line as $line){
-                    if ($line->licenseTo > time()){
+                foreach ($is_line as $line) {
+                    if ($line->licenseTo > time()) {
                         $lines[$item['id']][] = [
                             'licenseId' => $line->licenseId,
                             'licenseName' => $line->licenseName,
-                            'name' => $line->licenseName.'#'.$line->licenseId,
+                            'name' => $line->licenseName . '#' . $line->licenseId,
                             'messenger' => $line->messenger,
                         ];
                     }
                 }
-            }
-            else {
+            } else {
                 $lines[$item['id']] = [
                     'licenseId' => 1,
                     'licenseName' => 'ошибка',
@@ -72,10 +70,6 @@ class AutomationController extends Controller
                 ];
             }
         }
-
-        //dd($lines);
-        //dd($automation);
-        //dd($list_template);
 
 
         return view('setting.automation.main', [
@@ -92,6 +86,7 @@ class AutomationController extends Controller
         ]);
 
     }
+
     function postAutomation(Request $request, $accountId)
     {
         $isAdmin = $request->isAdmin ?? 'NO';
@@ -110,15 +105,11 @@ class AutomationController extends Controller
 
 
         $isAutomation = Automation::getInformationALLAcc($accountId);
-        //dd($isAutomation);
         $is_default = false;
 
-        if ($request->is_default == '1') {
-
-            if ($isAutomation->toArray != null) {
-                foreach ($isAutomation->toArray as $item){
-                    if ($item['is_default'] == '1' or $item['is_default'] == 1) $is_default = true;
-                }
+        if ($request->is_default == '1' and $isAutomation->toArray != null) {
+            foreach ($isAutomation->toArray as $item) {
+                if ($item['is_default'] == '1' or $item['is_default'] == 1) $is_default = true;
             }
 
         }
@@ -134,11 +125,10 @@ class AutomationController extends Controller
 
         $id = [];
         if ($isAutomation->toArray != null) {
-            foreach ($isAutomation->toArray as $item){
-                if ($item['employee_id'] == $request->employee_id ) $id = $item;
+            foreach ($isAutomation->toArray as $item) {
+                if ($item['employee_id'] == $request->employee_id) $id = $item;
             }
         }
-
 
 
         $data = [
@@ -150,8 +140,6 @@ class AutomationController extends Controller
             'employee_id' => $request->employee_id ?? '0',
             'template' => $request->template ?? [],
         ];
-
-
 
 
         Automation::createOrUpdateIsArray($accountId, $data);

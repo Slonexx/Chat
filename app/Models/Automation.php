@@ -51,6 +51,7 @@ class Automation extends Model
 
         if ($is_bool){
             $model = Automation::find($data['id']['id']);
+
             foreach (Automation_scenario::getInformation($model->get()->toArray()[0]['id'])->query as $item) $item->delete();
         }
         else $model = new Automation();
@@ -61,10 +62,6 @@ class Automation extends Model
         $model->is_default = $data['is_default'];
         $model->employee_id  = $data['employee_id'];
         $model->save();
-
-        //dd($model, $model->get()->toArray(), $model->toArray());
-
-
 
         $id = $model->get()->toArray()[0]['id'];
 
