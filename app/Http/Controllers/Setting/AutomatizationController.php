@@ -357,8 +357,14 @@ class AutomatizationController extends Controller{
 
     function deleteScenario(Request $request, $accountId){
 
-        return response()->json(['status'=> false, 'message' => 'Ошибка']);
-
-        //$is_set = Scenario::deleteIsUuid($accountId, $newArray);
+        $id = $request->id ?? null;
+        if ($id == null) return response()->json(['status'=> false, 'message' => 'Ошибка Удаления, неизвестный идентификатор']);
+        try {
+            $model = Scenario::find($id);
+            $model->delete();
+        } catch (BadResponseException $e){
+            return response()->json(['status'=> false, 'message' => $e->getMessage()]);
+        }
+        return response()->json(['status'=> true]);
     }
 }

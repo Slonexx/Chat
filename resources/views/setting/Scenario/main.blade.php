@@ -4,8 +4,9 @@
 @section('form')
     <div id="notificationS" class="notification is-success" style="display: none"> <div id="notificationMessageS"></div> </div>
 
-    @include('setting.Scenario.lite_script')
-    @include('setting.Scenario.main_script')
+    @include('setting.Scenario.automation_script')
+   {{-- @include('setting.Scenario.lite_script')
+    @include('setting.Scenario.main_script')--}}
 
 
     @include('setting.Scenario.html')
