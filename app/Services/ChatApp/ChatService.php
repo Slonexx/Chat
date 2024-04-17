@@ -1,44 +1,31 @@
 <?php
 namespace App\Services\ChatApp;
 
-use App\Clients\MoySklad;
 use App\Clients\newClient;
-use App\Models\ChatappEmployee;
-use App\Models\employeeModel;
-use App\Models\MainSettings;
-use App\Models\Templates;
-use App\Services\MoySklad\Entities\CounterpartyService;
-use App\Services\MoySklad\Entities\CustomOrderService;
-use App\Services\MoySklad\Entities\DemandService;
-use App\Services\MoySklad\Entities\InvoiceoutService;
-use App\Services\MoySklad\Entities\SalesReturnService;
-use App\Services\MoySklad\TemplateService;
 use App\Services\Response;
 use Exception;
-use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
-use stdClass;
 
 class ChatService{
 
-    private MoySklad $msC;
-
     private string $accountId;
 
-    private Response $res;
+    private string $employeeId;
 
-    function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+    private newClient $chatappC;
+
+    function __construct($accountId, $employeeId, newClient $chatappC = null) {
+        if ($chatappC == null) $this->chatappC = new newClient($employeeId);
+        else  $this->chatappC = $chatappC;
         $this->accountId = $accountId;
-        $this->res = new Response();
+        $this->employeeId = $employeeId;
     }
 
-    function getAllChatForEmployee($countConversation, $employeeId, $lineId){
+    function getAllChatForEmployee($countConversation, $lineId){
         
-        $chatappC = new newClient($employeeId);
         $res = new Response();
         try{
-            $licenseReq = $chatappC->licenses();
+            $licenseReq = $this->chatappC->licenses();
             $encoded_body = $licenseReq->getBody()->getContents();
             $body = json_decode($encoded_body);
             $lines = $body->data;
@@ -52,19 +39,52 @@ class ChatService{
 
             $resChat = [];
             foreach($mesengers as $item){
-                $chatsReq = $chatappC->chats($lineId, $item);
+                $chatsReq = $this->chatappC->chats($lineId, $item, $countConversation);
                 if(!$chatsReq->status){
                     return $chatsReq;
+                }
+                if($item == "avito"){
+                    $arrayChats = $chatsReq->data->data->items;
+                    array_map(function($value) use ($lineId, $item){
+                        $messageS = new MessageService($this->accountId, $this->employeeId, $this->chatappC);
+                        $errorMessage = "Ошибка при получении сообщений";
+                        $messages = $messageS->getAllMessagesFromChat($lineId, $item, $value->id, $errorMessage);
+                        if(!$messages->status){
+                            $value->id = null;
+                            $value->name = null;
+                            return $value;
+                        }
+                        $messages = $messages->data->data->items;
+                        if(count($messages) == 0){
+                            $value->id = null;
+                            $value->name = null;
+                        }
+                        foreach($messages as $message){
+                            if(!$message->fromMe){
+                                $value->id = $message->fromUser->id;
+                                $value->name = $message->fromUser->name;
+                                break;
+                            }
+
+                        }
+                        return $value;
+
+                    }, $arrayChats);
+                    
                 }
                 //chatapp/db
                 $compliances = [
                     "grWhatsApp" => "whatsapp",
-                    "telegram" => "telegram"
+                    "telegram" => "telegram",
+                    "email" => "email",
+                    "vkontakte" => "vk",
+                    "instagram" => "instagram",
+                    "telegramBot" => "telegram_bot",
+                    "avito" => "avito"
                 ];
                 $conversations = $chatsReq->data->data->items;
-                $chunks = array_chunk($conversations, $countConversation);
 
-                $resChat[$compliances[$item]] = $chunks[0];
+                $resChat[$compliances[$item]] = $conversations;
 
                 
             }

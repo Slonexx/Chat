@@ -3,25 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Clients\MoySklad;
+use App\Clients\newClient;
+use App\Models\Lid;
 use App\Models\MessengerAttributes;
 use App\Models\organizationModel;
-use App\Services\MoySklad\AgentFindLogicService;
 use App\Services\ChatApp\AgentMessengerHandler;
 use App\Services\ChatApp\ChatService;
 use App\Services\HandlerService;
+use App\Services\MoySklad\AgentControllerLogicService;
+use App\Services\MoySklad\AgentFindLogicService;
 use App\Services\MoySklad\AgentUpdateLogicService;
 use App\Services\MoySklad\Attributes\CounterpartyS;
+use App\Services\MoySklad\CustomerorderCreateLogicService;
+use App\Services\MoySklad\LidAttributesCreateService;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
 use Error;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
-class CounterpartyController extends Controller
+class CustomerorderController extends Controller
 {
     function create(Request $request, $accountId){
         try{
-
             $handlerS = new HandlerService();
             $msC = new MoySklad($accountId);
             $setAttrS = new CreatingAttributeService($accountId, $msC);
@@ -31,15 +35,14 @@ class CounterpartyController extends Controller
             $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, new CounterpartyS($accountId, $msC));
             if(!$resAttr->status)
                 return $handlerS->responseHandler($resAttr, true, false);
-
             $orgs = organizationModel::where("accountId", $accountId)->get()->all();
-            foreach($orgs as $item){
-                $employeeId = $item->employeeId;
-                $chatS = new ChatService($accountId, $employeeId);
-                $lineId = $item->lineId;
-                $chatsRes = $chatS->getAllChatForEmployee(50, $lineId);
-
-                if(!$chatsRes->status)  
+            $lid = Lid::where("accountId", $accountId)->get()->first();
+            //$orgEmployees = $orgsReq->pluck("employeeId")->all();
+            foreach($orgs as $orgItem){
+                $chatappC = new newClient($orgItem->employeeId);
+                $chatS = new ChatService($accountId, $orgItem->employeeId, $chatappC);
+                $chatsRes = $chatS->getAllChatForEmployee(50, $orgItem->lineId);
+                if(!$chatsRes->status)
                     return $handlerS->responseHandler($chatsRes, true, false);
 
                 $agentH = new AgentMessengerHandler($accountId, $msC);
@@ -63,21 +66,44 @@ class CounterpartyController extends Controller
                         if(!$agentByRequisitesRes->status)
                             return $handlerS->responseHandler($agentByRequisitesRes, true, false);
                         else if(!empty($agents)){
-                            $updateLogicS = new AgentUpdateLogicService($accountId, $msC);
-                            $atUsername = "@{$username}";
-                            $addFieldValue = match($messenger){
-                                "telegram" => $atUsername,
-                                "whatsapp" => $chatId,
-                                "email" => $email,
-                                "vk" => ctype_digit($chatId) ? "id{$chatId}" : $chatId,
-                                "instagram" => $atUsername,
-                                "telegram_bot" => $atUsername,
-                                "avito" => $chatId
-                            };
-                            $bodyWithAttr = $handlerS->FormationAttribute($attrMeta, $addFieldValue);
-                            $updatedAgentRes = $updateLogicS->addTagsAndAttr($agents, $messenger, $bodyWithAttr);
-                            if(!$updatedAgentRes->status)
-                                return $handlerS->responseHandler($updatedAgentRes, true, false);
+                            if(empty($lid)){
+                                $res = $handlerS->createResponse(false, "настройки lid не пройдены");
+                                return $handlerS->responseHandler($res, true, false);
+                            }
+
+                            $responsible = $lid->responsible;
+                            $responsibleUuid = $lid->responsible_uuid;
+                            $isCreateOrder = $lid->is_activity_order;
+                            
+                            $agentHref = $agents[0]->meta->href;
+                            $customOrderS = new CustomerorderCreateLogicService($accountId, $msC);
+                            $ordersByAgentRes = $customOrderS->findFirst(10, $agentHref);
+                            if(!$ordersByAgentRes->status)
+                                return $handlerS->responseHandler($ordersByAgentRes, true, false);
+
+                            $customerOrders = $ordersByAgentRes->data;
+                            $organId = $orgItem->organId;
+                            $agentControllerS = new AgentControllerLogicService($accountId, $msC);
+                            if(count($customerOrders) == 0){
+                                $res = $agentControllerS->createOrderAndAttributes($organId, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
+                                if(!$res->status)
+                                    return $handlerS->responseHandler($res, true, false);
+                            } else {
+                                $isCreate = $customOrderS->checkStateTypeEqRegular($customerOrders);
+                                if($isCreate){
+                                    //Regular
+                                    $customerOrderRes = $agentControllerS->createOrderAndAttributes($organId, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
+                                    if(!$customerOrderRes->status)
+                                        return $handlerS->responseHandler($customerOrderRes, true, false);
+
+                                } else {
+                                    //Final
+                                    $customerOrderRes = $agentControllerS->updateAttributesIfNecessary($customerOrders);
+                                    if(!$customerOrderRes->status)
+                                        return $handlerS->responseHandler($customerOrderRes, true, false);
+                                }
+
+                            }
                             
                         } else if(empty($agents)){
                     
@@ -96,8 +122,8 @@ class CounterpartyController extends Controller
                     }
                 }
 
-                
             }
+
             return response()->json();
             
         } catch(Exception | Error $e){

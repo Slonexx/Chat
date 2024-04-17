@@ -17,8 +17,9 @@ class CustomOrderService {
 
     private const URL_IDENTIFIER = "customerorder";
 
-    function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+    function __construct($accountId, MoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+        else  $this->msC = $MoySklad;
         $this->res = new Response();
         $this->accountId = $accountId;
     }
@@ -121,6 +122,14 @@ class CustomOrderService {
         }
     }
 
+    public function create($body){
+        $res = $this->msC->post(self::URL_IDENTIFIER, $body);
+        if(!$res->status)
+            return $res->addMessage("Ошибка при создании заказа покупателя");
+        else
+            return $res;
+    }
+
     function getStatuses(){
         try{
             $url = Config::get("Global")[self::URL_IDENTIFIER] . "metadata/";
@@ -143,4 +152,14 @@ class CustomOrderService {
             return $answer;
         }
     }
+
+    function update($id, $body, $errorMes){
+        $res = $this->msC->put(self::URL_IDENTIFIER, $body, $id);
+        if(!$res->status)
+            return $res->addMessage($errorMes);
+        else
+            return $res;
+    }
+
+    
 }

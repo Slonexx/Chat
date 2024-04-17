@@ -19,8 +19,9 @@ class CounterpartyService{
 
     private const URL_IDENTIFIER = "agent";
 
-    function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+    function __construct($accountId, MoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+        else  $this->msC = $MoySklad;
         $this->res = new Response();
         $this->accountId = $accountId;
     }
@@ -33,34 +34,15 @@ class CounterpartyService{
             return $res;
     }
 
-    public function getByPhone(string $name, string $phone, string $addF, string $attribute_id) {
+    public function getByParam(string $name, mixed $value, string $errorMes) {
 
         $filterS = new MsFilterService();
         
-        $url = $filterS->prepareUrlWithParam(self::URL_IDENTIFIER, "name", $name);
+        $url = $filterS->prepareUrlWithParam(self::URL_IDENTIFIER, $name, $value);
         $nameRes = $this->msC->getByUrl($url);
         if(!$nameRes->status)
-            return $nameRes->addMessage("Ошибка при поиске контрагента по имени");
-
-        if(count($nameRes->data->rows) == 0){
-            $url = $filterS->prepareUrlWithParam(self::URL_IDENTIFIER, "phone", $phone);
-            $phoneRes = $this->msC->getByUrl($url);
-            if(!$phoneRes->status)
-                return $phoneRes->addMessage("Ошибка при поиске контрагента по номеру");
-
-            if(count($phoneRes->data->rows) == 0 && $addF != false){    
-                
-                $filterUrl = $filterS->prepareUrlForFilter(self::URL_IDENTIFIER, "agentMetadataAttributes", $attribute_id, $addF);
-                $res = $this->msC->getByUrl($filterUrl);
-                if(!$res->status)
-                    return $res->addMessage("Ошибка при поиске контрагента по доп полю");
-                else
-                    return $this->res->success($res->data->rows); 
-
-            } else
-                return $this->res->success($phoneRes->data->rows);
-                 
-        } else
+            return $nameRes->addMessage($errorMes);
+        else
             return $this->res->success($nameRes->data->rows);
 
     }
@@ -121,12 +103,10 @@ class CounterpartyService{
             return $res;
     }
 
-    function addTags($id, $tags){
-        $body = new stdClass();
-        $body->tags = $tags;
+    function update($id, $body, $errorMes){
         $res = $this->msC->put(self::URL_IDENTIFIER, $body, $id);
         if(!$res->status)
-            return $res->addMessage("Невозможно обновить теги контрагента");
+            return $res->addMessage($errorMes);
         else
             return $res;
     }
