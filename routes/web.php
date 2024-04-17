@@ -6,6 +6,7 @@ use App\Http\Controllers\Entity\PopapController;
 use App\Http\Controllers\Entity\widgetController;
 use App\Http\Controllers\initialization\indexController;
 use App\Http\Controllers\Setting\AttributeController;
+use App\Http\Controllers\Setting\AutomationController;
 use App\Http\Controllers\Setting\AutomatizationController;
 use App\Http\Controllers\Setting\CreateAuthTokenController;
 use App\Http\Controllers\Setting\organizationController;
@@ -19,20 +20,28 @@ Route::get('/{accountId}/', [indexController::class, 'index'])->name('main');
 Route::get('error/{accountId}/', [indexController::class, 'error'])->name('error');
 
 //Setting get Employee
-Route::get('/Setting/createToken/{accountId}', [CreateAuthTokenController::class, 'getCreateAuthToken'])->name('creatEmployee');
-Route::post('/Setting/createToken/{accountId}', [CreateAuthTokenController::class, 'postCreateAuthToken']);
+Route::group(["prefix" => "Setting"], function () {
+    Route::get('/createToken/{accountId}', [CreateAuthTokenController::class, 'getCreateAuthToken'])->name('creatEmployee');
+    Route::post('/createToken/{accountId}', [CreateAuthTokenController::class, 'postCreateAuthToken']);
 
-Route::get('/Setting/get/employee/{accountId}', [CreateAuthTokenController::class, 'getEmployee']);
-Route::get('/Setting/create/employee/{accountId}', [CreateAuthTokenController::class, 'createEmployee']);
-Route::get('/Setting/delete/employee/{accountId}', [CreateAuthTokenController::class, 'deleteEmployee']);
+    Route::get('/get/employee/{accountId}', [CreateAuthTokenController::class, 'getEmployee']);
+    Route::get('/create/employee/{accountId}', [CreateAuthTokenController::class, 'createEmployee']);
+    Route::get('/delete/employee/{accountId}', [CreateAuthTokenController::class, 'deleteEmployee']);
+});
+
 
 //Setting for
-Route::get('/Setting/organization/{accountId}', [organizationController::class, 'getCreate'])->name('creatOrganization');
-Route::post('/Setting/organization/{accountId}', [organizationController::class, 'postCreate']);
+Route::group(["prefix" => "Setting"], function () {
+    Route::get('/organization/{accountId}', [organizationController::class, 'getCreate'])->name('creatOrganization');
+    Route::post('/organization/{accountId}', [organizationController::class, 'postCreate']);
 
-Route::get('/Setting/organization/get/Licenses/{accountId}', [organizationController::class, 'getLicenses']);
-Route::get('/Setting/organization/create/Licenses/{accountId}', [organizationController::class, 'createLicenses']);
-Route::get('/Setting/organization/delete/Licenses/{accountId}', [organizationController::class, 'deleteLicenses']);
+    Route::get('/organization/get/Licenses/{accountId}', [organizationController::class, 'getLicenses']);
+    Route::get('/organization/create/Licenses/{accountId}', [organizationController::class, 'createLicenses']);
+    Route::get('/organization/delete/Licenses/{accountId}', [organizationController::class, 'deleteLicenses']);
+});
+
+
+
 
 
 Route::get('/Setting/addFields/{accountId}', [AddFieldsController::class, 'getAddFields']);
@@ -68,30 +77,41 @@ Route::get('/Setting/template/info/fields/', [templateController::class, 'getMai
 
 
 
-
-//getTemplateById
 Route::post('/Setting/getTemplate/{accountId}', [templateController::class, 'getTemplate']);
 
 Route::get('/Setting/template/get/attributes/{accountId}', [templateController::class, 'getAttributes']);
 Route::get('/Setting/template/delete/poles/{accountId}', [templateController::class, 'deletePoles']);
 
-Route::get('/Setting/automatization/{accountId}', [AutomatizationController::class, 'getPage']);
 
-Route::post('/automatization/{accountId}', [AutomatizationController::class, 'sendTemplate']);
+Route::group(["prefix" => "Setting"], function () {
+    Route::get('/scenario/{accountId}', [AutomatizationController::class, 'getScenario'])->name('scenario');
+    Route::post('/scenario/{accountId}', [AutomatizationController::class, 'saveScenario']);
+    Route::delete('/scenario/{accountId}', [AutomatizationController::class, 'deleteScenario']);
+
+    Route::get('/automation/{accountId}', [AutomationController::class, 'getAutomation'])->name('automation');
+    Route::post('/automation/{accountId}', [AutomationController::class, 'postAutomation']);
+});
 
 
-//Widget
-Route::get('/widget/{object}', [widgetController::class, 'widgetObject']);
-Route::get('/widget/get/Data', [widgetController::class, 'widgetGetData']);
+
+//widget
+Route::group(["prefix" => "widget"], function () {
+    Route::get('/{object}', [widgetController::class, 'widgetObject']);
+    Route::get('/get/Data', [widgetController::class, 'widgetGetData']);
+});
+
 
 //Popup
-Route::get('/Popup/{object}', [PopapController::class, 'Popup']);
-Route::get('/Popup/template/message/Show', [PopapController::class, 'template']);
-Route::get('/Popup/template/message/get/All', [templateController::class, 'getTemplates']);
-Route::get('/Popup/template/message/get/where/name', [PopapController::class, 'searchTemplate']);
-Route::get('/Popup/template/message/get/information/messenger', [PopapController::class, 'messenger']);
-Route::get('/Popup/template/message/get/information/chatapp', [PopapController::class, 'information']);
-Route::get('/Popup/template/message/get/send/message', [PopapController::class, 'sendMessage']);
+Route::group(["prefix" => "Popup"], function () {
+    Route::get('/{object}', [PopapController::class, 'Popup']);
+    Route::get('/template/message/Show', [PopapController::class, 'template']);
+    Route::get('/template/message/get/All', [templateController::class, 'getTemplates']);
+    Route::get('/template/message/get/where/name', [PopapController::class, 'searchTemplate']);
+    Route::get('/template/message/get/information/messenger', [PopapController::class, 'messenger']);
+    Route::get('/template/message/get/information/chatapp', [PopapController::class, 'information']);
+    Route::get('/template/message/get/send/message', [PopapController::class, 'sendMessage']);
+});
+
 
 //Install or delete web app
 Route::put('Config/vendor-endpoint/api/moysklad/vendor/1.0/apps/{apps}/{accountId}', [vendorEndpoint::class, 'put']);

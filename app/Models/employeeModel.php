@@ -26,9 +26,34 @@ class employeeModel extends Model
         'refreshToken',
     ];
 
+    public static function getAllEmpl($accountId): object
+    {
+        $model = employeeModel::where('accountId', $accountId )->get();
+        if (!$model->isEmpty()) {
+            $return = [];
+            foreach ($model as $item) {
+                $return[] = $item->toArray();
+            }
+            return (object) [
+                'query' => $model,
+                'toArray' => $return,
+            ];
+        } else {
+            return (object) [
+                'query' => $model,
+                'toArray' => null,
+            ];
+        }
+    }
+
     public function chatAutoSet()
     {
         return $this->hasOne(ChatappEmployee::class, "employee_id", "id");
+    }
+
+    public function getEmployee()
+    {
+        return $this->belongsTo(employeeModel::class, 'employee_id');
     }
 
 }
