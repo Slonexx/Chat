@@ -88,12 +88,12 @@ class AutomatizationService{
                 && $val->project == $project_id
             );
 
-        } else if ($channel_id === false || $project_id === false) {
-            if ($channel_id === false) {
-                $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->project == $project_id);
-            } else if ($project_id === false) {
-                $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->channel == $channel_id);
-            }
+        } else if ($channel_id === false && $project_id !== false) {
+            $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->project == $project_id);
+        } else if ($project_id === false && $channel_id !== false) {
+            $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->channel == $channel_id);
+        } else {
+            $filteredTemplatesAuto = $autos;
         }
 
         if(count($filteredTemplatesAuto) == 0)
@@ -116,7 +116,7 @@ class AutomatizationService{
 
             $body = new stdClass();
             if(!$agentAttributes){
-                $messengerErr = "У данного документа у контрагента отсутствуют поля месседжеров";
+                $messengerErr = "У данного документа у контрагента отсутствуют доп поля месседжеров";
                 if($desc == false)
                     $body->description = $messengerErr;
                 else
@@ -155,7 +155,7 @@ class AutomatizationService{
             }
             
         }
-        return response()->json();
+        return $this->res->success("");
         
     }
 }
