@@ -5,7 +5,6 @@ use App\Clients\MoySklad;
 use App\Services\MoySklad\Attributes\CounterpartyS;
 use App\Services\MoySklad\Attributes\CustomorderS;
 use App\Services\Response;
-use Illuminate\Support\Facades\Config;
 
 class LidAttributesCreateService{
     private MoySklad $msC;

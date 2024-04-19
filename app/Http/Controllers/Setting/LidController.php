@@ -66,16 +66,38 @@ class LidController extends Controller
         $is_activity_settings = $request->is_activity_settings ?? '0';
         if ($is_activity_settings == 'on') $is_activity_settings = '1';
 
-       /*МЕТОД СОЗДАТЬ ДОП ПОЛЕЙ (ЛИД) И СОХРАЕНИЯ В БАЗУ*/
+        $orderIsActive = $request->is_activity_order;
+
+        $attributesS = new LidAttributesCreateService($accountId);
+        $serviceFieldsNames = [
+            "lid",
+        ];
+        $config = Config::get("lidAttributes");
+        $serviceFields = array_filter($config, fn($key)=> in_array($key, $serviceFieldsNames), ARRAY_FILTER_USE_KEY);
+        $findOrCreateRes = $attributesS->findOrCreate($serviceFields, $orderIsActive);
+        if(isset($findOrCreateRes)){
+            if(!$findOrCreateRes->status)
+                return to_route('lid', [
+                    'accountId' => $accountId,
+                    'isAdmin' => $isAdmin,
+                    'fullName' => $fullName ?? "Имя аккаунта",
+                    'uid' => $uid ?? "логин аккаунта",
+        
+                    'message' => $findOrCreateRes->message,
+                ]);
+
+        }
 
         $data = [
             'accountId' => $accountId,
             'is_activity_settings' => $is_activity_settings,
-            'is_activity_order' => $request->is_activity_order ?? '0',
+            'is_activity_order' => $orderIsActive ?? '0',
             'lid' => 'lid',
             'responsible' => $request->responsible ?? '0',
             'responsible_uuid' => $request->responsible_uuid ?? null,
         ];
+
+
         $model = Lid::createOrUpdate($data);
 
         if ($model->status) $message = '';
