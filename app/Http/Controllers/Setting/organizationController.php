@@ -48,7 +48,7 @@ class organizationController extends Controller
 
         $ms = new MsClient($accountId);
         try {
-            $All = json_decode(json_encode(['id'=>'0', 'name'=>'Все организации']));
+            $All = json_decode(json_encode(['id' => '0', 'name' => 'Все организации']));
             $E = $ms->get('https://api.moysklad.ru/api/remap/1.2/entity/organization')->rows;
             array_unshift($E, $All);
         } catch (BadResponseException $e) {
@@ -128,90 +128,99 @@ class organizationController extends Controller
 
     public function createLicenses(Request $request, $accountId): JsonResponse
     {
-      $data = json_decode(json_encode($request->all()));
+        $data = json_decode(json_encode($request->all()));
 
-      if (count($data) > 0) {
-          $length = count($data)-1;
-          $employeeName = '';
-          $line = '';
+        if (count($data) > 0) {
+            $length = count($data) - 1;
+            $employeeName = '';
+            $line = '';
 
-          try {
-              if ($data[0]->organId == '0')  $existingRecords = organizationModel::where('accountId', $accountId)->get();
-               else $existingRecords = organizationModel::where('accountId', $accountId)->where('organId', $data[0]->organId)->get();
-
-
-              if (!$existingRecords->isEmpty()) { foreach ($existingRecords as $record) { $record->delete(); } }
+            try {
+                if ($data[0]->organId == '0') $existingRecords = organizationModel::where('accountId', $accountId)->get();
+                else $existingRecords = organizationModel::where('accountId', $accountId)->where('organId', $data[0]->organId)->get();
 
 
-              foreach ($data as $id => $item) {
+                if (!$existingRecords->isEmpty()) {
+                    foreach ($existingRecords as $record) {
+                        $record->delete();
+                    }
+                }
 
-                  if ($line != '') $line = $line.', '.$item->lineName;
-                  else $line = $item->lineName;
+
+                foreach ($data as $id => $item) {
+
+                    if ($line != '') $line = $line . ', ' . $item->lineName;
+                    else $line = $item->lineName;
 
 
-                  if ($id == $length) {
-                      $add = '';
-                  } else {
-                      $add = ', ';
-                  }
-                  $employeeName = $employeeName. $item->employeeName . $add;
+                    if ($id == $length) {
+                        $add = '';
+                    } else {
+                        $add = ', ';
+                    }
+                    $employeeName = $employeeName . $item->employeeName . $add;
 
-                  $model = new organizationModel();
+                    $model = new organizationModel();
 
-                  $model->accountId = $accountId;
-                  $model->organId = $item->organId;
-                  $model->organName = $item->organName;
+                    $model->accountId = $accountId;
+                    $model->organId = $item->organId;
+                    $model->organName = $item->organName;
 
-                  $model->employeeId = $item->employeeId;
-                  $model->employeeName = $item->employeeName;
+                    $model->employeeId = $item->employeeId;
+                    $model->employeeName = $item->employeeName;
 
-                  $model->lineId = $item->lineId;
-                  $model->lineName = $item->lineName;
+                    $model->lineId = $item->lineId;
+                    $model->lineName = $item->lineName;
 
-                  $model->save();
-              }
-              return response()->json([
-                  'status' => true,
-                  'data' => [
-                      'id' => $data[0]->organId,
-                      'name' => $data[0]->organName,
-                      'line' => $line,
-                  ],
-                  'message' => 'Все данные сохранились, а именно организация: ' . $data[0]->organName . ' и сотрудники: '. $employeeName,
-              ]);
-          } catch (BadResponseException $e) {
-              return response()->json([
-                  'status' => false,
-                  'message' => $e->getResponse()->getBody()->getContents(),
-              ]);
-          }
-      } else  return response()->json([
-          'status' => false,
-          'message' => "Отсутствуют данные",
-      ]);
+                    $model->save();
+                }
+                return response()->json([
+                    'status' => true,
+                    'data' => [
+                        'id' => $data[0]->organId,
+                        'name' => $data[0]->organName,
+                        'line' => $line,
+                    ],
+                    'message' => 'Все данные сохранились, а именно организация: ' . $data[0]->organName . ' и сотрудники: ' . $employeeName,
+                ]);
+            } catch (BadResponseException $e) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $e->getResponse()->getBody()->getContents(),
+                ]);
+            }
+        } else  return response()->json([
+            'status' => false,
+            'message' => "Отсутствуют данные",
+        ]);
 
 
     }
+
     public function deleteLicenses(Request $request, $accountId): JsonResponse
     {
-     $organId = $request->organId ?? '';
+        $organId = $request->organId ?? '';
 
-     if ($organId == '') {
-         return response()->json([
-             'status' => false,
-             'message' => 'Данных в базе нет',
-         ]);
-     }
+        if ($organId == '') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Данных в базе нет',
+            ]);
+        }
 
         try {
-         if ($organId == '0') {
-             $existingRecords = organizationModel::where('accountId', $accountId)->get();
-         } else {
-             $existingRecords = organizationModel::where('accountId', $accountId)->where('organId', $organId)->get();
-         }
+            if ($organId == '0') {
+                $existingRecords = organizationModel::where('accountId', $accountId)->get();
+            } else {
+                $existingRecords = organizationModel::where('accountId', $accountId)->where('organId', $organId)->get();
+            }
 
 
-            if (!$existingRecords->isEmpty()) { foreach ($existingRecords as $record) { $record->delete(); } }
+            if (!$existingRecords->isEmpty()) {
+                foreach ($existingRecords as $record) {
+                    $record->delete();
+                }
+            }
 
             return response()->json([
                 'status' => true,

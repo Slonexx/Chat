@@ -1,13 +1,11 @@
 <style>
-    .head-full {
-        height: 1280px;
-    }
-
     body {
         font-family: 'Helvetica', 'Arial', sans-serif;
         color: #444444;
         font-size: 8pt;
-        background-color: #FAFAFA;
+        background-color:#dcdcdc;
+        height: 100vh;
+        max-height: 2280px
     }
 
     .main-container {

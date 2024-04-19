@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class settingModel extends Model
 {
+    protected $table = "setting_models";
+
     use HasFactory;
     protected  $primaryKey = 'accountId';
     protected $casts = [
@@ -16,5 +18,10 @@ class settingModel extends Model
         'accountId',
         'tokenMs',
     ];
+
+    public function getMain()
+    {
+        return $this->belongsTo(settingModel::class, 'accountId');
+    }
 
 }

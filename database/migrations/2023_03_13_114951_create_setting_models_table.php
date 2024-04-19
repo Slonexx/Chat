@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
 
-    public function up()
+    public function up(): void
     {
         Schema::create('setting_models', function (Blueprint $table) {
             $table->string('accountId')->unique()->primary();
@@ -17,7 +17,7 @@ return new class extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('setting_models');
     }

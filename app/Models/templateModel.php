@@ -19,4 +19,6 @@ class templateModel extends Model
         'message',
     ];
 
+
+
 }

@@ -1,8 +1,16 @@
 <?php
 
 namespace App\Http\Controllers\Setting;
+use App\Clients\MoySklad;
+use App\Clients\MsClientAdd;
 use App\Http\Controllers\Controller;
+use App\Models\AutomationSettings;
+use App\Models\CompanySettings;
+use App\Models\employeeModel;
 use App\Models\MainSettings;
+use App\Models\organizationModel;
+use App\Models\Scenario;
+use App\Models\Templates;
 use App\Services\HandlerService;
 use App\Services\ChatApp\AutomatizationService;
 use App\Services\MoySklad\Entities\CustomOrderService;
@@ -15,6 +23,7 @@ use App\Services\MoySklad\Entities\SalesReturnService;
 use App\Services\MoySklad\FrontendLogicService;
 use Error;
 use Exception;
+use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Http\Request;
 use stdClass;
 
@@ -31,15 +40,15 @@ class AutomatizationController extends Controller{
             ->where("account_id", $accountId)
             ->select(
                 "auto_s.uuid",
-                "channel", 
-                "project", 
+                "channel",
+                "project",
                 "status",
                 "entity",
                 "t.uuid as template"
                 )
             ->get()
             ->toArray();
-            
+
             $automation = [];
             $statuses = [];
             $entityServices = [
@@ -52,7 +61,7 @@ class AutomatizationController extends Controller{
             foreach($entityServices as $entityType => $service){
                 $statusesRes = $service->getStatuses();
                 if(!$statusesRes->status){
-                    return $handlerS->responseHandler($statusesRes, true, false);       
+                    return $handlerS->responseHandler($statusesRes, true, false);
                 }
                 $statuses[$entityType] = $statusesRes->data;
             }
@@ -159,14 +168,14 @@ class AutomatizationController extends Controller{
                 $automation[$i]['template'] = [];
                 $automation[$i]['template'] = $preparedTemplate;
                 ////////////TEMPLATE////////////
-                
+
             }
 
-            return view('setting.automatization.main', [
+            return view('setting.Scenario.main', [
                 'savedAuto' => $automation,
                 // 'template' => $templates,
                 // 'message' => $request->message ?? '',
-    
+
                 'accountId' => $accountId,
                 'isAdmin' => $isAdmin,
                 'fullName' => $fullName,
@@ -187,7 +196,7 @@ class AutomatizationController extends Controller{
             $msUid = $req["auditContext"]["uid"];
             $spldUid = explode("@", $msUid);
             $startUid = $spldUid[0];
-            
+
             foreach($req['events'] as $event){
                 $type = $event['meta']['type'] ?? null;
                 $href = $event['meta']['href'] ?? null;
@@ -214,5 +223,150 @@ class AutomatizationController extends Controller{
         } catch(Exception | Error $e){
             return response()->json($e->getMessage(), 500);
         }
+    }
+
+
+
+    function getScenario(Request $request, $accountId){
+        $isAdmin = $request->isAdmin ?? 'NO';
+        $fullName = $request->fullName ?? "Имя аккаунта";
+        $uid = $request->uid ?? "логин аккаунта";
+        $main = employeeModel::getAllEmpl($accountId);
+
+
+        if ($main->toArray == null) {
+            return to_route('creatEmployee', [
+                'accountId' => $accountId,
+                'isAdmin' => $isAdmin,
+                'message' => 'Сначала пройдите настройки подключение'
+            ]);
+        }
+        $client = new MoySklad($accountId);
+
+        $endpoints = [
+            'customerorder' => '/customerorder/metadata',
+            'demand' => '/demand/metadata',
+            'salesreturn' => '/salesreturn/metadata',
+            'invoiceout' => '/invoiceout/metadata',
+            'project' => '/project',
+            'saleschannel' => '/saleschannel',
+        ];
+
+        $response = [];
+
+        foreach ($endpoints as $key => $endpoint) {
+            $result = $client->getByUrl("https://api.moysklad.ru/api/remap/1.2/entity$endpoint");
+            //$defaultOption = [['id' => '0', 'name' => 'Не выбирать']];
+
+            if (in_array($key, ['customerorder', 'demand', 'salesreturn', 'invoiceout']))  {
+                if ($result->status) {
+                    $result = $result->data;
+                    $data = property_exists($result, 'states') ? $result->states : [];
+                }
+                else  return view('setting.error', [ 'accountId' => $accountId, 'isAdmin' => $isAdmin, 'message' => $result->data->message ]);
+            }
+            else {
+                if ($result->status) {
+                    $result = $result->data;
+                    $data = $result->meta->size > 0 ? $result->rows : [];
+                }
+                else return view('setting.error', [ 'accountId' => $accountId, 'isAdmin' => $isAdmin, 'message' => $result->data->message ]);
+            }
+
+            //array_unshift($data, ...$defaultOption);
+            $response[$key] = $data;
+        }
+
+        $template = Templates::getAllMainsTemplates($accountId);
+        if ($template->toArray == null) return to_route('template', [
+            'accountId' => $accountId,
+            'isAdmin' => $request->isAdmin,
+            'fullName' => $request->fullName ?? "Имя аккаунта",
+            'uid' => $request->uid ?? "логин аккаунта",
+
+            'message' => 'Сначала создайте шаблоны'
+        ]);
+
+
+        $Saved = Scenario::getInformationALLAcc($accountId);
+        //dd($Saved);
+
+        return view('setting.Scenario.main', [
+            'arr_meta' => [
+                'customerorder' => (array)$response['customerorder'],
+                'demand' => (array)$response['demand'],
+                'salesreturn' => (array)$response['salesreturn'],
+                'invoiceout' => (array)$response['invoiceout'],
+            ],
+            'arr_project' => (array)$response['project'],
+            'arr_saleschannel' => (array)$response['saleschannel'],
+            'template' => $template->toArray,
+
+
+            'SavedCreateToArray' => $Saved->toArray,
+
+
+
+            'accountId' => $accountId,
+            'message' => $request->message ?? '',
+            'isAdmin' => $isAdmin,
+            'fullName' => $fullName,
+            'uid' => $uid,
+        ]);
+
+    }
+
+    function saveScenario(Request $request, $accountId){
+        $isAdmin = $request->isAdmin ?? 'NO';
+        $fullName = $request->fullName ?? "Имя аккаунта";
+        $uid = $request->uid ?? "логин аккаунта";
+        $newArray = [];
+
+        foreach ($request->all() as $key => $value) {
+            // Если ключ содержит один из префиксов, то извлекаем идентификатор
+            if (preg_match('/^(template_|entity_|status_|saleschannel_|project_)(.*)$/', $key, $matches)) {
+                // Получаем префикс и идентификатор
+                $prefix = $matches[1];
+                $identifier = $matches[2];
+                // Создаем новую запись в новом массиве
+                if (!isset($newArray[$identifier])) {
+                    $newArray[$identifier] = [];
+                }
+                // Добавляем значение в новый массив
+                $newArray[$identifier][str_replace('_', '', $prefix)] = $value;
+            }
+        }
+
+        $is_set = Scenario::createOrUpdateIsArray($accountId, $newArray);
+        if ($is_set['status']){
+            return to_route('creatEmployee', [
+                'accountId' => $accountId,
+                'isAdmin' => $request->isAdmin,
+                'fullName' => $request->fullName ?? "Имя аккаунта",
+                'uid' => $request->uid ?? "логин аккаунта",
+            ]);
+        } else {
+            return to_route('scenario', [
+                'accountId' => $accountId,
+                'isAdmin' => $request->isAdmin,
+                'fullName' => $request->fullName ?? "Имя аккаунта",
+                'uid' => $request->uid ?? "логин аккаунта",
+
+                'message' => $is_set['message']
+            ]);
+        }
+    }
+
+    function deleteScenario(Request $request, $accountId){
+
+        $id = $request->id ?? null;
+        if ($id == null) return response()->json(['status'=> false, 'message' => 'Ошибка Удаления, неизвестный идентификатор']);
+        try {
+            $model = Scenario::find($id);
+            $model->delete();
+        } catch (BadResponseException $e){
+            return response()->json(['status'=> false, 'message' => $e->getMessage()]);
+        }
+        return response()->json(['status'=> true]);
     }
 }
