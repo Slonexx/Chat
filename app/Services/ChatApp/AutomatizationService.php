@@ -6,6 +6,7 @@ use App\Clients\newClient;
 use App\Models\ChatappEmployee;
 use App\Models\employeeModel;
 use App\Models\MainSettings;
+use App\Models\settingModel;
 use App\Models\Templates;
 use App\Services\MoySklad\Entities\CustomOrderService;
 use App\Services\MoySklad\Entities\DemandService;
@@ -14,6 +15,7 @@ use App\Services\MoySklad\Entities\SalesReturnService;
 use App\Services\MoySklad\TemplateService;
 use App\Services\Response;
 use GuzzleHttp\Exception\BadResponseException;
+use stdClass;
 
 class AutomatizationService{
 
@@ -31,107 +33,129 @@ class AutomatizationService{
 
     function sendTemplate($type, $href, $employeeId){
         $entityServices = [
-            "demand" => new DemandService($this->accountId),
             "customerorder" => new CustomOrderService($this->accountId),
-            "invoiceout" => new InvoiceoutService($this->accountId),
+            "demand" => new DemandService($this->accountId),
             "salesreturn" => new SalesReturnService($this->accountId),
+            "invoiceout" => new InvoiceoutService($this->accountId),
         ];
         $service = $entityServices[$type];
         $splUrl = explode("/", $href);
         $entityId = array_pop($splUrl);
-        $expArray = ["state", "channel", "project"];
+        $expArray = ["state", "channel", "project", "agent"];
         if($employeeId == null)
             array_push($expArray, "owner");
         $docRes = $service->getByIdWithExpand($entityId, $expArray);
 
         if(!$docRes->status)
             return $docRes->addMessage("Не удаётся получить документ");
-        $autos = MainSettings::join('template_auto_settings as auto_s', "main_settings.id", "=", "auto_s.main_settings_id")
-            ->where('entity', $type)
+        $compliaceEntityType  = [];
+        $i = 0;
+        foreach($entityServices as $key => $value){
+            $compliaceEntityType[$key] = $i++;
+        }
+        $state_id = $docRes->data->state->id;
+        $channel_id = $docRes->data->channel->id ?? false;
+        $project_id = $docRes->data->project->id ?? false;
+        $agentAttributes = $docRes->data->agent->attributes ?? false;
+        $desc = $docRes->data->description ?? false;
+
+        if($employeeId == null){
+            $employeeId = $docRes->data->owner->id;
+        }
+        $autos = settingModel::join('scenario as scen', "setting_models.accountId", "=", "scen.accountId")
+            ->leftJoin('templates as t', 'scen.template_id', "=", "t.id")
+            ->join('automation_scenarios as a_scen', "scen.id", "=", "a_scen.scenario_id")
+            ->join('automations as a', "a_scen.automation_id", "=", "a.id")
+            ->join('employee_models as e', "a.employee_id", "=", "e.id")
+            ->where("scen.status", $state_id)
+            ->where('scen.entity', $compliaceEntityType[$type])
+            ->where("e.employeeId", $employeeId)
             ->select(
                 "status",
                 "channel",
                 "project",
-                "template_id",
-                "employee_id"
+                "e.employeeId",
+                "t.uuid as template_uuid",
+                "a.line",
+                "a.messenger"
             )->get()
             ->all();
-        $state_id = $docRes->data->state->id;
-        $channel_id = $docRes->data->channel->id ?? false;
-        $project_id = $docRes->data->project->id ?? false;
-        if($employeeId == null){
-            $employeeId = $docRes->data->project->id;
-        }
+        
 
         $filteredTemplatesAuto = [];
         if($channel_id !== false && $project_id !== false){
-            $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->status == $state_id
-                && $val->channel == $channel_id
+            $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->channel == $channel_id
                 && $val->project == $project_id
             );
 
-        } else if($channel_id === false && $project_id === false){
-            $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->status == $state_id);
-        } else if ($channel_id === false) {
-            $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->status == $state_id
-                && $val->project == $project_id
-            );
-        } else if ($project_id === false) {
-            $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->status == $state_id
-                && $val->channel == $channel_id
-            );
+        } else if ($channel_id === false || $project_id === false) {
+            if ($channel_id === false) {
+                $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->project == $project_id);
+            } else if ($project_id === false) {
+                $filteredTemplatesAuto = array_filter($autos, fn($val) => $val->channel == $channel_id);
+            }
         }
 
         if(count($filteredTemplatesAuto) == 0)
             return $this->res->success("");
 
-        $templateIds = collect($filteredTemplatesAuto)->pluck("template_id")->all();
-
-        $templatesForSending = Templates::whereIn("id", $templateIds)->get()->all();
-
         $templateS = new TemplateService($this->accountId);
+        $messengerAttributes = MainSettings::join("messenger_attributes as mes", "main_settings.id", "=", "mes.main_settings_id")
+            ->where("main_settings.account_id", $this->accountId)
+            ->where("entity_type", "counterparty")
+            ->get()
+            ->pluck("attribute_id", "name")
+            ->all();
         foreach($filteredTemplatesAuto as $t){
-            $template_id = $t->template_id;
-            $employee_id = $t->employee_id;
-            $template = array_filter($templatesForSending, fn($val)=> $val->id == $template_id);
+            $template_uuid = $t->template_uuid;
+            if($template_uuid == null)
+            continue;
 
-            $prepTemplRes = $templateS->getTemplate($type, $entityId, $template[0]["uuid"]);
+            $lineId = $t->line;
+            $messenger = $t->messenger;
+
+            $body = new stdClass();
+            if(!$agentAttributes){
+                $messengerErr = "У данного документа у контрагента отсутствуют поля месседжеров";
+                if($desc == false)
+                    $body->description = $messengerErr;
+                else
+                    $body->description += PHP_EOL . $messengerErr;
+                return $this->msC->put($type, $body, $entityId);
+                
+            } else {
+                $messengerId = $messengerAttributes[$messenger];
+                $findedAttribute = array_filter($agentAttributes, fn($val) => $val->id == $messengerId);
+                if(count($findedAttribute) == 0){
+                    $messengerErr = "У данного документа у контрагента не заполнен месседжер {$messenger}";
+                    if($desc == false)
+                        $body->description = $messengerErr;
+                    else
+                        $body->description += PHP_EOL . $messengerErr;
+                    return $this->msC->put($type, $body, $entityId);
+                } else {
+                    $firstAttr = array_shift($findedAttribute);
+                    $chatId = $firstAttr->value;
+                }
+                
+            }
+            
+        
+            $prepTemplRes = $templateS->getTemplate($type, $entityId, $template_uuid);
             if(!$prepTemplRes->status){
                 return $prepTemplRes;
             }
-            $employeeModel = employeeModel::where("id", $employee_id)->get();
-            if($employeeModel->isEmpty()){
-                return $this->res->error("Сотрудник не привязан к данной автоматизации");
-            }
-            $autoChatappSettings = ChatappEmployee::where("employee_id", $employee_id)->get();
-            if($autoChatappSettings->isEmpty()){
-                return $this->res->error("Настройки chatappEmployee не найдены");
-            }
-            $chatappObj = $autoChatappSettings->first();
-            $lineId = $chatappObj->lineId;
-            $messenger = $chatappObj->messenger;
-            $chatId = $chatappObj->chatId;
             $template = $prepTemplRes->data;
 
             $newClient = new newClient($employeeId);
             try {
-                $res = ($newClient->sendMessage($lineId, $messenger, $chatId, $template))->getBody()->getContents();
+                $response = $newClient->sendMessage($lineId, $messenger, $chatId, $template);
             } catch (BadResponseException $e) {
-                return response()->json([
-                    'status' => false,
-                    'data' => json_decode($e->getResponse()->getBody()->getContents())
-                ]);
+                return $newClient->ResponseExceptionHandler($e);
             }
             
-
-
-
         }
-
-
-
-
-        return 1;
+        return response()->json();
         
     }
 }
