@@ -21,6 +21,7 @@ use App\Services\MoySklad\Entities\ProjectService;
 use App\Services\MoySklad\Entities\SalesChannelService;
 use App\Services\MoySklad\Entities\SalesReturnService;
 use App\Services\MoySklad\FrontendLogicService;
+use Error;
 use Exception;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Http\Request;
@@ -214,11 +215,12 @@ class AutomatizationController extends Controller{
                 if($stateHasChanged){
                     $autoS = new AutomatizationService($accountId);
                     $res = $autoS->sendTemplate($type, $href, $employeeIdRes->data);
+                    return $handlerS->responseHandler($res, true, false);
                 } else {
                     return response()->json();
                 }
             }
-        } catch(Exception $e){
+        } catch(Exception | Error $e){
             return response()->json($e->getMessage(), 500);
         }
     }

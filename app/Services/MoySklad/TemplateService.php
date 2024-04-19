@@ -131,11 +131,11 @@ class TemplateService {
                     else
                         $templateAttributeValues[$key] = $firstAttributeById->value;
                     $templateAttributeValues[$key] = $firstAttributeById->value;
+                    //add only add. fields
+                    $readyTemplate = $templateLogicS->insertIn($readyTemplate, $templateAttributeValues);
                 }
 
             }
-            //add only add. fields
-            $readyTemplate = $templateLogicS->insertIn($readyTemplate, $templateAttributeValues);
             
         }
         
