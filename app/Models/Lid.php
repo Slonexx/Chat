@@ -8,6 +8,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lid extends Model
 {
+
+    public static function getInformationALLAcc($accountId): object
+    {
+        $model = Lid::where('accountId',  $accountId )->get()->first();
+        if (!empty($model)) {
+            return (object) [
+                'query' => $model,
+                'toArray' => $model->toArray(),
+            ];
+        } else {
+            return (object) [
+                'query' => $model,
+                'toArray' => null,
+            ];
+        }
+
+    }
+
     public static function createOrUpdate($array): object
     {
         $model = Lid::where('accountId',  $array['accountId'])->get()->first();

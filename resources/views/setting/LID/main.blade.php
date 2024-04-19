@@ -6,6 +6,7 @@
 
     <script>
         const employee = @json($employee);
+        const model = @json($model);
     </script>
 
 

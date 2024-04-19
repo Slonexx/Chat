@@ -67,6 +67,30 @@
 
 <script>
 
+    $(document).ready(function () { leading() });
+
+    function leading(){
+        let is_activity_settings = window.document.getElementById('is_activity_settings')
+        let is_activity_order = window.document.getElementById('is_activity_order')
+        let responsible = window.document.getElementById('responsible')
+        let responsible_uuid = window.document.getElementById('responsible_uuid')
+
+        if (model != null){
+            if (model.is_activity_settings == '1') is_activity_settings.checked = true
+            else is_activity_settings.checked = false
+
+            is_activity_order.value = model.is_activity_order
+            responsible.value = model.responsible
+            on_responsible_uuid(responsible)
+
+            if (model.responsible == '1'){
+                responsible_uuid.value = model.responsible_uuid
+            }
+        }
+
+    }
+
+
     function on_responsible_uuid(box){
         let div_employee = window.document.getElementById('div_employee')
         let responsible_uuid = window.document.getElementById('responsible_uuid')

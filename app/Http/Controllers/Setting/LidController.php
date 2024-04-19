@@ -36,16 +36,13 @@ class LidController extends Controller
             'uid' => $request->uid ?? "логин аккаунта",
             'message' => "",
         ]);
-        //dd($employee);
 
-
-
-
+        $model = (Lid::getInformationALLAcc($accountId));
 
 
         return view('setting.LID.main', [
             'employee' => $employee,
-
+            'model' => $model->toArray,
 
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
@@ -82,7 +79,7 @@ class LidController extends Controller
                     'isAdmin' => $isAdmin,
                     'fullName' => $fullName ?? "Имя аккаунта",
                     'uid' => $uid ?? "логин аккаунта",
-        
+
                     'message' => $findOrCreateRes->message,
                 ]);
 
