@@ -1,18 +1,17 @@
 <div id="html" class="box">
-
-    <div class="notification is-info is-light">
-        <div class="columns field">
-            <div class="column is-4" style="font-size: 1.5rem">Создание лидов</div>
-            <div class="column">
-                <div class="form-check form-switch">
-                    <input id="is_activity_settings" name="is_activity_settings" class="form-check-input input_checkbox" type="checkbox" checked>
+    <form action="/Setting/lid/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}" method="post">
+        @csrf <!-- {{ csrf_field() }} -->
+        <div class="notification is-info is-light">
+            <div class="columns field">
+                <div class="column is-4" style="font-size: 1.5rem">Создание лидов</div>
+                <div class="column">
+                    <div class="form-check form-switch">
+                        <input id="is_activity_settings" name="is_activity_settings" class="form-check-input input_checkbox" type="checkbox" checked>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <form action="/Setting/automation/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}" method="post">
-        @csrf <!-- {{ csrf_field() }} -->
         <div class="box">
             <div class="notification is-info p-1" style="font-size: 1rem">
                 <span class="icon has-text-white"> <i class="fas fa-info-circle"></i> </span>
@@ -61,8 +60,6 @@
             </div>
 
         </div>
-
-
         <br>
         <button class="button is-outlined gradient_focus"> сохранить </button>
     </form>

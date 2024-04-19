@@ -8,8 +8,12 @@ use App\Clients\newClient;
 use App\Http\Controllers\Controller;
 use App\Models\Automation;
 use App\Models\employeeModel;
+use App\Models\Lid;
 use App\Models\Scenario;
+use App\Services\MoySklad\AgentControllerLogicService;
+use App\Services\MoySklad\LidAttributesCreateService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class LidController extends Controller
 {
@@ -53,11 +57,29 @@ class LidController extends Controller
 
     }
 
-    function postLid(Request $request, $accountId)
+    function saveLid(Request $request, $accountId)
     {
         $isAdmin = $request->isAdmin ?? 'NO';
         $fullName = $request->fullName ?? "Имя аккаунта";
         $uid = $request->uid ?? "логин аккаунта";
+
+        $is_activity_settings = $request->is_activity_settings ?? '0';
+        if ($is_activity_settings == 'on') $is_activity_settings = '1';
+
+       /*МЕТОД СОЗДАТЬ ДОП ПОЛЕЙ (ЛИД) И СОХРАЕНИЯ В БАЗУ*/
+
+        $data = [
+            'accountId' => $accountId,
+            'is_activity_settings' => $is_activity_settings,
+            'is_activity_order' => $request->is_activity_order ?? '0',
+            'lid' => 'lid',
+            'responsible' => $request->responsible ?? '0',
+            'responsible_uuid' => $request->responsible_uuid ?? null,
+        ];
+        $model = Lid::createOrUpdate($data);
+
+        if ($model->status) $message = '';
+        else $message = $model->message;
 
 
         return to_route('lid', [
@@ -65,7 +87,10 @@ class LidController extends Controller
             'isAdmin' => $isAdmin,
             'fullName' => $request->fullName ?? "Имя аккаунта",
             'uid' => $request->uid ?? "логин аккаунта",
+
+            'message' => $message,
         ]);
+
     }
 
 }
