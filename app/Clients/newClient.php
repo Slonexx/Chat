@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
+use Psr\Http\Message\ResponseInterface;
 
 class newClient
 {
@@ -69,7 +70,7 @@ class newClient
         ]);
     }
 
-    public function createTokenMake(string $email, string $password, string $appId): \Psr\Http\Message\ResponseInterface
+    public function createTokenMake(string $email, string $password, string $appId): ResponseInterface
     {
 
         $client = new Client();
@@ -88,7 +89,7 @@ class newClient
         return $client->post($this->URL_->url_.'v1/tokens',$options);
     }
 
-    public function checkToken(): \Psr\Http\Message\ResponseInterface
+    public function checkToken(): ResponseInterface
     {
         return $this->client->post($this->URL_->url_.'v1/tokens',[
             'headers' => [
@@ -97,16 +98,16 @@ class newClient
         ]);
     }
 
-    public function licenses(): \Psr\Http\Message\ResponseInterface
+    public function licenses(): ResponseInterface
     {
         return $this->client->get($this->URL_->url_.'v1/licenses',[
             'headers' => [
-                'Authorization' => $this->Setting->accessToken
+                'Authorization' => $this->Setting->accessToken,
             ]
         ]);
     }
 
-    public function messagesSearch($licenseId, $messengerType , $chatId, $data): \Psr\Http\Message\ResponseInterface
+    public function messagesSearch($licenseId, $messengerType , $chatId, $data): ResponseInterface
     {
         return $this->client->get($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/chats/'.$chatId.'/messages/search',[
             'headers' => [
@@ -114,7 +115,7 @@ class newClient
             ]
         ]);
     }
-    public function usersCheckTelegram($licenseId, $messengerType , $userName): \Psr\Http\Message\ResponseInterface
+    public function usersCheckTelegram($licenseId, $messengerType , $userName): ResponseInterface
     {
         return $this->client->get($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/users/'.$userName.'/check',[
             'headers' => [
@@ -123,7 +124,7 @@ class newClient
         ]);
     }
 
-    public function phonesCheck($licenseId, $messengerType , $phone): \Psr\Http\Message\ResponseInterface
+    public function phonesCheck($licenseId, $messengerType , $phone): ResponseInterface
     {
         $newPhone = '+'.substr($phone, -11);
         return $this->client->get($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/phones/'.$newPhone.'/check',[
@@ -133,7 +134,7 @@ class newClient
         ]);
     }
 
-    public function sendMessage($licenseId, $messengerType , $chats, $text): \Psr\Http\Message\ResponseInterface
+    public function sendMessage($licenseId, $messengerType , $chats, $text): ResponseInterface
     {
         return $this->client->post($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/chats/'.$chats.'/messages/text',[
             'headers' => [

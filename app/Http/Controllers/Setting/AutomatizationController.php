@@ -337,7 +337,7 @@ class AutomatizationController extends Controller{
 
         $is_set = Scenario::createOrUpdateIsArray($accountId, $newArray);
         if ($is_set['status']){
-            return to_route('creatEmployee', [
+            return to_route('automation', [
                 'accountId' => $accountId,
                 'isAdmin' => $request->isAdmin,
                 'fullName' => $request->fullName ?? "Имя аккаунта",

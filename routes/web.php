@@ -9,6 +9,7 @@ use App\Http\Controllers\Setting\AttributeController;
 use App\Http\Controllers\Setting\AutomationController;
 use App\Http\Controllers\Setting\AutomatizationController;
 use App\Http\Controllers\Setting\CreateAuthTokenController;
+use App\Http\Controllers\Setting\LidController;
 use App\Http\Controllers\Setting\organizationController;
 use App\Http\Controllers\Setting\templateController;
 use App\Http\Controllers\vendor\vendorEndpoint;
@@ -88,8 +89,15 @@ Route::group(["prefix" => "Setting"], function () {
     Route::post('/scenario/{accountId}', [AutomatizationController::class, 'saveScenario']);
     Route::delete('/scenario/{accountId}', [AutomatizationController::class, 'deleteScenario']);
 
+
     Route::get('/automation/{accountId}', [AutomationController::class, 'getAutomation'])->name('automation');
     Route::post('/automation/{accountId}', [AutomationController::class, 'postAutomation']);
+});
+
+
+Route::group(["prefix" => "Setting"], function () {
+    Route::get('/lid/{accountId}', [LidController::class, 'getLid'])->name('lid');
+    Route::post('/lid/{accountId}', [LidController::class, 'saveLid']);
 });
 
 

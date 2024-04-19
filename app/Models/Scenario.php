@@ -55,6 +55,10 @@ class Scenario extends Model
             if ($model != null) $is_create = false;
 
             $template_id = Templates::GetIsUuid($item['template'], $accountId);
+
+            //dd($template_id);
+
+
             if ($template_id == null) return ['status' => false, 'message'=>'Ошибка присваивания шаблона к автоматизации'];
             if ($template_id->toArray == null) return ['status' => false, 'message'=>'Ошибка присваивания шаблона к автоматизации'];
             if ($is_create) $model = new Scenario();

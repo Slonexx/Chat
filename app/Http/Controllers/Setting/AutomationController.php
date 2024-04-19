@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Automation;
 use App\Models\employeeModel;
 use App\Models\Scenario;
+use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Http\Request;
 
 class AutomationController extends Controller
@@ -45,8 +46,8 @@ class AutomationController extends Controller
 
         foreach ($main->toArray as $item) {
             $chatAppClient = new newClient($item['employeeId']);
-            $req = $chatAppClient->licenses();
-            if ($req->getStatusCode() == 200) {
+            try {
+                $req = $chatAppClient->licenses();
                 $is_line = (json_decode($req->getBody()->getContents()))->data;
                 foreach ($is_line as $line) {
                     if ($line->licenseTo > time()) {
@@ -58,7 +59,7 @@ class AutomationController extends Controller
                         ];
                     }
                 }
-            } else {
+            } catch (BadResponseException){
                 $lines[$item['id']] = [
                     'licenseId' => 1,
                     'licenseName' => 'ошибка',

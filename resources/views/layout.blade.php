@@ -43,6 +43,9 @@
                     <a id="link_7" class="mt-1"
                        href="/Setting/automation/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}">
                         Отправитель </a>
+                    <a id="link_8" class="mt-1"
+                       href="/Setting/lid/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}">
+                        ЛИД </a>
                 </div>
             </div>
         </div>

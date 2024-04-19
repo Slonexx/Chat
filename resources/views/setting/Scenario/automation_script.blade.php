@@ -23,23 +23,24 @@
         if (Saved !== null) {
             Saved.forEach(function (item) {
                 createScript(item.id)
+                setTimeout(function() {
+                    let template = $(`#template_${item.id}`)
+                    let entity = $(`#entity_${item.id}`)
+                    let status = $(`#status_${item.id}`)
+                    let project = $(`#project_${item.id}`)
+                    let saleschannel = $(`#saleschannel_${item.id}`)
 
-                let template = window.document.getElementById('template_' + item.id)
-                let entity = window.document.getElementById('entity_' + item.id)
-                let status = window.document.getElementById('status_' + item.id)
-                let project = $(`#project_${item.id}`)
-                let saleschannel = $(`#saleschannel_${item.id}`)
-
-                template.value = item.template_uuid;
-                entity.value = item.entity;
-                onChangeEntity(item.id)
-                status.value = item.status;
-
-                project.val(item.project);
-                saleschannel.val(item.channel);
+                    entity.val(item.entity)
+                    onChangeEntity(item.id)
 
 
-                set_is_activity('template', template)
+
+                    template.val(item.template_uuid)
+                    status.val(item.status)
+                    project.val(item.project)
+                    saleschannel.val(item.channel)
+                    set_is_activity('template', window.document.getElementById('template_'+item.id))
+                }, 500)
             })
         }
     }
@@ -80,7 +81,7 @@
         let onchange_on = ``;
         if (name != null) onchange_on = `set_is_activity('${name}', this)`;
 
-        if (onchange == true) {
+        if (onchange === true) {
             onchange_on = `onChangeEntity('${i}')`;
             options = '<option value="0">Заказ покупателя</option> <option value="1">Отгрузки</option> <option value="2">Возврат покупателя</option> <option value="3">Счет покупателю</option>';
         }
@@ -157,7 +158,7 @@
 
 
     function clearOptionsIsSaved() {
-        if (gridChild != {}) {
+        if (gridChild !== {}) {
             for (let key in gridChild) {
                 let template = window.document.getElementById('template_' + key)
 
@@ -269,7 +270,7 @@
 
     function generateUUID() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0,
+            let r = Math.random() * 16 | 0,
                 v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
