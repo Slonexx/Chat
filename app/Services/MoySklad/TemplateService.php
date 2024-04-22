@@ -1,11 +1,9 @@
 <?php
 namespace App\Services\MoySklad;
 
-use App\Clients\MsClient;
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Models\MainSettings;
 use App\Models\MsEntities;
-use App\Models\OrderSettings;
 use App\Models\Templates;
 use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\MoySklad\Entities\CustomOrderService;
@@ -13,14 +11,9 @@ use App\Services\MoySklad\Entities\DemandService;
 use App\Services\MoySklad\Entities\InvoiceoutService;
 use App\Services\MoySklad\Entities\SalesReturnService;
 use App\Services\Response;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
-use SebastianBergmann\Template\Template;
-use stdClass;
 
 class TemplateService {
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     private string $accountId;
 
@@ -29,7 +22,7 @@ class TemplateService {
     //private HandlerService $handlerS;
 
     function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+        $this->msC = new oldMoySklad($accountId);
         //$this->handlerS = new HandlerService();
         $this->accountId = $accountId;
         $this->res = new Response();

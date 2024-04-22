@@ -1,13 +1,13 @@
 <?php
 namespace App\Services\MoySklad\Entities;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\HandlerService;
 use Illuminate\Support\Facades\Config;
 use stdClass;
 
 class CustomEntityService {
-    private MoySklad $msClient;
+    private oldMoySklad $msClient;
 
     private string $accountId;
 
@@ -15,8 +15,8 @@ class CustomEntityService {
 
     public const URL_IDENTIFIER = "customentity";
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msClient = new MoySklad($accountId);
+    function __construct($accountId, oldMoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msClient = new oldMoySklad($accountId);
         else  $this->msClient = $MoySklad;
         $this->handlerS = new HandlerService();
         $this->accountId = $accountId;

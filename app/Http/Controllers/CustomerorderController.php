@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Clients\newClient;
 use App\Models\Lid;
 use App\Models\MessengerAttributes;
@@ -27,7 +27,7 @@ class CustomerorderController extends Controller
     function create(Request $request, $accountId){
         try{
             $handlerS = new HandlerService();
-            $msC = new MoySklad($accountId);
+            $msC = new oldMoySklad($accountId);
             $setAttrS = new CreatingAttributeService($accountId, $msC);
             //все добавленные в messengerAttributes будут созданы в мс
             $mesAttr = Config::get("messengerAttributes");

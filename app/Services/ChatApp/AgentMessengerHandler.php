@@ -1,21 +1,21 @@
 <?php
 namespace App\Services\ChatApp;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\HandlerService;
 use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\Response;
 
 class AgentMessengerHandler{
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     private string $accountId;
 
     private Response $res;
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+    function __construct($accountId, oldMoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->accountId = $accountId;
         $this->res = new Response();
@@ -113,6 +113,8 @@ class AgentMessengerHandler{
     }
 
     function avito($name, $chatId, $attrMeta){
+        if(empty($name) || empty($chatId))
+            return $this->res->success("skip");
         $handlerS = new HandlerService();
 
         $body = $handlerS->FormationAttribute($attrMeta, $chatId);

@@ -1,13 +1,13 @@
 <?php
 namespace App\Services\MoySklad\RequestBody\Attributes;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\HandlerService;
 use App\Services\Response;
 
 class UpdateValuesService{
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     public string $accountId;
 
@@ -15,8 +15,8 @@ class UpdateValuesService{
 
     private const URL_IDENTIFIER = "agent";
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+    function __construct($accountId, oldMoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->res = new Response();
         $this->accountId = $accountId;

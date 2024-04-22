@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers\Setting;
 
-
 use App\Clients\MsClient;
-use App\Clients\newClient;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\getBaseTableByAccountId\getMainSettingBD;
-use App\Models\employeeModel;
 use App\Models\MainSettings;
 use App\Models\MsEntityFields;
 use App\Models\organizationModel;
@@ -21,18 +17,14 @@ use App\Services\MoySklad\TemplateService;
 use App\Services\Response;
 use Error;
 use Exception;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
-use JetBrains\PhpStorm\NoReturn;
 
 class templateController extends Controller
 {

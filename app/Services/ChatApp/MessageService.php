@@ -2,6 +2,7 @@
 namespace App\Services\ChatApp;
 
 use App\Clients\newClient;
+use App\Services\ChatappRequest;
 use App\Services\Response;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
@@ -12,12 +13,11 @@ class MessageService{
 
     private string $employeeId;
 
-    private newClient $chatappC;
+    private ChatappRequest $chatReq;
 
-    function __construct($accountId, $employeeId, newClient $chatappC = null) {
-        if ($chatappC == null) $this->chatappC = new newClient($accountId);
-        else  $this->chatappC = $chatappC;
-        $this->accountId = $accountId;
+    function __construct($employeeId, ChatappRequest $chatappC = null) {
+        if ($chatappC == null) $this->chatReq = new ChatappRequest($employeeId);
+        else  $this->chatReq = $chatappC;
         $this->employeeId = $employeeId;
     }
 
@@ -25,7 +25,7 @@ class MessageService{
         
         $res = new Response();
         try{
-            $messagesRes = $this->chatappC->messages($lineId, $messenger, $chatId);
+            $messagesRes = $this->chatReq->getMessages($lineId, $messenger, $chatId);
             if(!$messagesRes->status)
                 return $messagesRes->addMessage($errorMessage);
             else
@@ -35,9 +35,6 @@ class MessageService{
             $res = new Response();
             $body = $e->getResponse()->getBody()->getContents();
             return $res->customResponse(json_decode($body), 400, false);
-        }catch(Exception $e){
-            $res = new Response();
-            return $res->customResponse($e->getMessage(), 500, false);
         }
         
     }

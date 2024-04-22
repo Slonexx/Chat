@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\MoySklad\Entities;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\Response;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -9,7 +9,7 @@ use stdClass;
 
 class SalesChannelService {
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     public string $accountId;
 
@@ -18,7 +18,7 @@ class SalesChannelService {
     private const URL_IDENTIFIER = "saleschannel";
 
     function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+        $this->msC = new oldMoySklad($accountId);
         $this->res = new Response();
         $this->accountId = $accountId;
     }

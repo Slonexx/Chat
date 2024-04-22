@@ -1,20 +1,21 @@
 <?php
 namespace App\Services\MoySklad;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
+use App\Exceptions\AgentFindLogicException;
 use App\Services\ChatApp\AgentFindService;
 use App\Services\Response;
 
 class AgentFindLogicService{
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     private string $accountId;
 
     private Response $res;
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+    function __construct($accountId, oldMoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->accountId = $accountId;
         $this->res = new Response();
@@ -24,7 +25,7 @@ class AgentFindLogicService{
         $agentFindS = new AgentFindService($this->accountId, $this->msC);
         if($messenger == "telegram" || $messenger == "whatsapp"){
             if(strlen($phone) < 11)
-                return null;
+                throw new AgentFindLogicException("Длина телефона меньше 11", 1);
             $phoneForFinding = "%2b{$phone}";
         }
 

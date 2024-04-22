@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\MoySklad\Entities;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\MoySklad\CutLogicService;
 use App\Services\Response;
 use Exception;
@@ -10,7 +10,7 @@ use stdClass;
 
 class DemandService {
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     public string $accountId;
 
@@ -19,7 +19,7 @@ class DemandService {
     private const URL_IDENTIFIER = "demand";
 
     function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+        $this->msC = new oldMoySklad($accountId);
         $this->res = new Response();
         $this->accountId = $accountId;
     }

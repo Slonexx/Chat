@@ -1,13 +1,13 @@
 <?php
 namespace App\Services\MoySklad\Attributes;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\HandlerService;
 use App\Services\Response;
 
 class CustomorderS {
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     public string $accountId;
 
@@ -16,7 +16,7 @@ class CustomorderS {
     private const ATTRIBUTES_URL_IDENTIFIER = "customerorderMetadataAttributes";
 
     function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+        $this->msC = new oldMoySklad($accountId);
         $this->res = new Response();
         $this->accountId = $accountId;
     }

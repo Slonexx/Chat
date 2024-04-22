@@ -7,7 +7,7 @@ use App\Services\Response;
 use Exception;
 use Illuminate\Support\Facades\Config;
 
-class MoySklad {
+class oldMoySklad {
 
     public string $token;
 

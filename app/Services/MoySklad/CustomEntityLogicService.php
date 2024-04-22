@@ -1,26 +1,19 @@
 <?php
 namespace App\Services\MoySklad;
 
-use App\Clients\MoySklad;
-use App\Clients\MsClient;
-use App\Clients\MsClientAdd;
-use App\Models\AttributeSettings;
+use App\Clients\oldMoySklad;
 use App\Services\MoySklad\Entities\CustomEntityService;
 use App\Services\HandlerService;
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\ClientException;
-use Illuminate\Support\Facades\Config;
-use stdClass;
 
 class CustomEntityLogicService {
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     private string $accountId;
 
     private HandlerService $handlerS;
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+    function __construct($accountId, oldMoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->handlerS = new HandlerService();
         $this->accountId = $accountId;
