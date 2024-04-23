@@ -2,15 +2,9 @@
 
 namespace App\Http\Controllers\Setting;
 
-use App\Clients\MoySklad;
-use App\Clients\MsClient;
-use App\Clients\newClient;
+use App\Clients\oldMoySklad;
 use App\Http\Controllers\Controller;
-use App\Models\Automation;
-use App\Models\employeeModel;
 use App\Models\Lid;
-use App\Models\Scenario;
-use App\Services\MoySklad\AgentControllerLogicService;
 use App\Services\MoySklad\LidAttributesCreateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -25,7 +19,7 @@ class LidController extends Controller
         $uid = $request->uid ?? "логин аккаунта";
         //$main = employeeModel::getAllEmpl($accountId);
 
-        $msClient = new MoySklad($accountId);
+        $msClient = new oldMoySklad($accountId);
         $req = $msClient->getAll('employee');
         if ($req->status){
             $employee = $req->data->rows;
