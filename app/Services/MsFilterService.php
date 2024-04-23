@@ -1,5 +1,7 @@
 <?php
 namespace App\Services;
+
+use Error;
 use Illuminate\Support\Facades\Config;
 
 class MsFilterService{
@@ -15,11 +17,20 @@ class MsFilterService{
     }
     
     public function prepareUrlForFilter(string $masterUrlIdentifier, string $slaveUrlIdentifier, string $attributeId, mixed $filterValue) {
-        $primaryURL =  $this->url[$masterUrlIdentifier];
+        $fullKey = "msUrls.$masterUrlIdentifier";
+        $url1 = Config::get($fullKey, null);
+        if(!is_string($url1) || $url1 == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
 
-        $joinedSecondaryURL =  $this->url[$slaveUrlIdentifier] . $attributeId;
+        $fullKey = "msUrls.$slaveUrlIdentifier";
+        $url2 = Config::get($fullKey, null);
 
-        return "{$primaryURL}?filter={$joinedSecondaryURL}={$filterValue};";
+        if(!is_string($url2) || $url2 == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+
+        $joinedSecondaryURL =  $url2 . $attributeId;
+
+        return "{$url1}?filter={$joinedSecondaryURL}={$filterValue};";
 
     }
 
@@ -41,10 +52,11 @@ class MsFilterService{
     }
 
     public function prepareUrlWithParam(string $masterUrlIdentifier, string $param, mixed $filterValue) {
-        $primaryURL =  $this->url[$masterUrlIdentifier];
-
-        return "{$primaryURL}?filter={$param}={$filterValue}";
-
+        $fullKey = "msUrls.$masterUrlIdentifier";
+        $url = Config::get($fullKey, null);
+        if(!is_string($url) || $url == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+        return "{$url}?filter={$param}={$filterValue}";
     }
 
     public function prepareUrlWithUrl(string $masterUrlIdentifier, string $param, string $valueUrlIdentifier, string $valueId) {

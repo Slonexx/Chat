@@ -1,21 +1,21 @@
 <?php
 namespace App\Services\ChatApp;
 
-use App\Clients\oldMoySklad;
+use App\Clients\MoySklad;
 use App\Services\HandlerService;
 use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\Response;
 
 class AgentMessengerHandler{
 
-    private oldMoySklad $msC;
+    private MoySklad $msC;
 
     private string $accountId;
 
     private Response $res;
 
-    function __construct($accountId, oldMoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
+    function __construct($accountId, MoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->accountId = $accountId;
         $this->res = new Response();
@@ -90,7 +90,7 @@ class AgentMessengerHandler{
         $body = $handlerS->FormationAttribute($attrMeta, "@{$username}");
 
         $body->name = $name;
-        $body->tags = ['chatapp', 'inst'];
+        $body->tags = ['chatapp', 'instagram'];
         
         $agentS = new CounterpartyService($this->accountId, $this->msC);
         return $agentS->create($body);

@@ -2,15 +2,11 @@
 namespace App\Services\MoySklad;
 
 use App\Clients\oldMoySklad;
-use App\Services\HandlerService;
 use App\Services\MoySklad\Attributes\CustomorderS;
-use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\MoySklad\Entities\CustomEntityService;
 use App\Services\MoySklad\Entities\CustomOrderService;
 use App\Services\MoySklad\RequestBody\Attributes\UpdateValuesService;
-use App\Services\MsFilterService;
 use App\Services\Response;
-use stdClass;
 
 class CustomerorderUpdateLogicService{
 

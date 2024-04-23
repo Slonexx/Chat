@@ -1,17 +1,18 @@
 <?php
 namespace App\Services\MoySklad\Entities;
 
-use App\Clients\oldMoySklad;
-use App\Models\MessengerAttributes;
+use App\Clients\MoySklad;
+use App\Exceptions\MsException;
+use App\Services\HTTPResponseHandler;
 use App\Services\MsFilterService;
 use App\Services\Response;
-use Exception;
+use Error;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Config;
-use stdClass;
 
 class CounterpartyService{
 
-    private oldMoySklad $msC;
+    private MoySklad $msC;
 
     public string $accountId;
 
@@ -19,8 +20,8 @@ class CounterpartyService{
 
     private const URL_IDENTIFIER = "agent";
 
-    function __construct($accountId, oldMoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
+    function __construct($accountId, MoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->res = new Response();
         $this->accountId = $accountId;
@@ -34,17 +35,28 @@ class CounterpartyService{
             return $res;
     }
 
-    public function getByParam(string $name, mixed $value, string $errorMes) {
-
+    public function getByParam(string $name, mixed $value){
         $filterS = new MsFilterService();
-        
-        $url = $filterS->prepareUrlWithParam(self::URL_IDENTIFIER, $name, $value);
-        $nameRes = $this->msC->getByUrl($url);
-        if(!$nameRes->status)
-            return $nameRes->addMessage($errorMes);
-        else
-            return $this->res->success($nameRes->data->rows);
+        try{
+            $url = $filterS->prepareUrlWithParam(self::URL_IDENTIFIER, $name, $value);
+        } catch(Error $e){
+            throw new Error("Ошибка при получении url с параметрами", previous:$e);
+        }
+        $resHandler = new HTTPResponseHandler();
+        try{
+            $response = $this->msC->get($url);
+            return $resHandler->handleOK($response, "поиск контрагент успешно завершён");
 
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при поиске контрагента|" . $encodedBody, $statusCode);
+            } else {
+                throw new MsException("неизвестная ошибка при поиске контрагента", previous:$e);
+            }
+        }
     }
 
     public function getByIdWithExpand(string $id, array $expandParams) {
@@ -64,50 +76,48 @@ class CounterpartyService{
             return $expandedRes;
     }
 
-    /**
-     * specific f
-     */
-    function cutMsObjectFromReqExpand($objectMs){
+    public function create($body){
+        $fullKey = "msUrls." . self::URL_IDENTIFIER;
+        $url = Config::get($fullKey, null);
+        $resHandler = new HTTPResponseHandler();
+        if(!is_string($url) || $url == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
         try{
-            $preppedChangeList = [];
+            $response = $this->msC->post($url, $body);
+            return $resHandler->handleOK($response, "контрагент успешно создан");
 
-            $preppedChangeList["{agent}"] = $objectMs->name;
-            if($objectMs->companyType == "individual"){
-                $preppedChangeList["{agentFIO}"] = $objectMs->legalTitle ?? "{agentFIO}";
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при создании контрагента|" . $encodedBody, $statusCode);
             } else {
-                $preppedChangeList["{agentFIO}"] = "{agentFIO}";
+                throw new MsException("неизвестная ошибка при создании контрагента", previous:$e);
             }
-
-            $preppedChangeList["{name}"] = $objectMs->name;
-
-            $description = $objectMs->description ?? false;
-            if(!empty($description))
-                $preppedChangeList["{description}"] = $description;
-
-            $res = new Response();
-
-            return $res->success($preppedChangeList);
-
-        } catch (Exception $e){
-            $res = new Response();
-            $answer = $res->error($e, $e->getMessage());
-            return $answer;
         }
     }
 
-    public function create($body){
-        $res = $this->msC->post(self::URL_IDENTIFIER, $body);
-        if(!$res->status)
-            return $res->addMessage("Ошибка при создании контрагента");
-        else
-            return $res;
-    }
+    function update($id, $body){
+        $fullKey = "msUrls." . self::URL_IDENTIFIER;
+        $url = Config::get($fullKey, null);
+        $resHandler = new HTTPResponseHandler();
+        if(!is_string($url) || $url == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+        try{
+            $preparedUrl = $url . $id;
+            $response = $this->msC->put($preparedUrl, $body);
+            return $resHandler->handleOK($response, "контрагент успешно обновлён");
 
-    function update($id, $body, $errorMes){
-        $res = $this->msC->put(self::URL_IDENTIFIER, $body, $id);
-        if(!$res->status)
-            return $res->addMessage($errorMes);
-        else
-            return $res;
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при обновлении контрагента|" . $encodedBody, $statusCode);
+            } else {
+                throw new MsException("неизвестная ошибка при обновлении контрагента", previous:$e);
+            }
+        }
     }
 }

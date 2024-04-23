@@ -2,7 +2,7 @@
 namespace App\Services\MoySklad;
 
 use App\Clients\oldMoySklad;
-use App\Services\MoySklad\Attributes\CounterpartyS;
+use App\Services\MoySklad\Attributes\oldCounterpartyS;
 use App\Services\MoySklad\Attributes\CustomorderS;
 use App\Services\Response;
 use Illuminate\Support\Facades\Config;
@@ -26,7 +26,7 @@ class LidAttributesCreateService{
      */
     function findOrCreate(array $attributes, bool $isCreateOrder){
         
-        $agentAttributesS = new CounterpartyS($this->accountId, $this->msC);
+        $agentAttributesS = new oldCounterpartyS($this->accountId, $this->msC);
         //find add f.
         $customEntityS = new CustomEntityLogicService($this->accountId, $this->msC);
         $createCustomEntityRes = $agentAttributesS->checkCreateArrayAttributes($attributes);

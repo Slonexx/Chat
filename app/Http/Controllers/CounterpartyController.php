@@ -12,7 +12,7 @@ use App\Services\ChatApp\AgentMessengerHandler;
 use App\Services\ChatApp\ChatService;
 use App\Services\HandlerService;
 use App\Services\MoySklad\AgentUpdateLogicService;
-use App\Services\MoySklad\Attributes\CounterpartyS;
+use App\Services\MoySklad\Attributes\oldCounterpartyS;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
 use Error;
 use Exception;
@@ -32,10 +32,9 @@ class CounterpartyController extends Controller
             //все добавленные в messengerAttributes будут созданы в мс
             $mesAttr = Config::get("messengerAttributes");
             $attrNames = array_keys($mesAttr);
-            $agentAttrS = new CounterpartyS($accountId, $msC);
+            $agentAttrS = new oldCounterpartyS($accountId, $msC);
             $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, $agentAttrS);
             if(!$resAttr->status)
-                
                 return $handlerS->responseHandler($resAttr);
             else
                 $messageStack[] = $resAttr->message;
@@ -47,8 +46,8 @@ class CounterpartyController extends Controller
                 $lineId = $item->lineId;
                 $chatsRes = $chatS->getAllChatForEmployee(50, $lineId);
                 $messageStack[] = $chatsRes->message;
-                //$msCnew = new MoySklad($accountId);
-                $agentH = new AgentMessengerHandler($accountId, $msC);
+                $msCnew = new MoySklad($accountId);
+                $agentH = new AgentMessengerHandler($accountId, $msCnew);
                 foreach($chatsRes->data as $messenger => $chats){
                     $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $messenger);
                     $attribute_id = $attribute->attribute_id;
@@ -61,19 +60,17 @@ class CounterpartyController extends Controller
                         $email = $chat->email;
                         $phoneForCreating = "+{$phone}";
 
-                        $findLogicS = new AgentFindLogicService($accountId, $msC);
+                        $findLogicS = new AgentFindLogicService($accountId, $msCnew);
                         try{
                             $agentByRequisitesRes = $findLogicS->findByRequisites($messenger, $chatId, $username, $name, $phone, $email, $attribute_id);
-
                         } catch(AgentFindLogicException $e){
                             if($e->getCode() == 1)
                                 continue;
                         }
-                        $agents = $agentByRequisitesRes->data;
-                        if(!$agentByRequisitesRes->status)
-                            return $handlerS->responseHandler($agentByRequisitesRes, true, false);
-                        else if(!empty($agents)){
-                            $updateLogicS = new AgentUpdateLogicService($accountId, $msC);
+                        $agents = $agentByRequisitesRes->data->rows;
+                        //update
+                        if(!empty($agents)){
+                            $updateLogicS = new AgentUpdateLogicService($accountId, $msCnew);
                             $atUsername = "@{$username}";
                             $addFieldValue = match($messenger){
                                 "telegram" => $atUsername,
@@ -85,13 +82,10 @@ class CounterpartyController extends Controller
                                 "avito" => $chatId
                             };
                             $bodyWithAttr = $handlerS->FormationAttribute($attrMeta, $addFieldValue);
-                            $updatedAgentRes = $updateLogicS->addTagsAndAttr($agents, $messenger, $bodyWithAttr);
-                            if(!$updatedAgentRes->status)
-                                return $handlerS->responseHandler($updatedAgentRes, true, false);
-                            
+                            $updateLogicS->addTagsAndAttr($agents, $messenger, $bodyWithAttr);
+                        //create
                         } else if(empty($agents)){
-                    
-                            $createdAgent = match($messenger){
+                            match($messenger){
                                 "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMeta),
                                 "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMeta),
                                 "email" => $agentH->email($email, $attrMeta),
@@ -100,13 +94,9 @@ class CounterpartyController extends Controller
                                 "telegram_bot" => $agentH->tg_bot($name, $username, $attrMeta),
                                 "avito" => $agentH->avito($name, $chatId, $attrMeta),
                             };
-                            if(!$createdAgent->status)
-                                return $handlerS->responseHandler($createdAgent, true, false);
                         }
                     }
                 }
-
-                
             }
             return response()->json();
             

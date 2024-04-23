@@ -1,7 +1,9 @@
 <?php
 namespace App\Services\MoySklad;
 
-use App\Clients\oldMoySklad;
+use App\Clients\MoySklad;
+use App\Exceptions\AgentUpdateLogicException;
+use App\Exceptions\MsException;
 use App\Services\MoySklad\Attributes\CounterpartyS;
 use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\MoySklad\Entities\CustomEntityService;
@@ -10,14 +12,14 @@ use App\Services\Response;
 
 class AgentUpdateLogicService{
 
-    private oldMoySklad $msC;
+    private MoySklad $msC;
 
     private string $accountId;
 
     private Response $res;
 
-    function __construct($accountId, oldMoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
+    function __construct($accountId, MoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->accountId = $accountId;
         $this->res = new Response();
@@ -41,8 +43,11 @@ class AgentUpdateLogicService{
             $body->tags = $tags;
         }
         $agentS = new CounterpartyService($this->accountId, $this->msC);
-        return $agentS->update($id, $body, "Невозможно обновить теги контрагента");
-
+        try{
+            return $agentS->update($id, $body);
+        } catch(MsException $e){
+            throw new AgentUpdateLogicException("Невозможно обновить теги контрагента", previous: $e);
+        }
     }
 
     function agentUpdateLidAttribute($agentId, $lidName, $valueName, UpdateValuesService $updateValuesS, CustomEntityService $customEntityS){

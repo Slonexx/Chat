@@ -1,21 +1,21 @@
 <?php
 namespace App\Services\MoySklad;
 
-use App\Clients\oldMoySklad;
+use App\Clients\MoySklad;
 use App\Exceptions\AgentFindLogicException;
 use App\Services\ChatApp\AgentFindService;
 use App\Services\Response;
 
 class AgentFindLogicService{
 
-    private oldMoySklad $msC;
+    private MoySklad $msC;
 
     private string $accountId;
 
     private Response $res;
 
-    function __construct($accountId, oldMoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
+    function __construct($accountId, MoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->accountId = $accountId;
         $this->res = new Response();

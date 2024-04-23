@@ -1,20 +1,16 @@
 <?php
 namespace App\Services\MoySklad\Attributes;
 
-use App\Clients\MoySklad;
-use App\Exceptions\MsException;
+use App\Clients\oldMoySklad;
 use App\Services\Entities\CustomEntityService;
 use App\Services\HandlerService;
-use App\Services\HTTPResponseHandler;
 use App\Services\MsFilterService;
 use App\Services\Response;
-use Error;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Config;
 
-class CounterpartyS {
+class oldCounterpartyS {
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     public string $accountId;
 
@@ -22,8 +18,8 @@ class CounterpartyS {
 
     private const ATTRIBUTES_URL_IDENTIFIER = "agentMetadataAttributes";
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+    function __construct($accountId, oldMoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->res = new Response();
         $this->accountId = $accountId;
@@ -63,30 +59,14 @@ class CounterpartyS {
             return $res;
     }
 
-    public function getByAttribute(string $attribute_id, string $value){
+    public function getByAttribute(string $attribute_id, string $value, string $errorMes){
         $filterS = new MsFilterService();
-        try{
-            $filterUrl = $filterS->prepareUrlForFilter("agent", self::ATTRIBUTES_URL_IDENTIFIER, $attribute_id, $value);
-        }catch(Error $e){
-            throw new Error("Ошибка при получении контрагента по доп полю", previous:$e);
-        }
-        $resHandler = new HTTPResponseHandler();
-        try{
-            $response = $this->msC->get($filterUrl);
-            return $resHandler->handleOK($response, "поиск контрагент успешно завершён");
-
-        } catch(RequestException $e){
-            if($e->hasResponse()){
-                $response = $e->getResponse();
-                $statusCode = $response->getStatusCode();
-                $encodedBody = $response->getBody()->getContents();
-                throw new MsException("ошибка при поиске контрагента|" . $encodedBody, $statusCode);
-            } else {
-                throw new MsException("неизвестная ошибка при поиске контрагента", previous:$e);
-            }
-        }
-        
-        
+        $filterUrl = $filterS->prepareUrlForFilter("agent", self::ATTRIBUTES_URL_IDENTIFIER, $attribute_id, $value);
+        $res = $this->msC->getByUrl($filterUrl);
+        if(!$res->status)
+            return $res->addMessage($errorMes);
+        else
+            return $this->res->success($res->data->rows); 
     }
     /**
      * возращает аттрибуты, которых нет в моём складе
