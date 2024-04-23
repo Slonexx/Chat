@@ -19,7 +19,7 @@ return new class extends Migration
             $table->uuid('accountId');
             $table->boolean('is_activity_agent');
             $table->uuid('notes');
-            $table->string('is_messenger');
+            $table->boolean('is_messenger');
             $table->timestamps();
         });
     }

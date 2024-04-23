@@ -7,5 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lid extends Model
 {
-    use HasFactory;
+    protected $table = "lids";
+
+    protected $guarded = [];
 }
