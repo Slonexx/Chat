@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\MoySklad\Entities;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Models\MessengerAttributes;
 use App\Services\MsFilterService;
 use App\Services\Response;
@@ -11,7 +11,7 @@ use stdClass;
 
 class CounterpartyService{
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     public string $accountId;
 
@@ -19,8 +19,8 @@ class CounterpartyService{
 
     private const URL_IDENTIFIER = "agent";
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+    function __construct($accountId, oldMoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->res = new Response();
         $this->accountId = $accountId;

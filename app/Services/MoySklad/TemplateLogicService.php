@@ -2,7 +2,7 @@
 namespace App\Services\MoySklad;
 
 use App\Clients\MsClient;
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Models\OrderSettings;
 use App\Models\Templates;
 use App\Services\HandlerService;
@@ -12,14 +12,14 @@ use Illuminate\Database\QueryException;
 use SebastianBergmann\Template\Template;
 
 class TemplateLogicService {
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     private string $accountId;
 
     //private HandlerService $handlerS;
 
     function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+        $this->msC = new oldMoySklad($accountId);
         //$this->handlerS = new HandlerService();
         $this->accountId = $accountId;
     }

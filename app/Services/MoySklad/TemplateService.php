@@ -1,11 +1,9 @@
 <?php
 namespace App\Services\MoySklad;
 
-use App\Clients\MsClient;
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Models\MainSettings;
 use App\Models\MsEntities;
-use App\Models\OrderSettings;
 use App\Models\Templates;
 use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\MoySklad\Entities\CustomOrderService;
@@ -13,14 +11,9 @@ use App\Services\MoySklad\Entities\DemandService;
 use App\Services\MoySklad\Entities\InvoiceoutService;
 use App\Services\MoySklad\Entities\SalesReturnService;
 use App\Services\Response;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
-use SebastianBergmann\Template\Template;
-use stdClass;
 
 class TemplateService {
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     private string $accountId;
 
@@ -29,7 +22,7 @@ class TemplateService {
     //private HandlerService $handlerS;
 
     function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+        $this->msC = new oldMoySklad($accountId);
         //$this->handlerS = new HandlerService();
         $this->accountId = $accountId;
         $this->res = new Response();
@@ -96,9 +89,13 @@ class TemplateService {
 
         $templateValues = $objectWithNeededValues->data;
 
-        $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
+        if($entityType == "counterparty"){
+            $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
+            $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
+        } else {
+            $readyTemplate = $templateLogicS->insertIn($content, $templateValues);
+        }
 
-        $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
 
         //тут я говорю найди мне все связанные атрибуты с данным шаблоном. если пусто, то шаблон simple
         $templatesWithAtttributes = Templates::join('variables', 'templates.id', '=', 'variables.template_id')
@@ -201,7 +198,10 @@ class TemplateService {
 
         $templateValues = $objectWithNeededValues->data;
 
-        $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
+        if($entityType == "counterparty"){
+            $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
+        }
+        
 
         $allTemplates = $setting->first()
             ->templates()
@@ -215,11 +215,15 @@ class TemplateService {
 
         $count = 1;
 
-        $allTemplates = array_map(function($template) use ($templateLogicS, $objectWithTextPositions, $expandedInfo, &$count) {
+        $allTemplates = array_map(function($template) use ($templateLogicS, $objectWithTextPositions, $expandedInfo, &$count, $entityType, $templateValues) {
             $content = $template->content;
             $uuid = $template->uuid;
 
-            $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
+            if($entityType == "counterparty"){
+                $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
+            } else {
+                $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
+            }
 
             //тут я говорю найди мне все связанные атрибуты с данным шаблоном. если пусто, то шаблон simple
             $templatesWithAtttributes = Templates::join('variables', 'templates.id', '=', 'variables.template_id')

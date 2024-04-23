@@ -18,7 +18,7 @@ class createCustomerOrder extends Command
      *
      * @var string
      */
-    protected $signature = 'counterparty:check';
+    protected $signature = 'customer_order:create';
 
     /**
      * The console command description.

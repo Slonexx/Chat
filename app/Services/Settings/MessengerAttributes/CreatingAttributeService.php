@@ -76,14 +76,14 @@ class CreatingAttributeService {
                             $mainSet->mesAttrs()->create($attributeSettings);
                         }
                         else{
-                            $result = $res->errorWith200($res->data);
+                            $result = $res->error($res->data);
                             return $result;
                         }
                     }
 
                 }
             } catch(Exception $e){
-                return $res->errorWith200($e->getMessage(), "Проблемы с созданием аттрибута(");
+                return $res->error($e->getMessage(), "Проблемы с созданием аттрибута(");
             }
         }
         $res = new Response();

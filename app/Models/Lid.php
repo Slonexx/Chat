@@ -48,4 +48,7 @@ class Lid extends Model
         }
 
     }
+    protected $table = "lids";
+
+    protected $guarded = [];
 }

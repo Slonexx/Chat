@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\MoySklad;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\HandlerService;
 use App\Services\MoySklad\Attributes\CustomorderS;
 use App\Services\MoySklad\Entities\CounterpartyService;
@@ -14,14 +14,14 @@ use stdClass;
 
 class CustomerorderUpdateLogicService{
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     private string $accountId;
 
     private Response $res;
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+    function __construct($accountId, oldMoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->accountId = $accountId;
         $this->res = new Response();

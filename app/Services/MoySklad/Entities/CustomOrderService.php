@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\MoySklad\Entities;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\Response;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -9,7 +9,7 @@ use stdClass;
 
 class CustomOrderService {
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     public string $accountId;
 
@@ -17,8 +17,8 @@ class CustomOrderService {
 
     private const URL_IDENTIFIER = "customerorder";
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+    function __construct($accountId, oldMoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->res = new Response();
         $this->accountId = $accountId;

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
+use App\Exceptions\AgentFindLogicException;
 use App\Models\MessengerAttributes;
 use App\Models\organizationModel;
 use App\Services\MoySklad\AgentFindLogicService;
@@ -17,31 +19,35 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
+class CounterpartyControllerException extends Exception {}
+
 class CounterpartyController extends Controller
 {
-    function create(Request $request, $accountId){
+    function create(Request $request, string $accountId){
+        $messageStack = [];
         try{
-
             $handlerS = new HandlerService();
-            $msC = new MoySklad($accountId);
+            $msC = new oldMoySklad($accountId);
             $setAttrS = new CreatingAttributeService($accountId, $msC);
             //все добавленные в messengerAttributes будут созданы в мс
             $mesAttr = Config::get("messengerAttributes");
             $attrNames = array_keys($mesAttr);
-            $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, new CounterpartyS($accountId, $msC));
+            $agentAttrS = new CounterpartyS($accountId, $msC);
+            $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, $agentAttrS);
             if(!$resAttr->status)
-                return $handlerS->responseHandler($resAttr, true, false);
+                
+                return $handlerS->responseHandler($resAttr);
+            else
+                $messageStack[] = $resAttr->message;
 
-            $orgs = organizationModel::where("accountId", $accountId)->get()->all();
+            $orgs = organizationModel::getLineIdByAccountId($accountId);
             foreach($orgs as $item){
                 $employeeId = $item->employeeId;
-                $chatS = new ChatService($accountId, $employeeId);
+                $chatS = new ChatService($employeeId);
                 $lineId = $item->lineId;
                 $chatsRes = $chatS->getAllChatForEmployee(50, $lineId);
-
-                if(!$chatsRes->status)  
-                    return $handlerS->responseHandler($chatsRes, true, false);
-
+                $messageStack[] = $chatsRes->message;
+                //$msCnew = new MoySklad($accountId);
                 $agentH = new AgentMessengerHandler($accountId, $msC);
                 foreach($chatsRes->data as $messenger => $chats){
                     $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $messenger);
@@ -56,9 +62,13 @@ class CounterpartyController extends Controller
                         $phoneForCreating = "+{$phone}";
 
                         $findLogicS = new AgentFindLogicService($accountId, $msC);
-                        $agentByRequisitesRes = $findLogicS->findByRequisites($messenger, $chatId, $username, $name, $phone, $email, $attribute_id);
-                        if(!isset($agentByRequisitesRes))
-                            continue;
+                        try{
+                            $agentByRequisitesRes = $findLogicS->findByRequisites($messenger, $chatId, $username, $name, $phone, $email, $attribute_id);
+
+                        } catch(AgentFindLogicException $e){
+                            if($e->getCode() == 1)
+                                continue;
+                        }
                         $agents = $agentByRequisitesRes->data;
                         if(!$agentByRequisitesRes->status)
                             return $handlerS->responseHandler($agentByRequisitesRes, true, false);
@@ -101,7 +111,57 @@ class CounterpartyController extends Controller
             return response()->json();
             
         } catch(Exception | Error $e){
-            return response()->json($e->getMessage(), 500);
+            $current = $e;
+            $messages = [];
+            $statusCode = 500;//or HTTP Exception code
+
+            while ($current !== null) {
+                $filePath = $current->getFile();
+                $fileLine = $current->getLine();
+                $message = $current->getMessage();
+                
+                $nextError = $current->getPrevious();
+
+                $parts = explode('|', $message);
+
+                if (count($parts) === 2) {
+                    $text = $parts[0];
+                    $json_str = array_pop($parts);
+
+                    $value = [
+                        "message" => $text,
+                        "data" => json_decode($json_str)
+                    ];
+                    if($nextError === null){
+                        $messageStack["message"] = $text;
+                        $code = $current->getCode();
+                        if($code >= 400)
+                            $statusCode = $code;
+                    }
+                } else {
+                    $value = [
+                        "message" => $message
+                    ];
+                    if($nextError === null){
+                        $messageStack["message"] = $message;
+                        $code = $current->getCode();
+                        if($code >= 400)
+                            $statusCode = $code;
+                    }
+                }
+
+
+                $fileName = basename($filePath);
+
+                $key = "{$fileName}:{$fileLine}";
+                
+                $messages[] = [
+                    $key => $value
+                ];
+                $current = $current->getPrevious();
+            }
+            $messageStack["error"] = $messages;
+            return response()->json($messageStack, $statusCode);
         }
 
     }

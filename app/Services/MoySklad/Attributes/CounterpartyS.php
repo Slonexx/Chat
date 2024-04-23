@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\MoySklad\Attributes;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\Entities\CustomEntityService;
 use App\Services\HandlerService;
 use App\Services\MsFilterService;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Config;
 
 class CounterpartyS {
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     public string $accountId;
 
@@ -18,14 +18,17 @@ class CounterpartyS {
 
     private const ATTRIBUTES_URL_IDENTIFIER = "agentMetadataAttributes";
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
+    function __construct($accountId, oldMoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->res = new Response();
         $this->accountId = $accountId;
     }
-    
-    public function getAllAttributes($notEmpty = true){
+    /**
+     * Метод возращает все аттрибуты в виде массива
+     * @param bool $notEmpty true - выдаст ошибку если массив пустой
+     */
+    public function getAllAttributes(bool $notEmpty = true){
         $resAttr = $this->msC->getAll(self::ATTRIBUTES_URL_IDENTIFIER);
         if(!$resAttr->status)
             return $resAttr->addMessage("Ошибка при получении аттрибутов контрагента");

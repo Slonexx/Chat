@@ -6,7 +6,6 @@ namespace App\Services;
 use App\Clients\newClient;
 use App\Models\employeeModel;
 use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\ClientException;
 
 class updateAccessToken
 {

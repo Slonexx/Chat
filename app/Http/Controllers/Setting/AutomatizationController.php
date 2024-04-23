@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Setting;
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Clients\MsClientAdd;
 use App\Http\Controllers\Controller;
 use App\Models\AutomationSettings;
@@ -241,7 +241,7 @@ class AutomatizationController extends Controller{
                 'message' => 'Сначала пройдите настройки подключение'
             ]);
         }
-        $client = new MoySklad($accountId);
+        $client = new oldMoySklad($accountId);
 
         $endpoints = [
             'customerorder' => '/customerorder/metadata',

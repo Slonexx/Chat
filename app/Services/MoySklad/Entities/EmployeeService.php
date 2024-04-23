@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\MoySklad\Entities;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\MoySklad\CutLogicService;
 use App\Services\MsFilterService;
 use App\Services\Response;
@@ -11,7 +11,7 @@ use stdClass;
 
 class EmployeeService {
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     public string $accountId;
 
@@ -20,7 +20,7 @@ class EmployeeService {
     private const URL_IDENTIFIER = "employee";
 
     function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+        $this->msC = new oldMoySklad($accountId);
         $this->res = new Response();
         $this->accountId = $accountId;
     }

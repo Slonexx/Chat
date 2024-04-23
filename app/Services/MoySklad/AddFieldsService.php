@@ -1,20 +1,20 @@
 <?php
 namespace App\Services\MoySklad;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Services\Response;
 use stdClass;
 
 class AddFieldsService{
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     private string $accountId;
 
     private Response $res;
 
     function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+        $this->msC = new oldMoySklad($accountId);
         $this->accountId = $accountId;
         $this->res = new Response();
     }

@@ -1,13 +1,10 @@
 <?php
 namespace App\Services\ChatApp;
 
-use App\Clients\MoySklad;
+use App\Clients\oldMoySklad;
 use App\Clients\newClient;
-use App\Models\ChatappEmployee;
-use App\Models\employeeModel;
 use App\Models\MainSettings;
 use App\Models\settingModel;
-use App\Models\Templates;
 use App\Services\MoySklad\Entities\CustomOrderService;
 use App\Services\MoySklad\Entities\DemandService;
 use App\Services\MoySklad\Entities\InvoiceoutService;
@@ -19,14 +16,14 @@ use stdClass;
 
 class AutomatizationService{
 
-    private MoySklad $msC;
+    private oldMoySklad $msC;
 
     private string $accountId;
 
     private Response $res;
 
     function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
+        $this->msC = new oldMoySklad($accountId);
         $this->accountId = $accountId;
         $this->res = new Response();
     }

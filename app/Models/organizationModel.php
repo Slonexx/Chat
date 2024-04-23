@@ -47,5 +47,13 @@ class organizationModel extends Model
             ];
         }
     }
+    /**
+     * @return object[] lineId for Chatapp
+     */
+    public static function getLineIdByAccountId(string $accountId){
+        return self::where("accountId", $accountId)
+            ->get(["lineId", "employeeId"])
+            ->all();
+    }
 
 }

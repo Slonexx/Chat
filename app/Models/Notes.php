@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TemplateAccess extends Model
+class Notes extends Model
 {
-    use HasFactory;
+    protected $table = "notes";
+
+    protected $guarded = [];
 }
