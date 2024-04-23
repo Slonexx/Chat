@@ -89,9 +89,13 @@ class TemplateService {
 
         $templateValues = $objectWithNeededValues->data;
 
-        $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
+        if($entityType == "counterparty"){
+            $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
+            $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
+        } else {
+            $readyTemplate = $templateLogicS->insertIn($content, $templateValues);
+        }
 
-        $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
 
         //тут я говорю найди мне все связанные атрибуты с данным шаблоном. если пусто, то шаблон simple
         $templatesWithAtttributes = Templates::join('variables', 'templates.id', '=', 'variables.template_id')
@@ -194,7 +198,10 @@ class TemplateService {
 
         $templateValues = $objectWithNeededValues->data;
 
-        $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
+        if($entityType == "counterparty"){
+            $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
+        }
+        
 
         $allTemplates = $setting->first()
             ->templates()
@@ -208,11 +215,15 @@ class TemplateService {
 
         $count = 1;
 
-        $allTemplates = array_map(function($template) use ($templateLogicS, $objectWithTextPositions, $expandedInfo, &$count) {
+        $allTemplates = array_map(function($template) use ($templateLogicS, $objectWithTextPositions, $expandedInfo, &$count, $entityType, $templateValues) {
             $content = $template->content;
             $uuid = $template->uuid;
 
-            $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
+            if($entityType == "counterparty"){
+                $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
+            } else {
+                $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
+            }
 
             //тут я говорю найди мне все связанные атрибуты с данным шаблоном. если пусто, то шаблон simple
             $templatesWithAtttributes = Templates::join('variables', 'templates.id', '=', 'variables.template_id')

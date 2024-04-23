@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('is_activity_agent');
             $table->uuid('notes');
             $table->boolean('is_messenger');
+            $table->timestamp('last_start')->nullable();
             $table->timestamps();
         });
     }
