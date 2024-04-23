@@ -89,7 +89,7 @@ class TemplateService {
 
         $templateValues = $objectWithNeededValues->data;
 
-        if($entityType == "counterparty"){
+        if($entityType != "counterparty"){
             $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
             $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
         } else {
