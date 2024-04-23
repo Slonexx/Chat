@@ -198,7 +198,7 @@ class TemplateService {
 
         $templateValues = $objectWithNeededValues->data;
 
-        if($entityType == "counterparty"){
+        if($entityType != "counterparty"){
             $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
         }
         
@@ -219,10 +219,10 @@ class TemplateService {
             $content = $template->content;
             $uuid = $template->uuid;
 
-            if($entityType == "counterparty"){
+            if($entityType != "counterparty"){
                 $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
             } else {
-                $readyTemplate = $templateLogicS->insertIn($content, $objectWithTextPositions);
+                $readyTemplate = $templateLogicS->insertIn($content, $templateValues);
             }
 
             //тут я говорю найди мне все связанные атрибуты с данным шаблоном. если пусто, то шаблон simple
