@@ -198,6 +198,7 @@ class TemplateService {
 
         $templateValues = $objectWithNeededValues->data;
 
+        $objectWithTextPositions = null;
         if($entityType != "counterparty"){
             $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
         }
