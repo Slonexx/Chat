@@ -46,11 +46,6 @@ class employeeModel extends Model
         }
     }
 
-    public function chatAutoSet()
-    {
-        return $this->hasOne(ChatappEmployee::class, "employee_id", "id");
-    }
-
     public function getEmployee()
     {
         return $this->belongsTo(employeeModel::class, 'employee_id');

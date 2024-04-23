@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Clients\MoySklad;
 use App\Clients\oldMoySklad;
 use App\Exceptions\AgentFindLogicException;
 use App\Models\MessengerAttributes;
@@ -46,7 +47,7 @@ class CounterpartyController extends Controller
                 $lineId = $item->lineId;
                 $chatsRes = $chatS->getAllChatForEmployee(50, $lineId);
                 $messageStack[] = $chatsRes->message;
-
+                //$msCnew = new MoySklad($accountId);
                 $agentH = new AgentMessengerHandler($accountId, $msC);
                 foreach($chatsRes->data as $messenger => $chats){
                     $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $messenger);

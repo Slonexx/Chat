@@ -1,10 +1,8 @@
 <?php
 namespace App\Services\ChatApp;
 
-use App\Clients\newClient;
 use App\Services\ChatappRequest;
 use App\Services\Response;
-use Exception;
 use GuzzleHttp\Exception\ClientException;
 
 class MessageService{
