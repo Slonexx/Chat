@@ -2,9 +2,8 @@
 namespace App\Services\MoySklad\Attributes;
 
 use App\Clients\MoySklad;
+use App\Exceptions\CounterpartyAttributesException;
 use App\Exceptions\MsException;
-use App\Services\Entities\CustomEntityService;
-use App\Services\HandlerService;
 use App\Services\HTTPResponseHandler;
 use App\Services\MsFilterService;
 use App\Services\Response;
@@ -33,15 +32,28 @@ class CounterpartyS {
      * @param bool $notEmpty true - выдаст ошибку если массив пустой
      */
     public function getAllAttributes(bool $notEmpty = true){
-        $resAttr = $this->msC->getAll(self::ATTRIBUTES_URL_IDENTIFIER);
-        if(!$resAttr->status)
-            return $resAttr->addMessage("Ошибка при получении аттрибутов контрагента");
-        else {
-            $attributes = $resAttr->data->rows;
+        $fullKey = "msUrls." . self::ATTRIBUTES_URL_IDENTIFIER;
+        $url = Config::get($fullKey, null);
+        $resHandler = new HTTPResponseHandler();
+        if(!is_string($url) || $url == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+        try{
+            $resAttr = $this->msC->get($url);
+            $agentRes = $resHandler->handleOK($resAttr, "все аттрибуты контрагента успешно получены");
+            $attributes = $agentRes->data->rows;
             if($notEmpty && count($attributes) == 0){
-                return $this->res->error($attributes, "Аттрибуты не найдены");
+                throw new CounterpartyAttributesException("Аттрибуты не найдены", 1);
             } else {
                 return $this->res->success($attributes);
+            }
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при получении всех аттрибутов контрагента|" . $encodedBody, $statusCode);
+            } else {
+                throw new MsException("неизвестная ошибка при получении всех аттрибутов контрагента", previous:$e);
             }
         }
             
@@ -73,7 +85,7 @@ class CounterpartyS {
         $resHandler = new HTTPResponseHandler();
         try{
             $response = $this->msC->get($filterUrl);
-            return $resHandler->handleOK($response, "поиск контрагент успешно завершён");
+            return $resHandler->handleOK($response, "поиск по аттрибуту контрагента успешно завершён");
 
         } catch(RequestException $e){
             if($e->hasResponse()){
@@ -92,10 +104,7 @@ class CounterpartyS {
      * возращает аттрибуты, которых нет в моём складе
      */
     function checkCreateArrayAttributes($attributes){
-        $handlerS = new HandlerService();
         $attributesRes = $this->getAllAttributes(false);
-        if(!$attributesRes->status)
-            return $attributesRes;
         $attrubutesForCreating = [];
 
         foreach($attributes as $addFieldMs){
@@ -103,11 +112,7 @@ class CounterpartyS {
             if(count($findedAttribute) == 0)
                 $attrubutesForCreating[] = $addFieldMs;
         }
-        if(empty($attrubutesForCreating))
-            return null;
-        else{
-            return $handlerS->createResponse(true, $attrubutesForCreating);
-        }
+        return $attrubutesForCreating;
     }
 
 

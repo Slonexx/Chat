@@ -97,6 +97,7 @@ class CounterpartyController extends Controller
                         }
                     }
                 }
+                $messageStack[] = "Для сотрудника $employeeId были созданы и/или обновлены все контрагенты";
             }
             return response()->json();
             

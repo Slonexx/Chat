@@ -53,19 +53,13 @@ class AgentUpdateLogicService{
     function agentUpdateLidAttribute($agentId, $lidName, $valueName, UpdateValuesService $updateValuesS, CustomEntityService $customEntityS){
         $agentAttrS = new CounterpartyS($this->accountId, $this->msC);
         $agentAttrRes = $agentAttrS->getAllAttributes(true);
-        if(!$agentAttrRes->status)
-            return $agentAttrRes;
         $agentAllAttributes = $agentAttrRes->data;
         $agentLidAttr = array_filter($agentAllAttributes, fn($value)=> $value->name == $lidName);
         $agentAttr = array_shift($agentLidAttr);
 
         $agentS = new CounterpartyService($this->accountId, $this->msC);
         
-        $bodyRes = $updateValuesS->dictionary($customEntityS, $agentAttr, $valueName);
-        if(!$bodyRes->status)
-            return $bodyRes;
-
-        $bodyForAgentUpdate = $bodyRes->data;
-        return $agentS->update($agentId, $bodyForAgentUpdate, "Ошибка при обновлении контрагента во время создания заказа");  
+        $bodyForAgentUpdate = $updateValuesS->dictionary($customEntityS, $agentAttr, $valueName);
+        $agentS->update($agentId, $bodyForAgentUpdate);
     }
 }

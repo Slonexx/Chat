@@ -13,7 +13,7 @@ use App\Models\Scenario;
 use App\Models\Templates;
 use App\Services\HandlerService;
 use App\Services\ChatApp\AutomatizationService;
-use App\Services\MoySklad\Entities\CustomOrderService;
+use App\Services\MoySklad\Entities\oldCustomOrderService;
 use App\Services\MoySklad\Entities\DemandService;
 use App\Services\MoySklad\Entities\EmployeeService;
 use App\Services\MoySklad\Entities\InvoiceoutService;
@@ -53,7 +53,7 @@ class AutomatizationController extends Controller{
             $statuses = [];
             $entityServices = [
                 "demand" => new DemandService($accountId),
-                "customerorder" => new CustomOrderService($accountId),
+                "customerorder" => new oldCustomOrderService($accountId),
                 "invoiceout" => new InvoiceoutService($accountId),
                 "salesreturn" => new SalesReturnService($accountId),
             ];

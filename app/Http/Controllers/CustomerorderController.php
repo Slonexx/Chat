@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Clients\MoySklad;
 use App\Clients\oldMoySklad;
 use App\Clients\newClient;
+use App\Exceptions\AgentFindLogicException;
 use App\Models\Lid;
 use App\Models\MessengerAttributes;
 use App\Models\organizationModel;
@@ -12,10 +14,9 @@ use App\Services\ChatApp\ChatService;
 use App\Services\HandlerService;
 use App\Services\MoySklad\AgentControllerLogicService;
 use App\Services\MoySklad\AgentFindLogicService;
-use App\Services\MoySklad\AgentUpdateLogicService;
 use App\Services\MoySklad\Attributes\CounterpartyS;
+use App\Services\MoySklad\Attributes\oldCounterpartyS;
 use App\Services\MoySklad\CustomerorderCreateLogicService;
-use App\Services\MoySklad\LidAttributesCreateService;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
 use Error;
 use Exception;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Config;
 class CustomerorderController extends Controller
 {
     function create(Request $request, $accountId){
+        $messageStack = [];
         try{
             $handlerS = new HandlerService();
             $msC = new oldMoySklad($accountId);
@@ -32,20 +34,23 @@ class CustomerorderController extends Controller
             //все добавленные в messengerAttributes будут созданы в мс
             $mesAttr = Config::get("messengerAttributes");
             $attrNames = array_keys($mesAttr);
-            $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, new CounterpartyS($accountId, $msC));
+            $agentAttrS = new oldCounterpartyS($accountId, $msC);
+            $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, $agentAttrS);
             if(!$resAttr->status)
                 return $handlerS->responseHandler($resAttr, true, false);
-            $orgs = organizationModel::where("accountId", $accountId)->get()->all();
-            $lid = Lid::where("accountId", $accountId)->get()->first();
+            else
+                $messageStack[] = $resAttr->message;
+
+            $orgs = organizationModel::getLineIdByAccountId($accountId);
+            $lid = Lid::getFirstByAccountId($accountId);
             //$orgEmployees = $orgsReq->pluck("employeeId")->all();
             foreach($orgs as $orgItem){
-                $chatappC = new newClient($orgItem->employeeId);
-                $chatS = new ChatService($accountId, $orgItem->employeeId, $chatappC);
+                $employeeId = $orgItem->employeeId;
+                $chatS = new ChatService($employeeId);
                 $chatsRes = $chatS->getAllChatForEmployee(50, $orgItem->lineId);
-                if(!$chatsRes->status)
-                    return $handlerS->responseHandler($chatsRes, true, false);
-
-                $agentH = new AgentMessengerHandler($accountId, $msC);
+                $messageStack[] = $chatsRes->message;
+                $msCnew = new MoySklad($accountId);
+                $agentH = new AgentMessengerHandler($accountId, $msCnew);
                 foreach($chatsRes->data as $messenger => $chats){
                     $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $messenger);
                     $attribute_id = $attribute->attribute_id;
@@ -58,17 +63,17 @@ class CustomerorderController extends Controller
                         $email = $chat->email;
                         $phoneForCreating = "+{$phone}";
 
-                        $findLogicS = new AgentFindLogicService($accountId, $msC);
-                        $agentByRequisitesRes = $findLogicS->findByRequisites($messenger, $chatId, $username, $name, $phone, $email, $attribute_id);
-                        if(!isset($agentByRequisitesRes))
-                            continue;
-                        $agents = $agentByRequisitesRes->data;
-                        if(!$agentByRequisitesRes->status)
-                            return $handlerS->responseHandler($agentByRequisitesRes, true, false);
-                        else if(!empty($agents)){
+                        $findLogicS = new AgentFindLogicService($accountId, $msCnew);
+                        try{
+                            $agentByRequisitesRes = $findLogicS->findByRequisites($messenger, $chatId, $username, $name, $phone, $email, $attribute_id);
+                        } catch(AgentFindLogicException $e){
+                            if($e->getCode() == 1)
+                                continue;
+                        }
+                        $agents = $agentByRequisitesRes->data->rows;
+                        if(!empty($agents)){
                             if(empty($lid)){
-                                $res = $handlerS->createResponse(false, "настройки lid не пройдены");
-                                return $handlerS->responseHandler($res, true, false);
+                                throw new Error("настройки lid не пройдены");
                             }
 
                             $responsible = $lid->responsible;
@@ -76,38 +81,29 @@ class CustomerorderController extends Controller
                             $isCreateOrder = $lid->is_activity_order;
                             
                             $agentHref = $agents[0]->meta->href;
-                            $customOrderS = new CustomerorderCreateLogicService($accountId, $msC);
+                            $customOrderS = new CustomerorderCreateLogicService($accountId, $msCnew);
                             $ordersByAgentRes = $customOrderS->findFirst(10, $agentHref);
-                            if(!$ordersByAgentRes->status)
-                                return $handlerS->responseHandler($ordersByAgentRes, true, false);
 
-                            $customerOrders = $ordersByAgentRes->data;
+                            $customerOrders = $ordersByAgentRes->data->rows;
                             $organId = $orgItem->organId;
-                            $agentControllerS = new AgentControllerLogicService($accountId, $msC);
+                            $agentControllerS = new AgentControllerLogicService($accountId, $msCnew);
                             if(count($customerOrders) == 0){
-                                $res = $agentControllerS->createOrderAndAttributes($organId, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
-                                if(!$res->status)
-                                    return $handlerS->responseHandler($res, true, false);
+                                $agentControllerS->createOrderAndAttributes($organId, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
                             } else {
                                 $isCreate = $customOrderS->checkStateTypeEqRegular($customerOrders);
                                 if($isCreate){
                                     //Regular
-                                    $customerOrderRes = $agentControllerS->createOrderAndAttributes($organId, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
-                                    if(!$customerOrderRes->status)
-                                        return $handlerS->responseHandler($customerOrderRes, true, false);
+                                    $agentControllerS->createOrderAndAttributes($organId, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
 
                                 } else {
                                     //Final
-                                    $customerOrderRes = $agentControllerS->updateAttributesIfNecessary($customerOrders);
-                                    if(!$customerOrderRes->status)
-                                        return $handlerS->responseHandler($customerOrderRes, true, false);
+                                    $agentControllerS->updateAttributesIfNecessary($customerOrders);
                                 }
 
                             }
                             
                         } else if(empty($agents)){
-                    
-                            $createdAgent = match($messenger){
+                            match($messenger){
                                 "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMeta),
                                 "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMeta),
                                 "email" => $agentH->email($email, $attrMeta),
@@ -116,18 +112,67 @@ class CustomerorderController extends Controller
                                 "telegram_bot" => $agentH->tg_bot($name, $username, $attrMeta),
                                 "avito" => $agentH->avito($name, $chatId, $attrMeta),
                             };
-                            if(!$createdAgent->status)
-                                return $handlerS->responseHandler($createdAgent, true, false);
                         }
                     }
                 }
-
+                $successMessage = "Для сотрудника $employeeId были созданы и/или обновлены все контрагенты";
+                $messageStack[] = $isCreateOrder ? $successMessage : $successMessage . " и созданы заказы";
             }
 
             return response()->json();
             
         } catch(Exception | Error $e){
-            return response()->json($e->getMessage(), 500);
+            $current = $e;
+            $messages = [];
+            $statusCode = 500;//or HTTP Exception code
+
+            while ($current !== null) {
+                $filePath = $current->getFile();
+                $fileLine = $current->getLine();
+                $message = $current->getMessage();
+                
+                $nextError = $current->getPrevious();
+
+                $parts = explode('|', $message);
+
+                if (count($parts) === 2) {
+                    $text = $parts[0];
+                    $json_str = array_pop($parts);
+
+                    $value = [
+                        "message" => $text,
+                        "data" => json_decode($json_str)
+                    ];
+                    if($nextError === null){
+                        $messageStack["message"] = $text;
+                        $code = $current->getCode();
+                        if($code >= 400)
+                            $statusCode = $code;
+                    }
+                } else {
+                    $value = [
+                        "message" => $message
+                    ];
+                    if($nextError === null){
+                        $messageStack["message"] = $message;
+                        $code = $current->getCode();
+                        if($code >= 400)
+                            $statusCode = $code;
+                    }
+                }
+
+
+                $fileName = basename($filePath);
+
+                $key = "{$fileName}:{$fileLine}";
+                
+                $messages[] = [
+                    $key => $value
+                ];
+                $current = $current->getPrevious();
+            }
+            $messageStack["error"] = $messages;
+            return response()->json($messageStack, $statusCode);
         }
 
     }

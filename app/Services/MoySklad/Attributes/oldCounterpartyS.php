@@ -2,11 +2,9 @@
 namespace App\Services\MoySklad\Attributes;
 
 use App\Clients\oldMoySklad;
-use App\Services\Entities\CustomEntityService;
 use App\Services\HandlerService;
 use App\Services\MsFilterService;
 use App\Services\Response;
-use Illuminate\Support\Facades\Config;
 
 class oldCounterpartyS {
 
