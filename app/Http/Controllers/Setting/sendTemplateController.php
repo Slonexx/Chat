@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class sendTemplateController extends Controller{
 
-    function sendTemplate(Request $request){
+    public function sendTemplate(Request $request){
         try{
             $req = $request->all();
             $handlerS = new HandlerService();
