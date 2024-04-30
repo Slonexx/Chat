@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Setting;
 use App\Http\Controllers\Controller;
 use App\Models\AttributeSettings;
 use App\Models\MainSettings;
+use App\Models\Variables;
 use App\Services\HandlerService;
 use App\Services\MoySklad\Attributes\DemandS;
 use App\Services\MoySklad\AddFieldsService;
@@ -58,10 +59,16 @@ class AddFieldsController extends Controller
                     return count($findedAttributesImMs) > 0 ? false : true;
                 });
                 $attrSetAfterDeleting[$entityType] = $entityUuid;
-                if(count($attrForDeleting) > 0)
-                    AttributeSettings::where("entity_type", $entityType)
-                        ->whereIn("attribute_id", $attrForDeleting)
-                        ->delete();
+                if(count($attrForDeleting) > 0){
+
+                    $attrs = AttributeSettings::where("entity_type", $entityType)
+                        ->whereIn("attribute_id", $attrForDeleting);
+                    $varIdsForDeleting = $attrs->get()->pluck('id')->all();
+                    
+                    Variables::whereIn("id", $varIdsForDeleting)->delete();
+
+                    $attrs->delete();
+                }
                 foreach($attrForDeleting as $key => $item){
                     unset($attrSetAfterDeleting[$entityType][$key]);
                 }
