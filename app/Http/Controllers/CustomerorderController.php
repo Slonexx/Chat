@@ -43,13 +43,13 @@ class CustomerorderController extends Controller
 
             $orgs = organizationModel::getLineIdByAccountId($accountId);
             $lid = Lid::getFirstByAccountId($accountId);
+            $msCnew = new MoySklad($accountId);
             //$orgEmployees = $orgsReq->pluck("employeeId")->all();
             foreach($orgs as $orgItem){
                 $employeeId = $orgItem->employeeId;
                 $chatS = new ChatService($employeeId);
                 $chatsRes = $chatS->getAllChatForEmployee(50, $orgItem->lineId);
                 $messageStack[] = $chatsRes->message;
-                $msCnew = new MoySklad($accountId);
                 $agentH = new AgentMessengerHandler($accountId, $msCnew);
                 foreach($chatsRes->data as $messenger => $chats){
                     $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $messenger);

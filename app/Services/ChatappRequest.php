@@ -4,7 +4,6 @@ namespace App\Services;
 use App\Clients\ChatApp;
 use App\Exceptions\ChatappRequestException;
 use Error;
-use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Config;
 
@@ -72,7 +71,40 @@ class ChatappRequest{
         try{
             $response = $this->chatappC->get($url);
             return $resHandler->handleOK($response, "сообщения успешно получены");
-        } catch(BadResponseException $e){
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new ChatappRequestException("ошибка при получении сообщений|" . $encodedBody, $statusCode);
+            } else {
+                throw new ChatappRequestException("неизвестная ошибка при получении сообщений", previous:$e);
+            }
+        }
+    }
+    /**
+     * @param int $countMessages > 0 && $countMessages <= 100
+     */
+    function getMessagesWithLimitAndTime(string $licenseId, string $messenger, string $chatId, string $direction, int $countMessages = 20, $time = null){
+        $messagesUrl = Config::get("chatappUrls.messages", null);
+        if(!is_string($messagesUrl) || $messagesUrl == null)
+            throw new Error("url чатов отсутствует или имеет некорректный формат");
+        $url = sprintf($messagesUrl, $licenseId, $messenger, $chatId);
+        $urlWithLimit = "$url?limit=$countMessages&direction=$direction";
+        $timeIsNull = $time == null;
+        if(!$timeIsNull){
+            $urlWithLimitAndTime = $urlWithLimit . "&lastTime=$time";
+        }
+            
+        $resHandler = new HTTPResponseHandler();
+        try{
+            if(!$timeIsNull)
+                $urlChatapp = $urlWithLimitAndTime;
+            else
+                $urlChatapp = $urlWithLimit;
+            $response = $this->chatappC->get($urlChatapp);
+            return $resHandler->handleOK($response, "сообщения успешно получены");
+        } catch(RequestException $e){
             if($e->hasResponse()){
                 $response = $e->getResponse();
                 $statusCode = $response->getStatusCode();

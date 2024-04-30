@@ -21,5 +21,7 @@ Route::post('/webhook', [AutomatizationController::class, 'sendTemplate']);
 //createCounterparty
 Route::get('counterparty/create/{accountId}', [CounterpartyController::class, 'create']);
 Route::get('customerorder/create/{accountId}', [CustomerorderController::class, 'create']);
+Route::get('counterparty/import_dialogs/{accountId}', [CounterpartyController::class, 'importConversationsInNotes']);
+Route::post('counterparty/sendNotes/{accountId}', [CounterpartyController::class, 'sendNotes']);
 
 Route::get("check", [TestController::class, "check"]);

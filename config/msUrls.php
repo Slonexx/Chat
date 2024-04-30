@@ -5,6 +5,7 @@ return [
     "agentMetadataAttributes" => "{$MsURL}entity/counterparty/metadata/attributes/",
 
     "companySettingsMetadata" => "{$MsURL}context/companysettings/metadata/",
+    "counterpartyNotes" => "{$MsURL}entity/counterparty/{accountId}/notes",
     "customentity" => "{$MsURL}entity/customentity/",
     "customEntityMeta" => "{$MsURL}context/companysettings/metadata/customEntities/",
     "customerorder" => "{$MsURL}entity/customerorder/",

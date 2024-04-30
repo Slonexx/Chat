@@ -52,7 +52,7 @@ class organizationModel extends Model
      */
     public static function getLineIdByAccountId(string $accountId){
         return self::where("accountId", $accountId)
-            ->get(["lineId", "employeeId", "organId"])
+            ->get(["lineId", "employeeId", "organId", "lineName"])
             ->all();
     }
 
