@@ -7,6 +7,7 @@ use App\Models\MainSettings;
 use App\Models\Notes;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
 class checkCounterPartyFromConversations extends Command
@@ -44,7 +45,7 @@ class checkCounterPartyFromConversations extends Command
                 $accountId = $item->accountId;
                 $notesCollection = Notes::where("is_activity_agent", true)->get();
                 if($notesCollection->isNotEmpty()){
-                    $url = /*Config::get('Global.url')*/ '' . "api/counterparty/create/${$accountId}";
+                    $url = Config::get('Global.url') /*''*/ . "api/counterparty/create/${$accountId}";
                     CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
                     $this->info('Продолжение выполнения команды.');
                 }

@@ -9,6 +9,7 @@ use App\Models\MainSettings;
 use App\Models\organizationModel;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
 class createCustomerOrder extends Command
@@ -46,7 +47,7 @@ class createCustomerOrder extends Command
             try {
                 if($item){
                     $accountId = $item->account_id;
-                    $url = /*Config::get('Global.url')*/ '' . "api/customerorder/create/${$key}";
+                    $url = Config::get('Global.url') /*''*/ . "api/customerorder/create/${$key}";
                     //CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
                     
                     $this->info('Продолжение выполнения команды.');
