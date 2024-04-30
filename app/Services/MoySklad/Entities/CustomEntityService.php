@@ -1,13 +1,19 @@
 <?php
 namespace App\Services\MoySklad\Entities;
 
-use App\Clients\oldMoySklad;
+use App\Clients\MoySklad;
+use App\Exceptions\CustomEntityException;
+use App\Exceptions\MsException;
 use App\Services\HandlerService;
+use App\Services\HTTPResponseHandler;
+use Error;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Config;
 use stdClass;
 
 class CustomEntityService {
-    private oldMoySklad $msClient;
+    private MoySklad $msClient;
 
     private string $accountId;
 
@@ -15,38 +21,86 @@ class CustomEntityService {
 
     public const URL_IDENTIFIER = "customentity";
 
-    function __construct($accountId, oldMoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msClient = new oldMoySklad($accountId);
+    function __construct($accountId, MoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msClient = new MoySklad($accountId);
         else  $this->msClient = $MoySklad;
         $this->handlerS = new HandlerService();
         $this->accountId = $accountId;
     }
 
     public function getById($id){
-        $res = $this->msClient->getById(self::URL_IDENTIFIER, $id);
-        if(!$res->status)
-            return $this->handlerS->createResponse(false, $res->data, false, "Ошибка при получении customentity");
-        else
-            return $res;
+        $fullKey = "msUrls." . self::URL_IDENTIFIER;
+        $url = Config::get($fullKey, null);
+        if(!is_string($url) || $url == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+        $joinedUrl = $url . $id;
+        $resHandler = new HTTPResponseHandler();
+        try{
+            $res = $this->msClient->get($joinedUrl);
+            return $resHandler->handleOK($res);
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при получении справочника по id|" . $encodedBody, $statusCode);
+            } else {
+                throw new MsException("неизвестная ошибка при получении справочника по id", previous:$e);
+            }
+        }
+    }
+
+    public function getAll(){
+        $url = Config::get("msUrls.companySettingsMetadata", null);
+        $resHandler = new HTTPResponseHandler();
+        if(!is_string($url) || $url == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+        try{
+            $res = $this->msClient->get($url);
+            $customEntitiesRes = $resHandler->handleOK($res);
+            $rows = (array) $customEntitiesRes->data->customEntities ?? [];
+            return $rows;
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при получении всех справочников|" . $encodedBody, $statusCode);
+            } else {
+                throw new MsException("неизвестная ошибка при получении всех справочников", previous:$e);
+            }
+        }
     }
 
     /**
      * use from createAddFieldsDictionaryType function (вынести)
      * @return response/badResponse check ResponseHandler(createResponse)
      */
-    function createDictionary(object $attribute){
-        $body = new stdClass();
-        $dictionaryName = $attribute->name ?? false;
+    function createDictionary(string $dictionaryName){
         if(!$dictionaryName)
-            return $this->handlerS->createResponse(false, $attribute, false, "Не найдено имя справочника");
-
+            throw new CustomEntityException("Не найдено имя справочника: $dictionaryName", 1);
+        $body = new stdClass();
         $body->name = $dictionaryName;
 
-        $res = $this->msClient->post(self::URL_IDENTIFIER, $body);
-        if(!$res->status)
-            return $this->handlerS->createResponse(false, $res->data, false, "Ошибка при создании customentity");
-        else
-            return $res;
+        $fullKey = "msUrls." . self::URL_IDENTIFIER;
+        $url = Config::get($fullKey, null);
+        $resHandler = new HTTPResponseHandler();
+        if(!is_string($url) || $url == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+
+        try{
+            $res = $this->msClient->post($url, $body);
+            return $resHandler->handleOK($res, "справочник успешно создан");
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при создании справочника|" . $encodedBody, $statusCode);
+            } else {
+                throw new MsException("неизвестная ошибка при создании справочника", previous:$e);
+            }
+        }
     }
 
     /**
@@ -54,104 +108,120 @@ class CustomEntityService {
      * @return response/badResponse check ResponseHandler(createResponse)
      */
     function createAttribute($entityTypeAttributes, $body){
-        if($entityTypeAttributes == false)
-            return $this->handlerS->createResponse(false, $entityTypeAttributes, false, "entityTypeAttributes = false");
-
-        $res = $this->msClient->post($entityTypeAttributes, $body);
-        if(!$res->status)
-            return $this->handlerS->createResponse(false, $res->data, false, "Ошибка при создании customentity");
-        else
-            return $res;
+        $fullKey = "msUrls." . $entityTypeAttributes;
+        $url = Config::get($fullKey, null);
+        if(!is_string($url) || $url == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+        
+        try{
+            $this->msClient->post($url, $body);
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при создании аттрибута типа справочник|" . $encodedBody, $statusCode);
+            } else {
+                throw new MsException("неизвестная ошибка при создании аттрибута типа справочник", previous:$e);
+            }
+        }    
     }
 
     /**
+     * настройка тела запроса для создания аттрибута типа справочник
      * use from createAddFieldsDictionaryType function (вынести)
      * @return response/badResponse check ResponseHandler(createResponse)
      */
     function setBody(object $attribute, string $customentityId){
         $body = [];
-        $url = Config::get("Global.customEntityMeta");
+        $url = Config::get("msUrls.customEntityMeta");
 
         $attributeName = $attribute->name ?? false;
         if(!$attributeName)
-            return $this->handlerS->createResponse(false, $attribute, false, "Не найдено имя аттрибута");
+            throw new CustomEntityException("Не найдено имя справочника:" . json_encode($attribute) , 1);
         $body["name"] = $attributeName;
 
         $body["type"] = "customentity";
 
         $attributeDescription = $attribute->descripion ?? "";
         if(!isset($attributeDescription))
-            return $this->handlerS->createResponse(false, $attribute, false, "Не найдено описание аттрибута");
+            throw new CustomEntityException("Не найдено описание аттрибута" . json_encode($attribute) , 2);
         $body["descripion"] = $attributeDescription;
 
-        $attributeShow = $attribute->show ?? "";
-        if($attributeShow !== "")
+        $attributeShow = $attribute->show ?? null;
+        if(isset($attributeShow))
             $body["show"] = $attributeShow;
 
         $body["required"] = false;
 
-
-        $body["customEntityMeta"] = [
+        $body["customEntityMeta"] = (object)[
             "href" => $url . $customentityId,
             "type" => "customentitymetadata",
         ];
 
         $objectBody = json_decode(json_encode($body));
 
-        return $this->handlerS->createResponse(true, $objectBody);
+        return $objectBody;
     }
 
     /**
      * use from createAddFieldsDictionaryType function (вынести)
-     * @return response/badResponse check ResponseHandler(createResponse)
+     * @param string $addField название справочника
+     * @return Response | null
      */
-    public function tryToFind($addField){
-        $dictionaryName = $addField->name ?? false;
+    public function tryToFind(string $dictionaryName, array $dictionaries){
         if(!$dictionaryName)
-            return $this->handlerS->createResponse(false, $addField, false, "Не найдено имя справочника");
-
-        $res = $this->msClient->getAll("companySettingsMetadata");
-        if(!$res->status)
-            return $this->handlerS->createResponse(false, $res->data, false, "Ошибка при поиске customentity");
-
-        $rows = $res->data->customEntities ?? false;
-        if($rows === false)
+            throw new CustomEntityException("Не найдено имя справочника: $dictionaryName", 1);
+        
+        //в мс не создано ни одного справочника
+        if(empty($dictionaries))
             return null;
-        $dictionary = array_filter($rows, fn($value)=> $value->name == $dictionaryName);
+        $dictionary = array_filter($dictionaries, fn($value)=> $value->name == $dictionaryName);
+
+        //не нашли справочник по имени
         if(count($dictionary) == 0)
             return null;
         else{
             $elem = array_shift($dictionary);
-            $urlArray = explode("/", $elem->entityMeta->href);
-            $dictionaryId = array_pop($urlArray);
+            $dictionaryId = basename($elem->entityMeta->href);
             return $this->handlerS->createResponse(true, $dictionaryId);
-
         }
     }
     /**
      * use from createAddFieldsDictionaryType function (вынести)
+     * @param string[] $dictionaryValues
      * @return response/badResponse check ResponseHandler(createResponse)
      */
-    function createValuesMoreThan1000(object $attribute, string $customentityId){
-        $dictionaryValues = $attribute->values ?? false;
-        if(!$dictionaryValues)
-            return $this->handlerS->createResponse(false, $attribute, false, "Не найден(о/ы) значени(е/я) справочника");
-
+    function createValuesMoreThan1000($dictionaryValues, string $customentityId){
         if(!is_array($dictionaryValues))
-            return $this->handlerS->createResponse(false, $attribute, false, "Значения справочника не являются массивом");
+            throw new CustomEntityException("Значения справочника не являются массивом |" . json_encode($dictionaryValues), 1);
 
         if(count($dictionaryValues) == 0)
-            return $this->handlerS->createResponse(false, $attribute, false, "Для значений справочника передан пустой массив");
+            throw new CustomEntityException("Для значений справочника передан пустой массив", 2);
 
+        $fullKey = "msUrls." . self::URL_IDENTIFIER;
+        $url = Config::get($fullKey, null);
+        if(!is_string($url) || $url == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+
+        //ограничение на 1000 значений МС
         $body = array_chunk($dictionaryValues, 1000);
-        foreach($body as $bodyItem){
-            $res = $this->msClient->postById(self::URL_IDENTIFIER, $customentityId, $bodyItem);
-            if(!$res->status)
-                return $this->handlerS->createResponse(false, $res->data, false, "Ошибка при заполнении customentity значениями");
-        }
-        
 
-        return $this->handlerS->createResponse(true, "");
+        foreach($body as $bodyItem){
+            $urlWithId = $url . $customentityId;
+            try{
+                $this->msClient->post($urlWithId, $bodyItem);
+            } catch(RequestException $e){
+                if($e->hasResponse()){
+                    $response = $e->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    $encodedBody = $response->getBody()->getContents();
+                    throw new MsException("ошибка при заполнении справочника значениями|" . $encodedBody, $statusCode);
+                } else {
+                    throw new MsException("неизвестная ошибка при заполнении справочника значениями", previous:$e);
+                }
+            }
+        }
     }
 
 }

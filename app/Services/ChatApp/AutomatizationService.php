@@ -5,7 +5,7 @@ use App\Clients\oldMoySklad;
 use App\Clients\newClient;
 use App\Models\MainSettings;
 use App\Models\settingModel;
-use App\Services\MoySklad\Entities\CustomOrderService;
+use App\Services\MoySklad\Entities\oldCustomOrderService;
 use App\Services\MoySklad\Entities\DemandService;
 use App\Services\MoySklad\Entities\InvoiceoutService;
 use App\Services\MoySklad\Entities\SalesReturnService;
@@ -30,7 +30,7 @@ class AutomatizationService{
 
     function sendTemplate($type, $href, $employeeId){
         $entityServices = [
-            "customerorder" => new CustomOrderService($this->accountId),
+            "customerorder" => new oldCustomOrderService($this->accountId),
             "demand" => new DemandService($this->accountId),
             "salesreturn" => new SalesReturnService($this->accountId),
             "invoiceout" => new InvoiceoutService($this->accountId),

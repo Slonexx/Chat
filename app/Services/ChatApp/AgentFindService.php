@@ -1,14 +1,14 @@
 <?php
 namespace App\Services\ChatApp;
 
-use App\Clients\oldMoySklad;
+use App\Clients\MoySklad;
 use App\Services\MoySklad\Attributes\CounterpartyS;
 use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\Response;
 
 class AgentFindService{
 
-    private oldMoySklad $msC;
+    private MoySklad $msC;
 
     private string $accountId;
 
@@ -20,8 +20,8 @@ class AgentFindService{
 
     private string $addFieldError = "Ошибка при поиске контрагента по доп полю";
 
-    function __construct($accountId, oldMoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
+    function __construct($accountId, MoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->accountId = $accountId;
         $this->res = new Response();
@@ -37,23 +37,16 @@ class AgentFindService{
 
         }
         $agentByNameRes = $counterpartyS->getByParam("name", $nameForFinding, $this->nameError);
-        if(!$agentByNameRes->status)
-            return $agentByNameRes;
-        if(count($agentByNameRes->data) == 0){
+        if(count($agentByNameRes->data->rows) == 0){
             $agentByPhoneRes = $counterpartyS->getByParam("phone", $phone, $this->phoneError);
-            if(!$agentByPhoneRes->status)
-                return $agentByPhoneRes;
-            if(count($agentByPhoneRes->data) == 0){
+            if(count($agentByPhoneRes->data->rows) == 0){
                 $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
                 $agentByTgRes = $counterpartyAttributeS->getByAttribute($attribute_id, "@{$addF}", $this->addFieldError);
-                if(!$agentByTgRes->status)
-                    return $agentByTgRes;
-                else
-                    return $this->res->success($agentByTgRes->data);
+                return $agentByTgRes;
             } else
-                return $this->res->success($agentByPhoneRes->data);
+                return $agentByPhoneRes;
         } else
-            return $this->res->success($agentByNameRes->data);
+            return $agentByNameRes;
     }
 
     function whatsapp($phone, $name, $addF, $attribute_id){
@@ -66,32 +59,22 @@ class AgentFindService{
 
         }
         $agentByNameRes = $counterpartyS->getByParam("name", $nameForFinding, $this->nameError);
-        if(!$agentByNameRes->status)
-            return $agentByNameRes;
-        if(count($agentByNameRes->data) == 0){
+        if(count($agentByNameRes->data->rows) == 0){
             $agentByPhoneRes = $counterpartyS->getByParam("phone", $phone, $this->phoneError);
-            if(!$agentByPhoneRes->status)
-                return $agentByPhoneRes;
-            if(count($agentByPhoneRes->data) == 0){
+            if(count($agentByPhoneRes->data->rows) == 0){
                 $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
                 $agentByWpRes = $counterpartyAttributeS->getByAttribute($attribute_id, $addF, $this->addFieldError);
-                if(!$agentByWpRes->status)
-                    return $agentByWpRes;
-                else
-                    return $this->res->success($agentByWpRes->data);
+                return $agentByWpRes;
             } else
-                return $this->res->success($agentByPhoneRes->data);
+                return $agentByPhoneRes;
         } else
-            return $this->res->success($agentByNameRes->data);
+            return $agentByNameRes;
     }
 
     function email($email, $attribute_id){
         $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
         $agentByEmailRes = $counterpartyAttributeS->getByAttribute($attribute_id, $email, $this->addFieldError);
-        if(!$agentByEmailRes->status)
-            return $agentByEmailRes;
-        else
-            return $this->res->success($agentByEmailRes->data);
+        return $agentByEmailRes;
         
     }
 
@@ -100,37 +83,25 @@ class AgentFindService{
             $chatId = "id{$chatId}";
         $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
         $agentByEmailRes = $counterpartyAttributeS->getByAttribute($attribute_id, $chatId, $this->addFieldError);
-        if(!$agentByEmailRes->status)
-            return $agentByEmailRes;
-        else
-            return $this->res->success($agentByEmailRes->data);
+        return $agentByEmailRes;
     }
 
     function inst($username, $attribute_id){
         $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
         $agentByEmailRes = $counterpartyAttributeS->getByAttribute($attribute_id, "@{$username}", $this->addFieldError);
-        if(!$agentByEmailRes->status)
-            return $agentByEmailRes;
-        else
-            return $this->res->success($agentByEmailRes->data);
+        return $agentByEmailRes;
     }
 
     function tg_bot($username, $attribute_id){
         $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
         $agentByTgRes = $counterpartyAttributeS->getByAttribute($attribute_id, "@{$username}", $this->addFieldError);
-        if(!$agentByTgRes->status)
-            return $agentByTgRes;
-        else
-            return $this->res->success($agentByTgRes->data);
+        return $agentByTgRes;
     }
 
     function avito($chatId, $attribute_id){
         $counterpartyAttributeS = new CounterpartyS($this->accountId, $this->msC);
         $agentByTgRes = $counterpartyAttributeS->getByAttribute($attribute_id, $chatId, $this->addFieldError);
-        if(!$agentByTgRes->status)
-            return $agentByTgRes;
-        else
-            return $this->res->success($agentByTgRes->data);
+        return $agentByTgRes;
     }
 
 }

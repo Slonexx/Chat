@@ -4,8 +4,9 @@ namespace App\Clients;
 use GuzzleHttp\Client;
 use App\Models\MainSettings;
 use InvalidArgumentException;
+use React\Http\Browser;
 
-class MoySklad {
+class MoySkladAsync {
 
     private string $token;
 
@@ -35,24 +36,24 @@ class MoySklad {
 
     }
 
-    public function get($url){
-        return $this->client->get($url);
+    public function getAsync($url, $loop){
+        $browser = new Browser($loop);
+        return $browser->get($url, $this->headers["headers"]);
     }
 
-    public function post($url, $data){
-        return $this->client->post($url, [
-            'json' => $data
-        ]);
+    public function postAsync($url, $data, $loop){
+        $browser = new Browser($loop);
+        return $browser->post($url, $this->headers, $data);
     }
 
-    public function put($url, $body){
-        return $this->client->put($url, [
-            'json' => $body
-        ]);
-    }
+    // public function put($url, $body){
+    //     return $this->client->put($url, [
+    //         'json' => $body
+    //     ]);
+    // }
 
-    public function delete($url){
-        return $this->client->delete($url);
-    }
+    // public function delete($url){
+    //     return $this->client->delete($url);
+    // }
 
 }

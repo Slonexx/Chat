@@ -3,6 +3,7 @@ namespace App\Services\ChatApp;
 
 use App\Services\ChatappRequest;
 use App\Services\Response;
+use DateTime;
 use GuzzleHttp\Exception\ClientException;
 
 class MessageService{
@@ -19,21 +20,13 @@ class MessageService{
         $this->employeeId = $employeeId;
     }
 
-    function getAllMessagesFromChat($lineId, $messenger, $chatId, $errorMessage){
-        
-        $res = new Response();
-        try{
-            $messagesRes = $this->chatReq->getMessages($lineId, $messenger, $chatId);
-            if(!$messagesRes->status)
-                return $messagesRes->addMessage($errorMessage);
-            else
-                return $res->success($messagesRes->data);
-        } 
-        catch(ClientException $e){
-            $res = new Response();
-            $body = $e->getResponse()->getBody()->getContents();
-            return $res->customResponse(json_decode($body), 400, false);
+    function prepareMessages(string $lineName, string $lineId, string $messenger, string $usernameOrPhone, bool $isAddMessengerInfo, array $messages){
+        $arrayMessages = [];
+        $messengerString = $isAddMessengerInfo == true ? ", $messenger $usernameOrPhone" : "";
+        foreach($messages as $message){
+            $directionSending = $message->fromMe == true ? "Мы:" : "Клиент:";
+            $arrayMessages[] =  "$lineName#$lineId{$messengerString}" . PHP_EOL . "$directionSending $message->text";
         }
-        
+        return $arrayMessages;
     }
 }

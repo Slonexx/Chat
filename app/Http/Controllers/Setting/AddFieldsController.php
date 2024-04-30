@@ -7,8 +7,8 @@ use App\Models\MainSettings;
 use App\Services\HandlerService;
 use App\Services\MoySklad\Attributes\DemandS;
 use App\Services\MoySklad\AddFieldsService;
-use App\Services\MoySklad\Attributes\CounterpartyS;
-use App\Services\MoySklad\Attributes\CustomorderS;
+use App\Services\MoySklad\Attributes\oldCounterpartyS;
+use App\Services\MoySklad\Attributes\oldCustomorderS;
 use App\Services\MoySklad\Attributes\InvoiceoutS;
 use App\Services\MoySklad\Attributes\SalesreturnS;
 use App\Services\MoySklad\CutLogicService;
@@ -29,8 +29,8 @@ class AddFieldsController extends Controller
 
             $services = [
                 "demand" => new DemandS($accountId),
-                "counterparty" => new CounterpartyS($accountId),
-                "customerorder" => new CustomorderS($accountId),
+                "counterparty" => new oldCounterpartyS($accountId),
+                "customerorder" => new oldCustomorderS($accountId),
                 "invoiceout" => new InvoiceoutS($accountId),
                 "salesreturn" => new SalesreturnS($accountId),
             ];
@@ -105,8 +105,8 @@ class AddFieldsController extends Controller
 
             $services = [
                 "demand" => new DemandS($accountId),
-                "counterparty" => new CounterpartyS($accountId),
-                "customerorder" => new CustomorderS($accountId),
+                "counterparty" => new oldCounterpartyS($accountId),
+                "customerorder" => new oldCustomorderS($accountId),
                 "invoiceout" => new InvoiceoutS($accountId),
                 "salesreturn" => new SalesreturnS($accountId),
             ];

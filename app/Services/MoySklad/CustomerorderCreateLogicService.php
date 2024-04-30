@@ -1,24 +1,27 @@
 <?php
 namespace App\Services\MoySklad;
 
-use App\Clients\oldMoySklad;
+use App\Clients\MoySklad;
+use App\Exceptions\MsException;
 use App\Services\HandlerService;
+use App\Services\HTTPResponseHandler;
 use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\MoySklad\Entities\CustomOrderService;
 use App\Services\MsFilterService;
 use App\Services\Response;
+use GuzzleHttp\Exception\RequestException;
 use stdClass;
 
 class CustomerorderCreateLogicService{
 
-    private oldMoySklad $msC;
+    private MoySklad $msC;
 
     private string $accountId;
 
     private Response $res;
 
-    function __construct($accountId, oldMoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new oldMoySklad($accountId);
+    function __construct($accountId, MoySklad $MoySklad = null) {
+        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
         else  $this->msC = $MoySklad;
         $this->accountId = $accountId;
         $this->res = new Response();
@@ -28,11 +31,21 @@ class CustomerorderCreateLogicService{
         $filterS = new MsFilterService();
         $urlWithFilter = $filterS->prepareUrlWithParam("customerorder", "agent", $agentHref);
         $prepUrl = $urlWithFilter . "&limit={$firstCount}&expand=state,agent";
-        $firstOrdersRes = $this->msC->getByUrl($prepUrl);
-        if(!$firstOrdersRes->status)
-            return $firstOrdersRes->addMessage("Не удалось найти первые {$firstCount} заказов");
-        else
-            return $this->res->success($firstOrdersRes->data->rows);
+        $resHandler = new HTTPResponseHandler();
+        try{
+            $firstOrdersRes = $this->msC->get($prepUrl);
+            return $resHandler->handleOK($firstOrdersRes, "поиск $firstCount заказов завершился успешно");
+
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при поиске $firstCount заказов по агенту|" . $encodedBody, $statusCode);
+            } else {
+                throw new MsException("неизвестная ошибка при обновлении контрагента", previous:$e);
+            }
+        }
     }
 
     function checkStateTypeEqRegular(array $customerOrders){
@@ -63,9 +76,7 @@ class CustomerorderCreateLogicService{
                 $bodyForChangeAgent = new stdClass();
                 $bodyForChangeAgent->owner = $preparedEmployeeMeta;
                 $agentS = new CounterpartyService($this->accountId, $this->msC);
-                $agentUpdateRes = $agentS->update($agentId, $bodyForChangeAgent, "Ошибка при обновлении контрагента во время создания заказа");
-                if(!$agentUpdateRes->status)
-                    return $agentUpdateRes;
+                $agentS->update($agentId, $bodyForChangeAgent);
                 
                 $body->owner = $preparedEmployeeMeta;
                 
@@ -73,11 +84,7 @@ class CustomerorderCreateLogicService{
             default:
                 break;
         }
-        $customerOrderCreateRes = $customerOrderS->create($body);
-        if(!$customerOrderCreateRes->status)
-            return $this->res->error($customerOrderCreateRes->data, "Ошибка при создании заказа покупателя");
-        else
-            return $customerOrderCreateRes;
+        $customerOrderS->create($body);
         
     }
 }

@@ -51,4 +51,8 @@ class Lid extends Model
     protected $table = "lids";
 
     protected $guarded = [];
+
+    public static function getFirstByAccountId($accountId){
+        return self::where("accountId", $accountId)->get()->first();
+    }
 }
