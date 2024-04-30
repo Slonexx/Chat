@@ -69,7 +69,7 @@ class CreateNotesLogicService{
             } while($countMessages == $limitMessages && count($messages) < $MAX_UPLOAD_MESSAGE);
             $messages = array_reverse($messages);
         } else {
-            $direction = "prev";
+            $direction = "next";
             if($olderTimeInArray == null)
                 $olderTimeInArray = $timeFromDb;
 
