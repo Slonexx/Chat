@@ -33,6 +33,7 @@ class AutomationController extends Controller
         $list_template = Scenario::getInformationALLAcc($accountId);
         if ($list_template->toArray == null)
             return to_route('scenario', [
+                'accountId' => $accountId,
                 'isAdmin' => $isAdmin,
                 'fullName' => $fullName,
                 'uid' => $uid,
@@ -61,13 +62,15 @@ class AutomationController extends Controller
                 }
             } catch (BadResponseException){
                 $lines[$item['id']] = [
-                    'licenseId' => 1,
-                    'licenseName' => 'ошибка',
-                    'name' => 'ошибка получение токена',
-                    'messenger' => [
-                        'type' => 0,
+                    [
+                        'licenseId' => 1,
+                        'licenseName' => 'ошибка',
                         'name' => 'ошибка получение токена',
-                    ],
+                        'messenger' => [
+                            'type' => 0,
+                            'name' => 'ошибка получение токена',
+                        ],
+                    ]
                 ];
             }
         }
@@ -143,7 +146,22 @@ class AutomationController extends Controller
             'employee_id' => $request->employee_id ?? '0',
             'template' => $request->template ?? [],
         ];
+        if ($data['line'] == '0') return to_route('automation', [
+            'accountId' => $accountId,
+            'isAdmin' => $isAdmin,
+            'fullName' => $fullName,
+            'uid' => $uid,
 
+            'message' => 'Отсутствует информация о линиях'
+        ]);
+        if ($data['messenger'] == '0') return to_route('automation', [
+            'accountId' => $accountId,
+            'isAdmin' => $isAdmin,
+            'fullName' => $fullName,
+            'uid' => $uid,
+
+            'message' => 'Отсутствует информация о мессенджерах'
+        ]);
 
         Automation::createOrUpdateIsArray($accountId, $data);
 

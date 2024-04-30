@@ -84,6 +84,10 @@ Route::get('/Setting/template/get/attributes/{accountId}', [templateController::
 Route::get('/Setting/template/delete/poles/{accountId}', [templateController::class, 'deletePoles']);
 
 
+
+/***
+НОВЫЕ ОБНОВЛЕНИЯ СЦЕНАРИИ И АВТОМАТИЗАЦИЯ
+ **/
 Route::group(["prefix" => "Setting"], function () {
     Route::get('/scenario/{accountId}', [AutomatizationController::class, 'getScenario'])->name('scenario');
     Route::post('/scenario/{accountId}', [AutomatizationController::class, 'saveScenario']);
@@ -93,8 +97,9 @@ Route::group(["prefix" => "Setting"], function () {
     Route::get('/automation/{accountId}', [AutomationController::class, 'getAutomation'])->name('automation');
     Route::post('/automation/{accountId}', [AutomationController::class, 'postAutomation']);
 });
-
-
+/***
+НОВЫЕ ОБНОВЛЕНИЯ
+ **/
 Route::group(["prefix" => "Setting"], function () {
     Route::get('/lid/{accountId}', [LidController::class, 'getLid'])->name('lid');
     Route::post('/lid/{accountId}', [LidController::class, 'saveLid']);

@@ -28,7 +28,7 @@ class LidController extends Controller
             'isAdmin' => $isAdmin,
             'fullName' => $request->fullName ?? "Имя аккаунта",
             'uid' => $request->uid ?? "логин аккаунта",
-            'message' => "",
+            'message' => $req->data
         ]);
 
         $model = (Lid::getInformationALLAcc($accountId));
