@@ -135,7 +135,7 @@ class AutomatizationController extends Controller{
 
         try {
             $Client = new oldMoySklad($accountId);
-            $webhookUrls = 'https://smartchatapp.kz/api/webhook/';
+            $webhookUrls = 'https://smartchatapp.kz/api/webhook';
 
             $webhooksResponse = $Client->getByUrl('https://api.moysklad.ru/api/remap/1.2/entity/webhook/');
             if (!$webhooksResponse->status) {
