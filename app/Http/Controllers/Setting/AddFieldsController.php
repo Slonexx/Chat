@@ -65,7 +65,7 @@ class AddFieldsController extends Controller
                         ->whereIn("attribute_id", $attrForDeleting);
                     $varIdsForDeleting = $attrs->get()->pluck('id')->all();
                     
-                    Variables::whereIn("id", $varIdsForDeleting)->delete();
+                    Variables::whereIn("attribute_settings_id", $varIdsForDeleting)->delete();
 
                     $attrs->delete();
                 }
