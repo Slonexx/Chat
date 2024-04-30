@@ -47,7 +47,7 @@ class checkCounterPartyFromConversations extends Command
                     ->where("is_activity_agent", true)
                     ->get();
                 if($notesCollection->isNotEmpty()){
-                    $url = Config::get('Global.url') /*''*/ . "api/counterparty/create/${$accountId}";
+                    $url = Config::get('Global.url') /*''*/ . "api/counterparty/import_dialogs/${$accountId}";
                     CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
                     $this->info('Продолжение выполнения команды.');
                 }
