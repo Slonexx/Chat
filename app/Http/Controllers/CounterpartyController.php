@@ -26,10 +26,8 @@ use Exception;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use React\EventLoop\Loop;
 use stdClass;
 
-use function React\Promise\all;
 
 class CounterpartyControllerException extends Exception {}
 
