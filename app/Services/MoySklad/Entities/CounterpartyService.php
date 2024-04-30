@@ -2,6 +2,7 @@
 namespace App\Services\MoySklad\Entities;
 
 use App\Clients\MoySklad;
+use App\Exceptions\CounterpartyException;
 use App\Exceptions\MsException;
 use App\Services\HTTPResponseHandler;
 use App\Services\MsFilterService;
@@ -33,6 +34,29 @@ class CounterpartyService{
             return $res->addMessage("Ошибка при получении контрагента");
         else
             return $res;
+    }
+
+    public function getWithLimit(int $limit) {
+        $fullKey = "msUrls." . self::URL_IDENTIFIER;
+        $url = Config::get($fullKey, null);
+        $resHandler = new HTTPResponseHandler();
+        if(!is_string($url) || $url == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+        try{
+            $urlWithLimit =  $url . "?limit=$limit";
+            $response = $this->msC->get($urlWithLimit);
+            return $resHandler->handleOK($response, "контрагенты c limit=$limit найдены");
+
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при поиске с limit=$limit |" . $encodedBody, $statusCode);
+            } else {
+                throw new MsException("неизвестная ошибка при поиске с limit=$limit", previous:$e);
+            }
+        }
     }
 
     public function getByParam(string $name, mixed $value){
