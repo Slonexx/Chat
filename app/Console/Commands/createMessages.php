@@ -10,7 +10,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
-class checkCounterPartyFromConversations extends Command
+class createMessages extends Command
 {
     /**
      * The name and signature of the console command.
@@ -39,7 +39,7 @@ class checkCounterPartyFromConversations extends Command
                 'Content-Type' => 'application/json'
                 ]
             ];
-            
+
         foreach ($allUsers as $item) {
             try {
                 $accountId = $item->accountId;
@@ -51,7 +51,7 @@ class checkCounterPartyFromConversations extends Command
                     CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
                     $this->info('Продолжение выполнения команды.');
                 }
-                
+
             } catch (Exception $e) {
                 Log::info('Непредвиденная ошибка' . $e->getMessage());
                 continue;
