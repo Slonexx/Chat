@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerorderController;
 use App\Http\Controllers\integration\connectController;
 use App\Http\Controllers\integration\entity\counterparty;
 use App\Http\Controllers\Setting\AutomatizationController;
+use App\Http\Controllers\Setting\sendTemplateController;
 use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,7 +17,7 @@ Route::middleware('api')->post('integration/entity/counterparty', [counterparty:
 Route::middleware('api')->get('integration/entity/counterparty/all/metadata', [counterparty::class, 'metadataStates']);
 Route::get('integration/entity/counterparty', [counterparty::class, 'creatingAgent']);
 
-Route::post('/webhook', [AutomatizationController::class, 'sendTemplate']);
+Route::post('/webhook', [sendTemplateController::class, 'sendTemplate']);
 
 //createCounterparty
 Route::get('counterparty/create/{accountId}', [CounterpartyController::class, 'create']);
