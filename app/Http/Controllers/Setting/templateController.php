@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Setting;
 
 use App\Clients\MsClient;
 use App\Http\Controllers\Controller;
+use App\Models\Automation_scenario;
 use App\Models\MainSettings;
 use App\Models\MsEntityFields;
 use App\Models\organizationModel;
 use App\Models\polesModel;
+use App\Models\Scenario;
 use App\Models\templateModel;
 use App\Models\Templates;
 use App\Models\Variables;
@@ -509,10 +511,21 @@ class templateController extends Controller
                 $er = $res->error($setting, 'Настройки по данному accountId не найдены');
                 return response()->json($er);
             }
-            $setting->first()
+            $templateReq = $setting->first()
                 ->templates()
-                ->where("uuid", $uuid)
+                ->where("uuid", $uuid);
+
+            $templateId = $templateReq->get(["templates.id"])
+                ->first()
+                ->id;
+
+            Scenario::where("template_id", $templateId)
                 ->delete();
+
+            Automation_scenario::where("template_id", $templateId)
+            ->delete();
+
+            $templateReq->delete();
 
             $success = $res->success("", 'Успешно удалено');
             return response()->json($success);
