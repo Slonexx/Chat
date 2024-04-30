@@ -132,6 +132,26 @@ class templateController extends Controller
                     $record->delete();
             }
 
+            // $mainSet = MainSettings::where("account_id", $accountId)->get()->first();
+            // $req = Templates::where("main_settings_id", $mainSet->id)
+            //     ->where("title", $data->title);
+
+            // $reqResult = $req->get();
+            
+            // if (!$reqResult->isEmpty()) {
+            //     $templateIds = $reqResult->pluck("id")
+            //     ->all();
+            //     Variables::whereIn("template_id", $templateIds)->delete();
+            //     $req->delete();
+            // }
+
+            // $setting = MainSettings::where("account_id", $accountId)->get();
+
+            // if($setting->isEmpty()){
+            //     $er = $res->error($setting, 'Настройки по данному accountId не найдены');
+            //     return response()->json($er);
+            // }
+
             $setting = MainSettings::where("account_id", $accountId)->get();
 
             if($setting->isEmpty()){

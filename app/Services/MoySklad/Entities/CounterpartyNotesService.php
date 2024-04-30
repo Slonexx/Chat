@@ -50,5 +50,29 @@ class CounterpartyNotesService{
         }
     }
 
+    function delete($counterpartyId, $noteId){
+        $fullKey = "msUrls." . self::URL_IDENTIFIER;
+        $notesUrl = Config::get($fullKey, null);
+        if(!is_string($notesUrl) || $notesUrl == null)
+            throw new Error("url отсутствует или имеет некорректный формат");
+        $replacedUrl = str_replace("{counterpartyId}", $counterpartyId, $notesUrl);
+        $preparedUrl = $replacedUrl . $noteId;
+        $resHandler = new HTTPResponseHandler();
+        try{
+            $response = $this->msC->delete($preparedUrl);
+            return $resHandler->handleOK($response, "заметка в контрагенте успешно удалена");
+
+        } catch(RequestException $e){
+            if($e->hasResponse()){
+                $response = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                $encodedBody = $response->getBody()->getContents();
+                throw new MsException("ошибка при удалении заметки в контрагенте|" . $encodedBody, $statusCode);
+            } else {
+                throw new MsException("неизвестная ошибка при удалении заметки в контрагенте", previous:$e);
+            }
+        }
+    }
+
 
 }

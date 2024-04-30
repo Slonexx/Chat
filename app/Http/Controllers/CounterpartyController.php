@@ -6,6 +6,7 @@ use App\Clients\MoySklad;
 use App\Clients\MoySkladAsync;
 use App\Clients\oldMoySklad;
 use App\Exceptions\AgentFindLogicException;
+use App\Exceptions\CounterpartyControllerException;
 use App\Jobs\ProcessNotes;
 use App\Models\MessengerAttributes;
 use App\Models\Notes;
@@ -19,6 +20,8 @@ use App\Services\HandlerService;
 use App\Services\MoySklad\AgentUpdateLogicService;
 use App\Services\MoySklad\Attributes\oldCounterpartyS;
 use App\Services\MoySklad\CreateNotesLogicService;
+use App\Services\MoySklad\Entities\CounterpartyNotesService;
+use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
 use DateTime;
 use Error;
@@ -27,9 +30,6 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use stdClass;
-
-
-class CounterpartyControllerException extends Exception {}
 
 class CounterpartyController extends Controller
 {
@@ -456,5 +456,87 @@ class CounterpartyController extends Controller
         }
         
 
+    }
+
+    function checkRate(Request $request, $accountId){
+        $messageStack = [];
+        try {
+            $msClient = new MoySklad($accountId);
+            $agentS = new CounterpartyService($accountId, $msClient);
+            $agentRes = $agentS->getWithLimit(1);
+
+            $counterparty = $agentRes->data->rows;
+            $messageStack[] = $agentRes->message;
+            if(count($counterparty) == 0)
+                throw new CounterpartyControllerException("Отсутствуют контрагенты в МС");
+
+            $counterpartyId = $counterparty[0]->id;
+
+            $body = new stdClass();
+            $body->description = "Проверка создания заметки";
+
+            $counterpartyNotesS = new CounterpartyNotesService($accountId, $msClient);
+
+            $noteCreateRes = $counterpartyNotesS->create($counterpartyId, $body);
+            $noteId = $noteCreateRes->data[0]->id;
+            $messageStack[] = $noteCreateRes->message;
+
+            $noteDeleteRes = $counterpartyNotesS->delete($counterpartyId, $noteId);
+            $messageStack[] = $noteDeleteRes->message;
+            return response()->json($messageStack);
+
+        } catch (Exception $e) {
+            $current = $e;
+            $messages = [];
+            $statusCode = 500;//or HTTP Exception code
+
+            while ($current !== null) {
+                $filePath = $current->getFile();
+                $fileLine = $current->getLine();
+                $message = $current->getMessage();
+                
+                $nextError = $current->getPrevious();
+
+                $parts = explode('|', $message);
+
+                if (count($parts) === 2) {
+                    $text = $parts[0];
+                    $json_str = array_pop($parts);
+
+                    $value = [
+                        "message" => $text,
+                        "data" => json_decode($json_str)
+                    ];
+                    if($nextError === null){
+                        $messageStack["message"] = $text;
+                        $code = $current->getCode();
+                        if($code >= 400)
+                            $statusCode = $code;
+                    }
+                } else {
+                    $value = [
+                        "message" => $message
+                    ];
+                    if($nextError === null){
+                        $messageStack["message"] = $message;
+                        $code = $current->getCode();
+                        if($code >= 400)
+                            $statusCode = $code;
+                    }
+                }
+
+
+                $fileName = basename($filePath);
+
+                $key = "{$fileName}:{$fileLine}";
+                
+                $messages[] = [
+                    $key => $value
+                ];
+                $current = $current->getPrevious();
+            }
+            $messageStack["error"] = $messages;
+            return response()->json($messageStack, $statusCode);
+        }
     }
 }
