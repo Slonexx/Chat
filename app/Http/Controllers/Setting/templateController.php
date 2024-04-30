@@ -119,7 +119,6 @@ class templateController extends Controller
             $idCreatePole = $request->idCreatePole ?? [];
             $idCreateAddPole = $request->idCreateAddPole ?? [];
             
-            
             $model = new templateModel();
             
             $existingRecords = MainSettings::join("templates", "main_settings.id", "=", "templates.main_settings_id")
@@ -128,8 +127,7 @@ class templateController extends Controller
                 ->get("templates.*");
             
             if (!$existingRecords->isEmpty()) {
-                foreach($existingRecords as $record)
-                    $record->delete();
+                throw new Exception("Шаблон с данным именем уже существует");
             }
 
             // $mainSet = MainSettings::where("account_id", $accountId)->get()->first();
@@ -142,14 +140,9 @@ class templateController extends Controller
             //     $templateIds = $reqResult->pluck("id")
             //     ->all();
             //     Variables::whereIn("template_id", $templateIds)->delete();
-            //     $req->delete();
-            // }
-
-            // $setting = MainSettings::where("account_id", $accountId)->get();
-
-            // if($setting->isEmpty()){
-            //     $er = $res->error($setting, 'Настройки по данному accountId не найдены');
-            //     return response()->json($er);
+            //     $reqResult->each(function($template){
+            //         $template->delete();
+            //     });
             // }
 
             $setting = MainSettings::where("account_id", $accountId)->get();
@@ -194,69 +187,6 @@ class templateController extends Controller
             $success = $res->success($data, 'Успешно сохранено');
             return response()->json($success);
 
-            //$template = new Templates();
-            
-            //::where('accountId', $accountId)->where('name', $data->name)->get();
-
-            //проверка на имя
-
-
-            // if (!$existingRecords->isEmpty()) {
-            //     foreach ($existingRecords as $record) {
-            //         $polesModel = polesModel::where('accountId', $accountId)->where('name_uid', ($record->toArray())['name_uid'])->get();
-            //         if (!$polesModel->isEmpty()) {
-            //             foreach ($polesModel as $item) {
-            //                 $item->delete();
-            //             }
-            //         }
-            //         $record->delete();
-            //     }
-            // }
-
-            // $model->accountId = $accountId;
-            // $model->organId = $data->organId;
-
-            // $model->name = $data->name;
-            // $model->name_uid = $name_uid;
-
-            // $model->message = $data->message;
-            // $model->save();
-
-
-            // if (count($idCreatePole) + count($idCreateAddPole) > 0)
-            //     if ((count($idCreatePole) >= count($idCreateAddPole))) {
-            //         foreach ($data->idCreatePole as $id => $item) {
-            //             $model = new polesModel();
-            //             $model->accountId = $accountId;
-            //             $model->name = $data->name;
-            //             $model->name_uid = $name_uid;
-
-            //             $model->i = $id;
-            //             if (isset($data->idCreatePole->$id)) $model->pole = $data->idCreatePole->$id;
-            //             else $model->pole = null;
-            //             if (isset($data->idCreateAddPole->$id)) $model->add_pole = $data->idCreateAddPole->$id;
-            //             else $model->add_pole = null;
-            //             $model->entity = null;
-
-            //             $model->save();
-            //         }
-            //     } else {
-            //         foreach ($data->idCreateAddPole as $id => $item) {
-            //             $model = new polesModel();
-            //             $model->accountId = $accountId;
-            //             $model->name = $data->name;
-            //             $model->name_uid = $name_uid;
-
-            //             $model->i = $id;
-            //             if (isset($data->idCreatePole->$id)) $model->pole = $data->idCreatePole->$id;
-            //             else $model->pole = null;
-            //             if (isset($data->idCreateAddPole->$id)) $model->add_pole = $data->idCreateAddPole->$id;
-            //             else $model->add_pole = null;
-            //             $model->entity = null;
-
-            //             $model->save();
-            //         }
-            //     }
         } catch (Exception | Error $e) {
           return response()->json([
                 'status' => false,
