@@ -217,7 +217,7 @@ class AutomatizationController extends Controller{
                     $res = $autoS->sendTemplate($type, $href, $employeeIdRes->data);
                     return $handlerS->responseHandler($res, true, false);
                 } else {
-                    return response()->json();
+                    return response()->json("Статус не был изменён");
                 }
             }
         } catch(Exception | Error $e){
