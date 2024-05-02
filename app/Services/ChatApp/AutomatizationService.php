@@ -5,6 +5,7 @@ use App\Clients\oldMoySklad;
 use App\Clients\newClient;
 use App\Models\MainSettings;
 use App\Models\settingModel;
+use App\Services\MoySklad\Entities\oldCounterpartyService;
 use App\Services\MoySklad\Entities\oldCustomOrderService;
 use App\Services\MoySklad\Entities\DemandService;
 use App\Services\MoySklad\Entities\InvoiceoutService;
@@ -34,13 +35,21 @@ class AutomatizationService{
             "demand" => new DemandService($this->accountId),
             "salesreturn" => new SalesReturnService($this->accountId),
             "invoiceout" => new InvoiceoutService($this->accountId),
+            "counterparty" => new oldCounterpartyService($this->accountId),
         ];
         $service = $entityServices[$type];
-        $splUrl = explode("/", $href);
-        $entityId = array_pop($splUrl);
-        $expArray = ["state", "channel", "project", "agent"];
+        $entityId = basename($href);
+
+        $expArray = null;
+        $isCounterparty = $type == "counterparty";
+        if(!$isCounterparty){
+            $expArray = ["state", "channel", "project", "agent"];
+        } else {
+            $expArray = ["state"];
+        }
         if($employeeId == null)
             array_push($expArray, "owner");
+
         $docRes = $service->getByIdWithExpand($entityId, $expArray);
 
         if(!$docRes->status)
@@ -53,7 +62,15 @@ class AutomatizationService{
         $state_id = $docRes->data->state->id;
         $channel_id = $docRes->data->channel->id ?? false;
         $project_id = $docRes->data->project->id ?? false;
-        $agentAttributes = $docRes->data->agent->attributes ?? false;
+        if(!$isCounterparty){
+            $agentAttributes = $docRes->data->agent->attributes ?? false;
+            $agentEmail = $docRes->data->agent->email ?? false;
+            $agentPhone = $docRes->data->agent->phone ?? false;
+        } else {
+            $agentAttributes = $docRes->data->attributes ?? false;
+            $agentEmail = $docRes->data->email ?? false;
+            $agentPhone = $docRes->data->phone ?? false;
+        }
         $desc = $docRes->data->description ?? false;
 
         if($employeeId == null){
@@ -113,7 +130,7 @@ class AutomatizationService{
 
             $body = new stdClass();
             if(!$agentAttributes){
-                $messengerErr = "У данного документа у контрагента отсутствуют доп поля месседжеров";
+                $messengerErr = "У данного $type у контрагента отсутствуют доп поля месседжеров";
                 if($desc == false)
                     $body->description = $messengerErr;
                 else
@@ -136,12 +153,23 @@ class AutomatizationService{
                 $messengerId = $messengerAttributes[$dbMessenger];
                 $findedAttribute = array_filter($agentAttributes, fn($val) => $val->id == $messengerId);
                 if(count($findedAttribute) == 0){
-                    $messengerErr = "У данного документа у контрагента не заполнен месседжер {$messenger}";
+                    $messengerErr = "У данного $type у контрагента не заполнен месседжер {$messenger}";
                     if($desc == false)
                         $body->description = $messengerErr;
                     else
                         $body->description += PHP_EOL . $messengerErr;
                     $this->msC->put($type, $body, $entityId);
+                    if($messenger == "whatsapp" || $messenger == "telegram"){
+                        if($agentPhone)
+                            $chatId = $agentPhone;
+                    } else if($messenger == "email"){
+                        if($agentEmail)
+                            $chatId = $agentEmail;
+                    } else {
+                        $messengerErr = "У данного $type у контрагента не заполнен email и phone";
+                        $body->description = $messengerErr;
+                        $this->msC->put($type, $body, $entityId);
+                    }
                     continue;
                 } else {
                     $firstAttr = array_shift($findedAttribute);
@@ -149,7 +177,6 @@ class AutomatizationService{
                 }
                 
             }
-            
         
             $prepTemplRes = $templateS->getTemplate($type, $entityId, $template_uuid);
             if(!$prepTemplRes->status){
