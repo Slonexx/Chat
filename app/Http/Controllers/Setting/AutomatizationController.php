@@ -1,27 +1,15 @@
 <?php
 
 namespace App\Http\Controllers\Setting;
+
 use App\Clients\oldMoySklad;
-use App\Clients\MsClientAdd;
 use App\Http\Controllers\Controller;
-use App\Models\Automation;
-use App\Models\AutomationSettings;
-use App\Models\CompanySettings;
 use App\Models\employeeModel;
-use App\Models\MainSettings;
-use App\Models\organizationModel;
 use App\Models\Scenario;
 use App\Models\Templates;
 use App\Services\HandlerService;
 use App\Services\ChatApp\AutomatizationService;
-use App\Services\MoySklad\Entities\oldCustomOrderService;
-use App\Services\MoySklad\Entities\DemandService;
 use App\Services\MoySklad\Entities\EmployeeService;
-use App\Services\MoySklad\Entities\InvoiceoutService;
-use App\Services\MoySklad\Entities\ProjectService;
-use App\Services\MoySklad\Entities\SalesChannelService;
-use App\Services\MoySklad\Entities\SalesReturnService;
-use App\Services\MoySklad\FrontendLogicService;
 use Error;
 use Exception;
 use GuzzleHttp\Exception\BadResponseException;
@@ -83,6 +71,12 @@ class AutomatizationController extends Controller{
                     $obj->message = "Статус не был изменён";
                     $messageStack[] = $obj;
                 }
+            }
+            if(empty($errors)){
+                return response()->json($messageStack);
+            } else {
+                $mesAr = array_merge($messageStack, $errors);
+                return response()->json($mesAr, 400);
             }
             if(empty($errors)){
                 return response()->json($messageStack);
