@@ -121,7 +121,18 @@ class AutomatizationService{
                 return $this->msC->put($type, $body, $entityId);
                 
             } else {
-                $messengerId = $messengerAttributes[$messenger];
+                //chatapp/db
+                $compliances = [
+                    "grWhatsApp" => "whatsapp",
+                    "telegram" => "telegram",
+                    "email" => "email",
+                    "vkontakte" => "vk",
+                    "instagram" => "instagram",
+                    "telegramBot" => "telegram_bot",
+                    "avito" => "avito"
+                ];
+                $dbMessenger = $compliances[$messenger];
+                $messengerId = $messengerAttributes[$dbMessenger];
                 $findedAttribute = array_filter($agentAttributes, fn($val) => $val->id == $messengerId);
                 if(count($findedAttribute) == 0){
                     $messengerErr = "У данного документа у контрагента не заполнен месседжер {$messenger}";
