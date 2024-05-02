@@ -29,11 +29,31 @@ class CounterpartyService{
     }
 
     public function getById(string $id) {
-        $res = $this->msC->getById(self::URL_IDENTIFIER, $id);
-        if(!$res->status)
-            return $res->addMessage("Ошибка при получении контрагента");
-        else
-            return $res;
+        // $res = $this->msC->getById(self::URL_IDENTIFIER, $id);
+        // if(!$res->status)
+        //     return $res->addMessage("Ошибка при получении контрагента");
+        // else
+        //     return $res;
+        // $fullKey = "msUrls." . self::URL_IDENTIFIER;
+        // $url = Config::get($fullKey, null);
+        // $resHandler = new HTTPResponseHandler();
+        // if(!is_string($url) || $url == null)
+        //     throw new Error("url отсутствует или имеет некорректный формат");
+        // try{
+        //     $urlWithId =  $url . $id;
+        //     $response = $this->msC->get($urlWithId);
+        //     return $resHandler->handleOK($response, "контрагент c id=$id найден");
+
+        // } catch(RequestException $e){
+        //     if($e->hasResponse()){
+        //         $response = $e->getResponse();
+        //         $statusCode = $response->getStatusCode();
+        //         $encodedBody = $response->getBody()->getContents();
+        //         throw new MsException("ошибка при получении контрагента |" . $encodedBody, $statusCode);
+        //     } else {
+        //         throw new MsException("неизвестная ошибка при поиске с limit=$limit", previous:$e);
+        //     }
+        // }
     }
 
     public function getWithLimit(int $limit) {
