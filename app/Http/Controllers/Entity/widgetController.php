@@ -131,11 +131,12 @@ class widgetController extends Controller
 
 
             try {
-                $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $entity_type . '/' . $entityId);
+                $url = 'https://api.moysklad.ru/api/remap/1.2/entity/' . $entity_type . '/' . $entityId;
                 if ($entity_type == 'counterparty') {
-                    $agent = $documents;
+                    $agent = $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $entity_type . '/' . $entityId);
                 } else {
-                    $agent = $msClient->get($documents->agent->meta->href);
+                    $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $entity_type . '/' . $entityId.'?expand=agent');
+                    $agent = $documents->agent;
                 }
 
             } catch (BadResponseException $e) {
@@ -175,15 +176,9 @@ class widgetController extends Controller
 
             if (property_exists($agent, 'phone')) {
                 $phone = str_replace(" ", "", $agent->phone);
-                if (strpos($phone, "+7") === 0) {
-                    $phone = substr($phone, 2);
-                }
-                if (strlen($phone) < 12 and strpos($phone, "8") === 0) {
-                    $phone = "+7" . $phone;
-                }
-                if (strpos($phone, "+") === 0) {
-                    $phone = substr($phone, 1);
-                }
+                $phone = str_replace("(", "", $phone);
+                $phone = str_replace(")", "", $phone);
+                $phone = substr($phone, -10);
                 if (strlen($phone) > 16) {
                     return response()->json([
                         'status' => false,
