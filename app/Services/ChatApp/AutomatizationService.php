@@ -94,7 +94,7 @@ class AutomatizationService{
         }
 
         if(count($filteredTemplatesAuto) == 0)
-            return $this->res->success("");
+            return $this->res->success("Не найдены автоматизации, соответствующие $type c Id=$entityId");
 
         $templateS = new TemplateService($this->accountId);
         $messengerAttributes = MainSettings::join("messenger_attributes as mes", "main_settings.id", "=", "mes.main_settings_id")
@@ -106,7 +106,7 @@ class AutomatizationService{
         foreach($filteredTemplatesAuto as $t){
             $template_uuid = $t->template_uuid;
             if($template_uuid == null)
-            continue;
+                continue;
 
             $lineId = $t->line;
             $messenger = $t->messenger;
@@ -118,7 +118,8 @@ class AutomatizationService{
                     $body->description = $messengerErr;
                 else
                     $body->description += PHP_EOL . $messengerErr;
-                return $this->msC->put($type, $body, $entityId);
+                $this->msC->put($type, $body, $entityId);
+                continue;
                 
             } else {
                 //chatapp/db
@@ -140,7 +141,8 @@ class AutomatizationService{
                         $body->description = $messengerErr;
                     else
                         $body->description += PHP_EOL . $messengerErr;
-                    return $this->msC->put($type, $body, $entityId);
+                    $this->msC->put($type, $body, $entityId);
+                    continue;
                 } else {
                     $firstAttr = array_shift($findedAttribute);
                     $chatId = $firstAttr->value;
@@ -157,13 +159,13 @@ class AutomatizationService{
 
             $newClient = new newClient($employeeId);
             try {
-                $response = $newClient->sendMessage($lineId, $messenger, $chatId, $template);
+                $newClient->sendMessage($lineId, $messenger, $chatId, $template);
             } catch (BadResponseException $e) {
                 return $newClient->ResponseExceptionHandler($e);
             }
             
         }
-        return $this->res->success("");
+        return $this->res->success("Все шаблоны отправлены");
         
     }
 }
