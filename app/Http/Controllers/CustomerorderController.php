@@ -46,8 +46,10 @@ class CustomerorderController extends Controller
             //$orgEmployees = $orgsReq->pluck("employeeId")->all();
             foreach($orgs as $orgItem){
                 $employeeId = $orgItem->employeeId;
+                $lineId = $orgItem->lineId;
+                $lineName = $orgItem->lineName;
                 $chatS = new ChatService($employeeId);
-                $chatsRes = $chatS->getAllChatForEmployee(50, $orgItem->lineId);
+                $chatsRes = $chatS->getAllChatForEmployee(50, $lineId);
                 $messageStack[] = $chatsRes->message;
                 $agentH = new AgentMessengerHandler($accountId, $msCnew);
                 foreach($chatsRes->data as $messenger => $chats){
@@ -94,13 +96,18 @@ class CustomerorderController extends Controller
 
                             $customerOrders = $ordersByAgentRes->data->rows;
                             $agentControllerS = new AgentControllerLogicService($accountId, $msCnew);
+                            $infoForTask = new stdClass();
+                            $infoForTask->lineId = $lineId;
+                            $infoForTask->lineName = $lineName;
+                            $infoForTask->messenger = $messenger;
+
                             if(count($customerOrders) == 0){
-                                $agentControllerS->createOrderAndAttributes($orderDbSettings, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
+                                $agentControllerS->createOrderAndAttributes($orderDbSettings, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder, $infoForTask);
                             } else {
                                 $isCreate = $customOrderS->checkStateTypeEqRegular($customerOrders);
                                 if($isCreate){
                                     //Regular
-                                    $agentControllerS->createOrderAndAttributes($orderDbSettings, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
+                                    $agentControllerS->createOrderAndAttributes($orderDbSettings, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder, $infoForTask);
 
                                 } else {
                                     //Final
