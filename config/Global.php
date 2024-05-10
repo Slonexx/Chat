@@ -38,6 +38,8 @@ return [
     "salesreturnMetadataAttributes" => "{$MsURL}entity/salesreturn/metadata/attributes/",
     "salesreturn" => "{$MsURL}entity/salesreturn/",
 
+    "task" => "{$MsURL}entity/task/",
+
 
     'url' => env('APP_URL'),
     'url_' => env('APP_URL_'),

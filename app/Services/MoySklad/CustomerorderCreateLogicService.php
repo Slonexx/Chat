@@ -76,6 +76,10 @@ class CustomerorderCreateLogicService{
         if($salesChannel)
             $body->salesChannel = $salesChannel;
 
+        $state = $preparedMetas->state;
+        if($state)
+            $body->state = $state;
+
         $handlerS = new HandlerService();
         $employeeMeta = $handlerS->FormationMetaById("employee", "employee", $responsibleUuid);
         $preparedEmployeeMeta = $handlerS->FormationMeta($employeeMeta);
@@ -96,7 +100,8 @@ class CustomerorderCreateLogicService{
             default:
                 break;
         }
-        $customerOrderS->create($body);
+        $orderRes = $customerOrderS->create($body);
+        return $orderRes->data;
         
     }
 }
