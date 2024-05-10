@@ -42,18 +42,18 @@ class createCustomerOrder extends Command
                 'Content-Type' => 'application/json'
                 ]
             ];
-        $lids = Lid::whereIn("accountId", $mainSet)->pluck("is_activity_settings", "account_id")->all();
+        $lids = Lid::whereIn("accountId", $mainSet)->pluck("is_activity_settings", "accountId")->all();
         foreach($lids as $key => $item){
             try {
                 if($item){
                     $accountId = $item->account_id;
                     $url = Config::get('Global.url') /*''*/ . "api/customerorder/create/${$key}";
                     //CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
-                    
+
                     $this->info('Продолжение выполнения команды.');
 
                 }
-                
+
             } catch (Exception $e) {
                 Log::info('Непредвиденная ошибка' . $e->getMessage());
                 continue;
