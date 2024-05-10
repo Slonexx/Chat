@@ -52,7 +52,7 @@
         let accountId = '{{ $accountId }}'
 
 
-        let message = '{{ $message }}'
+        let message = @json($message);
         if (message != '') {
             if (message == 'Настройки сохранены') notificationMessageS.innerText = message
             else {

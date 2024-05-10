@@ -22,6 +22,7 @@ use App\Services\MoySklad\Attributes\oldCounterpartyS;
 use App\Services\MoySklad\CreateNotesLogicService;
 use App\Services\MoySklad\Entities\CounterpartyNotesService;
 use App\Services\MoySklad\Entities\CounterpartyService;
+use App\Services\Response;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
 use DateTime;
 use Error;
@@ -110,7 +111,7 @@ class CounterpartyController extends Controller
                 $messageStack[] = "Для сотрудника $employeeId были созданы и/или обновлены все контрагенты";
             }
             return response()->json();
-            
+
         } catch(Exception | Error $e){
             $current = $e;
             $messages = [];
@@ -120,7 +121,7 @@ class CounterpartyController extends Controller
                 $filePath = $current->getFile();
                 $fileLine = $current->getLine();
                 $message = $current->getMessage();
-                
+
                 $nextError = $current->getPrevious();
 
                 $parts = explode('|', $message);
@@ -155,7 +156,7 @@ class CounterpartyController extends Controller
                 $fileName = basename($filePath);
 
                 $key = "{$fileName}:{$fileLine}";
-                
+
                 $messages[] = [
                     $key => $value
                 ];
@@ -268,7 +269,7 @@ class CounterpartyController extends Controller
                             }
 
                             //}
-                            
+
                         //create
                         } else if(empty($agents)){
                             match($messenger){
@@ -287,9 +288,9 @@ class CounterpartyController extends Controller
             }
             Notes::where('accountId', $accountId)
                 ->update(['last_start' => $date]);
-            
+
             return response()->json();
-            
+
         } catch(Exception | Error $e){
             $current = $e;
             $messages = [];
@@ -299,7 +300,7 @@ class CounterpartyController extends Controller
                 $filePath = $current->getFile();
                 $fileLine = $current->getLine();
                 $message = $current->getMessage();
-                
+
                 $nextError = $current->getPrevious();
 
                 $parts = explode('|', $message);
@@ -334,7 +335,7 @@ class CounterpartyController extends Controller
                 $fileName = basename($filePath);
 
                 $key = "{$fileName}:{$fileLine}";
-                
+
                 $messages[] = [
                     $key => $value
                 ];
@@ -410,7 +411,7 @@ class CounterpartyController extends Controller
                 $filePath = $current->getFile();
                 $fileLine = $current->getLine();
                 $message = $current->getMessage();
-                
+
                 $nextError = $current->getPrevious();
 
                 $parts = explode('|', $message);
@@ -445,7 +446,7 @@ class CounterpartyController extends Controller
                 $fileName = basename($filePath);
 
                 $key = "{$fileName}:{$fileLine}";
-                
+
                 $messages[] = [
                     $key => $value
                 ];
@@ -454,7 +455,7 @@ class CounterpartyController extends Controller
             $messageStack["error"] = $messages;
             return response()->json($messageStack, $statusCode);
         }
-        
+
 
     }
 
@@ -494,7 +495,7 @@ class CounterpartyController extends Controller
                 $filePath = $current->getFile();
                 $fileLine = $current->getLine();
                 $message = $current->getMessage();
-                
+
                 $nextError = $current->getPrevious();
 
                 $parts = explode('|', $message);
@@ -529,7 +530,7 @@ class CounterpartyController extends Controller
                 $fileName = basename($filePath);
 
                 $key = "{$fileName}:{$fileLine}";
-                
+
                 $messages[] = [
                     $key => $value
                 ];

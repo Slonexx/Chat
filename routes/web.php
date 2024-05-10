@@ -12,6 +12,7 @@ use App\Http\Controllers\Setting\CreateAuthTokenController;
 use App\Http\Controllers\Setting\LidController;
 use App\Http\Controllers\Setting\organizationController;
 use App\Http\Controllers\Setting\templateController;
+use App\Http\Controllers\Setting\webCounterpartyController;
 use App\Http\Controllers\vendor\vendorEndpoint;
 use Illuminate\Support\Facades\Route;
 
@@ -108,8 +109,8 @@ Route::group(["prefix" => "Setting"], function () {
 НОВЫЕ ОБНОВЛЕНИЯ ВЫГРУЗКИ КОТРАГЕНТОВ
  **/
 Route::group(["prefix" => "Setting"], function () {
-    Route::get('/counterparty/{accountId}', [CounterpartyController::class, 'get'])->name('counterparty');
-    Route::post('/counterparty/{accountId}', [CounterpartyController::class, 'save']);
+    Route::get('/counterparty/{accountId}', [webCounterpartyController::class, 'get'])->name('counterparty');
+    Route::post('/counterparty/{accountId}', [webCounterpartyController::class, 'save']);
 });
 
 

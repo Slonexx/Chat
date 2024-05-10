@@ -46,6 +46,9 @@
                     <a id="link_8" class="mt-1"
                        href="/Setting/lid/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}">
                         ЛИД </a>
+                    <a id="link_9" class="mt-1"
+                       href="/Setting/counterparty/{{$accountId}}?isAdmin={{ request()->isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}">
+                        Контрагенты и заметки </a>
                 </div>
             </div>
         </div>

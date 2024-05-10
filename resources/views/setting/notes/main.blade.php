@@ -1,11 +1,15 @@
 @extends('setting.temp_main_base')
-@section('item', 'link_8')
-@section('route_name', 'ЛИД')
+@section('item', 'link_9')
+@section('route_name', 'Контрагенты и заметки')
 @section('form')
     <div id="notificationS" class="notification is-success" style="display: none"> <div id="notificationMessageS"></div> </div>
 
+    <script>
 
-    @include('setting.LID.html')
+    </script>
+
+
+    @include('setting.notes.html')
 
 
 

@@ -31,11 +31,29 @@ class LidController extends Controller
             'message' => $req->data
         ]);
 
+
+        $req = $msClient->getByUrl(Config::get("Global.moyskladJsonApiEndpointUrl").'/entity/organization');
+        $organization = [];
+        foreach ($req->data->rows as $item){
+            $req = $msClient->getByUrl(Config::get("Global.moyskladJsonApiEndpointUrl").'/entity/organization/'.$item->id.'?expand=accounts');
+            $organization[] = $req->data;
+        }
+
+        $project = $msClient->getByUrl(Config::get("Global.moyskladJsonApiEndpointUrl").'/entity/project');
+        $project = $project->data->rows;
+
+        $saleschannel = $msClient->getByUrl(Config::get("Global.moyskladJsonApiEndpointUrl").'/entity/saleschannel');
+        $saleschannel = $saleschannel->data->rows;
+
         $model = (Lid::getInformationALLAcc($accountId));
 
 
         return view('setting.LID.main', [
             'employee' => $employee,
+            'organization' => $organization,
+            'project' => $project,
+            'saleschannel' => $saleschannel,
+
             'model' => $model->toArray,
 
             'accountId' => $accountId,
@@ -76,8 +94,15 @@ class LidController extends Controller
 
                     'message' => $findOrCreateRes->message,
                 ]);
-
         }
+
+
+
+        $project_uid = $request->project_uid ?? null;
+        if ($project_uid != null and $project_uid == 0) $project_uid = null;
+
+        $sales_channel_uid = $request->sales_channel_uid ?? null;
+        if ($sales_channel_uid != null and $sales_channel_uid == 0) $sales_channel_uid = null;
 
         $data = [
             'accountId' => $accountId,
@@ -86,8 +111,12 @@ class LidController extends Controller
             'lid' => 'lid',
             'responsible' => $request->responsible ?? '0',
             'responsible_uuid' => $request->responsible_uuid ?? null,
-        ];
 
+            'organization' => $request->organization ?? null,
+            'organization_account' => $request->organization_account ?? null,
+            'project_uid' => $project_uid,
+            'sales_channel_uid' => $sales_channel_uid,
+        ];
 
         $model = Lid::createOrUpdate($data);
 

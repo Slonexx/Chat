@@ -40,6 +40,11 @@ class Lid extends Model
         $model->responsible = $array['responsible'];
         $model->responsible_uuid = $array['responsible_uuid'];
 
+        $model->organization = $array['organization'];
+        $model->organization_account = $array['organization_account'];
+        $model->project_uid = $array['project_uid'];
+        $model->sales_channel_uid = $array['sales_channel_uid'];
+
         try {
             $model->save();
             return (object) ['status' => true];
