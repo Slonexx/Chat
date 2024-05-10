@@ -17,6 +17,11 @@ return new class extends Migration
             $table->uuid("lid");
             $table->string("responsible", 2);
             $table->uuid("responsible_uuid", 2)->nullable();
+
+            $table->uuid("organization", 36);
+            $table->uuid("organization_account", 36)->nullable();
+            $table->uuid("project_uid", 36)->nullable();
+            $table->uuid("sales_channel_uid", 36)->nullable();
             $table->timestamps();
         });
     }

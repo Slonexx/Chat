@@ -6,31 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+
+    public function up(): void
     {
         Schema::create('notes', function (Blueprint $table) {
             $table->id();
 
             $table->uuid('accountId');
             $table->boolean('is_activity_agent');
-            $table->uuid('notes');
+            $table->boolean('notes')->nullable();
             $table->boolean('is_messenger');
             $table->timestamp('last_start')->nullable();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+
+    public function down(): void
     {
         Schema::dropIfExists('notes');
     }
