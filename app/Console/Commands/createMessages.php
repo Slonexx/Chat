@@ -44,7 +44,7 @@ class createMessages extends Command
             try {
                 $accountId = $item->accountId;
                 $notesCollection = Notes::where("accountId", $accountId)
-                    ->where("is_activity_agent", true)
+                    ->where("notes", true)
                     ->get();
                 if($notesCollection->isNotEmpty()){
                     $url = Config::get('Global.url') /*''*/ . "api/counterparty/import_dialogs/${$accountId}";
