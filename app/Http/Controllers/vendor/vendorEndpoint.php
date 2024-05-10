@@ -14,7 +14,7 @@ class vendorEndpoint extends Controller
         $data = json_decode(json_encode($request->all()));
         $app = Lib::load($apps, $accountId);
 
-        if (property_exists($data->access[0], 'access_token')) $accessToken = $data->access[0]->access_token;
+        if (property_exists($data, 'access')) $accessToken = $data->access[0]->access_token;
         else $accessToken = $app->TokenMoySklad;
 
         if (!$app->getStatusName()) {
