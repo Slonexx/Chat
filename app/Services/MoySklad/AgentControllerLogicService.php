@@ -6,6 +6,7 @@ use App\Exceptions\AgentControllerLogicException;
 use App\Services\HandlerService;
 use App\Services\MoySklad\Attributes\CustomorderS;
 use App\Services\MoySklad\Entities\CustomEntityService;
+use App\Services\MoySklad\Entities\TaskService;
 use App\Services\MoySklad\RequestBody\Attributes\UpdateValuesService;
 use App\Services\Response;
 use Error;
@@ -84,6 +85,8 @@ class AgentControllerLogicService{
                 $organization_account = $orderDbSettings->organization_account;
                 $project_uid = $orderDbSettings->project_uid;
                 $sales_channel_uid = $orderDbSettings->sales_channel_uid;
+                $states = $orderDbSettings->states;
+                                
                 $orderAttrS = new CustomorderS($this->accountId, $this->msC);
                 $orderAttrRes = $orderAttrS->getAllAttributes(true);
                 $orderLidAttr = array_filter($orderAttrRes->data, fn($value)=> $value->name == $lidName);
@@ -103,6 +106,9 @@ class AgentControllerLogicService{
                 $salesChannelMeta = null;
                 if($sales_channel_uid)
                     $salesChannelMeta = $handlerS->FormationMetaById("saleschannel", "saleschannel", $sales_channel_uid);
+                $states = null;
+                if($states)
+                    $stateMeta = $handlerS->FormationMetaById("state", "state", $states);
 
                 $preparedMetas = new stdClass();
                 $preparedMetas->agent = $handlerS->FormationMeta($agent->meta);
@@ -111,9 +117,25 @@ class AgentControllerLogicService{
                 $preparedMetas->organizationAccount = $organAccountMeta;
                 $preparedMetas->project = $projectMeta;
                 $preparedMetas->salesChannel = $salesChannelMeta;
+                $preparedMetas->state = $stateMeta;
                 
-                $customOrderS->createBySettings($agentId, $preparedMetas, $responsible, $responsibleUuid, $attributes);
+                $order = $customOrderS->createBySettings($agentId, $preparedMetas, $responsible, $responsibleUuid, $attributes);
+                $tasks = $orderDbSettings->tasks;
+                $lid = $orderDbSettings->lid; 
+
+                //create task
+                if($tasks){
+                    $body = new stdClass();
+                    $assignee = $handlerS->FormationMetaById("task", "employee", $lid);
+                    $body->assignee = $assignee;
+                    $body->description = "Клиент ожидает ответа";
+                    $body->operation = $handlerS->FormationMeta($order->meta);
+                    $taskS = new TaskService($this->accountId);
+                    $taskS->create($body);
+                }
             }
+
+            
 
         } catch(Exception | Error $e){
             throw new AgentControllerLogicException("Ошибка во время создания заказа", 2, $e);

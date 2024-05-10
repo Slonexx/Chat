@@ -85,6 +85,8 @@ class CustomerorderController extends Controller
                             $orderDbSettings->organization_account = $lid->organization_account;
                             $orderDbSettings->project_uid = $lid->project_uid;
                             $orderDbSettings->sales_channel_uid = $lid->sales_channel_uid;
+                            $orderDbSettings->states = $lid->states;
+                            $orderDbSettings->lid = $lid->lid;
                             
                             $agentHref = $agents[0]->meta->href;
                             $customOrderS = new CustomerorderCreateLogicService($accountId, $msCnew);
@@ -122,6 +124,7 @@ class CustomerorderController extends Controller
                 }
                 $successMessage = "Для сотрудника $employeeId были созданы и/или обновлены все контрагенты";
                 $messageStack[] = $isCreateOrder ? $successMessage : $successMessage . " и созданы заказы";
+                $messageStack[] = "Для сотрудника $employeeId была создана задача";
             }
 
             return response()->json();

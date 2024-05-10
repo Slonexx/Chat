@@ -10,4 +10,6 @@ return [
     "customEntityMeta" => "{$MsURL}context/companysettings/metadata/customEntities/",
     "customerorder" => "{$MsURL}entity/customerorder/",
     "customerorderMetadataAttributes" => "{$MsURL}entity/customerorder/metadata/attributes/",
+
+    "task" => "{$MsURL}entity/task/",
 ];
