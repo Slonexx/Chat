@@ -56,6 +56,17 @@
                 </div>
 
                 <div class="columns field">
+                    <div class="column is-3">Счет организации</div>
+                    <div class="column">
+                        <div class="select w-50 is-small is-link">
+                            <select id="states" name="states" class="w-100">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="columns field">
                     <div class="column is-3">Проект</div>
                     <div class="column">
                         <div class="select w-50 is-small is-link">
@@ -64,6 +75,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="columns field">
                     <div class="column is-3">Канал продаж</div>
                     <div class="column">
@@ -76,6 +88,7 @@
             </div>
 
         </div>
+
         <div class="box">
             <div class="notification is-info p-1" style="font-size: 1rem">
                 <span class="icon has-text-white"> <i class="fas fa-info-circle"></i> </span>
@@ -104,6 +117,25 @@
                 </div>
             </div>
 
+            <div id="dev_tasks" style="display: none">
+                <div class="notification is-info p-1" style="font-size: 1rem">
+                    <span class="icon has-text-white"> <i class="fas fa-info-circle"></i> </span>
+                    <span><b>Важно: </b> формирование задач доступно с опцией CRM в тарифе</span>
+                </div>
+
+                <div class="columns field">
+                    <div class="column is-3">Задачи</div>
+                    <div class="column">
+                        <div class="select w-50 is-small is-link">
+                            <select id="tasks" name="tasks" class="w-100">
+                                <option value="0">Нет</option>
+                                <option value="1">Да</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
         <br>
         <button class="button is-outlined gradient_focus"> сохранить</button>
@@ -113,6 +145,7 @@
 <script>
 
     const dev_organization = @json($organization);
+    const dev_states = @json($states);
     const dev_project = @json($project);
     const dev_saleschannel = @json($saleschannel);
 
@@ -143,32 +176,36 @@
 
         let organization = window.document.getElementById('organization')
         let organization_account = window.document.getElementById('organization_account')
+        let states = window.document.getElementById('states')
         let project_uid = window.document.getElementById('project_uid')
         let sales_channel_uid = window.document.getElementById('sales_channel_uid')
+        let tasks = window.document.getElementById('tasks')
 
 
         if (model != null) {
-            if (model.is_activity_settings == '1') {
-                is_activity_settings.checked = true
+            if (model.is_activity_settings === 1) is_activity_settings.checked = true
+            else is_activity_settings.checked = false
 
+
+            is_activity_order.value = model.is_activity_order
+            if (model.is_activity_order === 1){
                 if (model.organization != null) organization.value = model.organization
                 if (model.organization_account != null) {
                     onIsOrganizationAccount(organization)
                     organization_account.value = model.organization_account
                 }
+                if (model.states != null) states.value = model.states
+
                 if (model.project_uid != null) project_uid.value = model.project_uid
                 if (model.sales_channel_uid != null) sales_channel_uid.value = model.sales_channel_uid
-
             }
-            else is_activity_settings.checked = false
 
-            is_activity_order.value = model.is_activity_order
+
             responsible.value = model.responsible
             on_responsible_uuid(responsible)
 
-            if (model.responsible == '1') {
-                responsible_uuid.value = model.responsible_uuid
-            }
+            if (model.responsible === 1) responsible_uuid.value = model.responsible_uuid
+            if (model.responsible != '0' && model.responsible != null) if (model.tasks != null) tasks.value = model.tasks
         }
 
     }
@@ -176,15 +213,18 @@
     function setSelect() {
         let organization = window.document.getElementById('organization')
         let organization_account = window.document.getElementById('organization_account')
+        let states = window.document.getElementById('states')
         let project_uid = window.document.getElementById('project_uid')
         let sales_channel_uid = window.document.getElementById('sales_channel_uid')
 
         clearOption(organization)
         clearOption(organization_account)
+        clearOption(states)
         clearOption(project_uid)
         clearOption(sales_channel_uid)
 
         createOptions(dev_organization, organization)
+        createOptions(dev_states, states)
         createOptions([{'name': 'Не выбирать', 'id': '0'}], project_uid)
         createOptions([{'name': 'Не выбирать', 'id': '0'}], sales_channel_uid)
         createOptions(dev_project, project_uid)
@@ -228,6 +268,7 @@
     function on_responsible_uuid(box) {
         let div_employee = window.document.getElementById('div_employee')
         let responsible_uuid = window.document.getElementById('responsible_uuid')
+        let dev_tasks = window.document.getElementById('dev_tasks')
         div_employee.style.display = 'none'
         clearOption(responsible_uuid)
 
@@ -236,6 +277,9 @@
             div_employee.style.display = ''
             createOptions(employee, responsible_uuid)
         }
+
+        if (box.value == '0') dev_tasks.style.display = 'none'
+        else dev_tasks.style.display = ''
     }
 
     function createOptions(data, targetElement) {

@@ -39,6 +39,10 @@ class LidController extends Controller
             $organization[] = $req->data;
         }
 
+        $states = $msClient->getByUrl(Config::get("Global.moyskladJsonApiEndpointUrl").'/entity/customerorder/metadata');
+        $states = $states->data->states;
+
+
         $project = $msClient->getByUrl(Config::get("Global.moyskladJsonApiEndpointUrl").'/entity/project');
         $project = $project->data->rows;
 
@@ -51,6 +55,7 @@ class LidController extends Controller
         return view('setting.LID.main', [
             'employee' => $employee,
             'organization' => $organization,
+            'states' => $states,
             'project' => $project,
             'saleschannel' => $saleschannel,
 
@@ -104,6 +109,10 @@ class LidController extends Controller
         $sales_channel_uid = $request->sales_channel_uid ?? null;
         if ($sales_channel_uid != null and $sales_channel_uid == 0) $sales_channel_uid = null;
 
+        //Проверка на task
+        $tasks = $request->tasks ?? null;
+        if ($tasks != null and $tasks == 0) $tasks = null;
+
         $data = [
             'accountId' => $accountId,
             'is_activity_settings' => $is_activity_settings,
@@ -111,9 +120,11 @@ class LidController extends Controller
             'lid' => 'lid',
             'responsible' => $request->responsible ?? '0',
             'responsible_uuid' => $request->responsible_uuid ?? null,
+            'tasks' => $tasks,
 
             'organization' => $request->organization ?? null,
             'organization_account' => $request->organization_account ?? null,
+            'states' => $request->states ?? null,
             'project_uid' => $project_uid,
             'sales_channel_uid' => $sales_channel_uid,
         ];

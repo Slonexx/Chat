@@ -39,9 +39,11 @@ class Lid extends Model
         $model->lid = $array['lid'];
         $model->responsible = $array['responsible'];
         $model->responsible_uuid = $array['responsible_uuid'];
+        $model->tasks = $array['tasks'];
 
         $model->organization = $array['organization'];
         $model->organization_account = $array['organization_account'];
+        $model->states = $array['states'];
         $model->project_uid = $array['project_uid'];
         $model->sales_channel_uid = $array['sales_channel_uid'];
 
