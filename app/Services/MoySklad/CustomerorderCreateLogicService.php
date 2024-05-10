@@ -57,12 +57,24 @@ class CustomerorderCreateLogicService{
         return false;
     }
 
-    function createByAgentAndOrg($agentId, $agentMeta, $orgMeta, $responsible, $responsibleUuid, $attributes){
+    function createBySettings($agentId, $preparedMetas, $responsible, $responsibleUuid, $attributes){
         $customerOrderS = new CustomOrderService($this->accountId, $this->msC);
         $body = new stdClass();
-        $body->agent = $agentMeta;
-        $body->organization = $orgMeta;
+        $body->agent = $preparedMetas->agent;
+        $body->organization = $preparedMetas->organization;
         $body->attributes = $attributes->attributes;
+
+        $organizationAccount = $preparedMetas->organizationAccount;
+        if($organizationAccount)
+            $body->organizationAccount = $organizationAccount;
+
+        $project = $preparedMetas->project;
+        if($project)
+            $body->project = $project;
+
+        $salesChannel = $preparedMetas->salesChannel;
+        if($salesChannel)
+            $body->salesChannel = $salesChannel;
 
         $handlerS = new HandlerService();
         $employeeMeta = $handlerS->FormationMetaById("employee", "employee", $responsibleUuid);

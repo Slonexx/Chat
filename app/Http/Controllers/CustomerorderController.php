@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Clients\MoySklad;
 use App\Clients\oldMoySklad;
-use App\Clients\newClient;
 use App\Exceptions\AgentFindLogicException;
 use App\Models\Lid;
 use App\Models\MessengerAttributes;
@@ -14,7 +13,6 @@ use App\Services\ChatApp\ChatService;
 use App\Services\HandlerService;
 use App\Services\MoySklad\AgentControllerLogicService;
 use App\Services\MoySklad\AgentFindLogicService;
-use App\Services\MoySklad\Attributes\CounterpartyS;
 use App\Services\MoySklad\Attributes\oldCounterpartyS;
 use App\Services\MoySklad\CustomerorderCreateLogicService;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
@@ -22,6 +20,7 @@ use Error;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use stdClass;
 
 class CustomerorderController extends Controller
 {
@@ -79,21 +78,27 @@ class CustomerorderController extends Controller
                             $responsible = $lid->responsible;
                             $responsibleUuid = $lid->responsible_uuid;
                             $isCreateOrder = $lid->is_activity_order;
+
+                            $orderDbSettings = new stdClass();
+
+                            $orderDbSettings->organization = $lid->organization;
+                            $orderDbSettings->organization_account = $lid->organization_account;
+                            $orderDbSettings->project_uid = $lid->project_uid;
+                            $orderDbSettings->sales_channel_uid = $lid->sales_channel_uid;
                             
                             $agentHref = $agents[0]->meta->href;
                             $customOrderS = new CustomerorderCreateLogicService($accountId, $msCnew);
                             $ordersByAgentRes = $customOrderS->findFirst(10, $agentHref);
 
                             $customerOrders = $ordersByAgentRes->data->rows;
-                            $organId = $orgItem->organId;
                             $agentControllerS = new AgentControllerLogicService($accountId, $msCnew);
                             if(count($customerOrders) == 0){
-                                $agentControllerS->createOrderAndAttributes($organId, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
+                                $agentControllerS->createOrderAndAttributes($orderDbSettings, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
                             } else {
                                 $isCreate = $customOrderS->checkStateTypeEqRegular($customerOrders);
                                 if($isCreate){
                                     //Regular
-                                    $agentControllerS->createOrderAndAttributes($organId, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
+                                    $agentControllerS->createOrderAndAttributes($orderDbSettings, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder);
 
                                 } else {
                                     //Final

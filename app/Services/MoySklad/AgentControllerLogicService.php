@@ -11,6 +11,7 @@ use App\Services\Response;
 use Error;
 use Exception;
 use Illuminate\Support\Facades\Config;
+use stdClass;
 
 class AgentControllerLogicService{
 
@@ -27,7 +28,7 @@ class AgentControllerLogicService{
         $this->res = new Response();
     }
 
-    function createOrderAndAttributes($organId, $agent, CustomerorderCreateLogicService $customOrderS, $responsible, $responsibleUuid, $isCreateOrder){
+    function createOrderAndAttributes($orderDbSettings, $agent, CustomerorderCreateLogicService $customOrderS, $responsible, $responsibleUuid, $isCreateOrder){
         $handlerS = new HandlerService();
         //agentId
         $agentHref = $agent->meta->href;
@@ -79,16 +80,39 @@ class AgentControllerLogicService{
         try{
             //createOrder
             if($isCreateOrder){
+                $organId = $orderDbSettings->organization;
+                $organization_account = $orderDbSettings->organization_account;
+                $project_uid = $orderDbSettings->project_uid;
+                $sales_channel_uid = $orderDbSettings->sales_channel_uid;
                 $orderAttrS = new CustomorderS($this->accountId, $this->msC);
                 $orderAttrRes = $orderAttrS->getAllAttributes(true);
                 $orderLidAttr = array_filter($orderAttrRes->data, fn($value)=> $value->name == $lidName);
                 $orderAttr = array_shift($orderLidAttr);
-                $body = $updateValuesS->dictionary($customEntityS, $orderAttr, $valueName);
+                $attributes = $updateValuesS->dictionary($customEntityS, $orderAttr, $valueName);
+
+                //formation meta Logic
                 $organMeta = $handlerS->FormationMetaById("organization", "organization", $organId);
-                $preparedOrganMeta = $handlerS->FormationMeta($organMeta);
-                $preparedAgentMeta = $handlerS->FormationMeta($agent->meta);
+                $organAccountMeta = null;
+                if($organization_account){
+                    $organAccountMeta = $organMeta->href .= "/accounts/$organization_account";
+                    $organAccountMeta = $organMeta->type = "account";
+                }
+                $projectMeta = null;
+                if($project_uid)
+                    $projectMeta = $handlerS->FormationMetaById("project", "project", $project_uid);
+                $salesChannelMeta = null;
+                if($sales_channel_uid)
+                    $salesChannelMeta = $handlerS->FormationMetaById("saleschannel", "saleschannel", $sales_channel_uid);
+
+                $preparedMetas = new stdClass();
+                $preparedMetas->agent = $handlerS->FormationMeta($agent->meta);
+                $preparedMetas->organization = $handlerS->FormationMeta($organMeta);
                 
-                $customOrderS->createByAgentAndOrg($agentId, $preparedAgentMeta, $preparedOrganMeta, $responsible, $responsibleUuid, $body);
+                $preparedMetas->organizationAccount = $organAccountMeta;
+                $preparedMetas->project = $projectMeta;
+                $preparedMetas->salesChannel = $salesChannelMeta;
+                
+                $customOrderS->createBySettings($agentId, $preparedMetas, $responsible, $responsibleUuid, $attributes);
             }
 
         } catch(Exception | Error $e){
