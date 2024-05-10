@@ -204,7 +204,7 @@
             responsible.value = model.responsible
             on_responsible_uuid(responsible)
 
-            if (model.responsible === 1) responsible_uuid.value = model.responsible_uuid
+            if (model.responsible == 1) responsible_uuid.value = model.responsible_uuid
             if (model.responsible != '0' && model.responsible != null) if (model.tasks != null) tasks.value = model.tasks
         }
 
