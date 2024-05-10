@@ -135,7 +135,7 @@ class LidController extends Controller
         else $message = $model->message;
 
 
-        return to_route('lid', [
+        return to_route('counterparty', [
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
             'fullName' => $request->fullName ?? "Имя аккаунта",

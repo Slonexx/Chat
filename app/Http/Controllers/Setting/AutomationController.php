@@ -166,7 +166,7 @@ class AutomationController extends Controller
         Automation::createOrUpdateIsArray($accountId, $data);
 
 
-        return to_route('automation', [
+        return to_route('lid', [
             'accountId' => $accountId,
             'isAdmin' => $isAdmin,
             'fullName' => $request->fullName ?? "Имя аккаунта",
