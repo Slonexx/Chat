@@ -183,12 +183,12 @@
 
 
         if (model != null) {
-            if (model.is_activity_settings === 1) is_activity_settings.checked = true
+            if (model.is_activity_settings == 1) is_activity_settings.checked = true
             else is_activity_settings.checked = false
 
 
             is_activity_order.value = model.is_activity_order
-            if (model.is_activity_order === 1){
+            if (model.is_activity_order == 1){
                 if (model.organization != null) organization.value = model.organization
                 if (model.organization_account != null) {
                     onIsOrganizationAccount(organization)
