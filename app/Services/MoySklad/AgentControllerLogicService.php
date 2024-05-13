@@ -29,10 +29,12 @@ class AgentControllerLogicService{
         $this->res = new Response();
     }
 
-    function createOrderAndAttributes($orderDbSettings, $agent, CustomerorderCreateLogicService $customOrderS, $responsible, $responsibleUuid, $isCreateOrder){
+    function createOrderAndAttributes($orderDbSettings, $agent, CustomerorderCreateLogicService $customOrderS, $responsible, $responsibleUuid, $isCreateOrder, $infoForTask){
         $handlerS = new HandlerService();
         //agentId
         $agentHref = $agent->meta->href;
+        $agentPhone = $agent->phone ?? false;
+        $agentEmail = $agent->email ?? false;
         $agentId = basename($agentHref);
         //agentId
         $agentAttr = $agent->attributes ?? null;
@@ -106,7 +108,7 @@ class AgentControllerLogicService{
                 $salesChannelMeta = null;
                 if($sales_channel_uid)
                     $salesChannelMeta = $handlerS->FormationMetaById("saleschannel", "saleschannel", $sales_channel_uid);
-                $states = null;
+                $stateMeta = null;
                 if($states)
                     $stateMeta = $handlerS->FormationMetaById("state", "state", $states);
 
@@ -128,7 +130,29 @@ class AgentControllerLogicService{
                     $body = new stdClass();
                     $assignee = $handlerS->FormationMetaById("task", "employee", $lid);
                     $body->assignee = $assignee;
-                    $body->description = "Клиент ожидает ответа";
+                    $lineName = $infoForTask->lineName;
+                    $lineId = $infoForTask->lineId;
+
+                    //prepareMessage
+                    $message = "Клиент ожидает ответа ! " . 
+                                PHP_EOL . "Линия: $lineName#$lineId\r\n \r\n";
+
+                    if($agentPhone)
+                        $message .= "Номер телефона: $agentPhone \r\n";
+
+                    if($agentEmail)
+                        $message .= "Почта: $agentEmail \r\n";
+
+                    $messengerAttrsObjs = Config::get("messengerAttributes");
+                    $messengerNames = array_column($messengerAttrsObjs, "name");
+                    $settedAttributes = array_filter($agentAttr, fn($value)=>  in_array($value->name, $messengerNames));
+                    foreach($settedAttributes as $item){
+                        $splittedArray = explode(" ", $item->name);
+                        $messengerName = $splittedArray[0];
+                        $message .= "$messengerName $item->value";
+                    }
+                                
+                    $body->description = $message;
                     $body->operation = $handlerS->FormationMeta($order->meta);
                     $taskS = new TaskService($this->accountId);
                     $taskS->create($body);
