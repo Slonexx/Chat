@@ -56,7 +56,7 @@
                 </div>
 
                 <div class="columns field">
-                    <div class="column is-3">Счет организации</div>
+                    <div class="column is-3">Статус заказа покупателя</div>
                     <div class="column">
                         <div class="select w-50 is-small is-link">
                             <select id="states" name="states" class="w-100">
