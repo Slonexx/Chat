@@ -48,7 +48,7 @@ class employeeModel extends Model
 
     public function getEmployee()
     {
-        return $this->belongsTo(employeeModel::class, 'employeeId');
+        return $this->belongsTo(employeeModel::class, 'employee_id');
     }
 
 }

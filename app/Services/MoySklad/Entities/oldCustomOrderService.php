@@ -70,10 +70,10 @@ class oldCustomOrderService {
             $deliveryPlannedMoment = $objectMs->deliveryPlannedMoment ?? false;
             if(!empty($deliveryPlannedMoment))
                 $preppedChangeList["{deliveryPlannedMoment}"] = $deliveryPlannedMoment;
-            
+
             $salesChannel = $objectMs->salesChannel ?? false;
             if(!empty($salesChannel))
-                $preppedChangeList["{salesChannel}"] = $salesChannel;
+                $preppedChangeList["{salesChannel}"] = $salesChannel->name;
             $preppedChangeList["{rate}"] = $objectMs->rate->currency->name;
             $preppedChangeList["{store}"] = $objectMs->store->name;
 
@@ -134,9 +134,9 @@ class oldCustomOrderService {
         try{
             $url = Config::get("Global")[self::URL_IDENTIFIER] . "metadata/";
             $statusesRes = $this->msC->getByUrl($url);
-            
+
             $res = new Response();
-            
+
             if($statusesRes->status){
                 $statuses = $statusesRes->data->states ?? null;
                 if($statuses === null)
@@ -161,5 +161,5 @@ class oldCustomOrderService {
             return $res;
     }
 
-    
+
 }

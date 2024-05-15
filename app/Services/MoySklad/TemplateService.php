@@ -37,7 +37,7 @@ class TemplateService {
                     $entityType,
                     $entityId,
                     $templateId
-                ], 
+                ],
             "Один или несколько параметров пусты");
 
         $entityServices = [
@@ -60,7 +60,7 @@ class TemplateService {
 
         // $templateWithAttributes = $template->attributes()->get()->toArray();
 
-        //2)get ms_entity_fields and info from Ms 
+        //2)get ms_entity_fields and info from Ms
         $fieldsArray = MsEntities::join('ms_entity_fields', 'ms_entities.id', '=', 'ms_entity_fields.ms_entities_id')
             ->where('ms_entities.keyword', "=",  $entityType)
             ->select('ms_entity_fields.keyword', 'ms_entity_fields.expand_filter')
@@ -79,7 +79,7 @@ class TemplateService {
         $expandedInfo = $expandRes->data;
         $objectWithNeededValues = $service->cutMsObjectFromReqExpand($expandedInfo, $expandParams);
 
-        //3)getTemplate and replace 
+        //3)getTemplate and replace
         $template = Templates::where('uuid', $templateId)
             ->get();
 
@@ -103,7 +103,7 @@ class TemplateService {
             ->where('templates.uuid', "=",  $templateId)
             ->get()
             ->toArray();
-        
+
         //4)add. fields
         if($templatesWithAtttributes){
             $templateAttributeValues = [];
@@ -133,9 +133,9 @@ class TemplateService {
                 }
 
             }
-            
+
         }
-        
+
         return $res->success($readyTemplate);
     }
 
@@ -147,7 +147,7 @@ class TemplateService {
                 [
                     $entityType,
                     $entityId
-                ], 
+                ],
             "Один или несколько параметров пусты");
 
         $entityServices = [
@@ -170,7 +170,7 @@ class TemplateService {
 
         // $templateWithAttributes = $template->attributes()->get()->toArray();
 
-        //2)get ms_entity_fields and info from Ms 
+        //2)get ms_entity_fields and info from Ms
         $fieldsArray = MsEntities::join('ms_entity_fields', 'ms_entities.id', '=', 'ms_entity_fields.ms_entities_id')
             ->where('ms_entities.keyword', "=",  $entityType)
             ->select('ms_entity_fields.keyword', 'ms_entity_fields.expand_filter')
@@ -189,7 +189,7 @@ class TemplateService {
         $expandedInfo = $expandRes->data;
         $objectWithNeededValues = $service->cutMsObjectFromReqExpand($expandedInfo, $expandParams);
 
-        //3)getTemplates and replace 
+        //3)getTemplates and replace
         $setting = MainSettings::where('account_id', $this->accountId)
             ->get();
 
@@ -202,12 +202,12 @@ class TemplateService {
         if($entityType != "counterparty"){
             $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);
         }
-        
+
 
         $allTemplates = $setting->first()
             ->templates()
-            ->select(   
-                "title", 
+            ->select(
+                "title",
                 "uuid",
                 "content"
             )
@@ -261,7 +261,7 @@ class TemplateService {
                 }
                 //add only add. fields
                 $readyTemplate = $templateLogicS->insertIn($readyTemplate, $templateAttributeValues);
-                
+
             }
 
             if($count <= 20)
@@ -272,9 +272,9 @@ class TemplateService {
             $count++;
 
             return $template;
-        
+
         }, $allTemplates);
-            
+
         return $res->success($allTemplates);
 
     }

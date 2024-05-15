@@ -40,6 +40,7 @@ class AutomatizationService{
         $service = $entityServices[$type];
         $entityId = basename($href);
 
+
         $expArray = null;
         $isCounterparty = $type == "counterparty";
         if(!$isCounterparty){
@@ -76,6 +77,7 @@ class AutomatizationService{
         if($employeeId == null){
             $employeeId = $docRes->data->owner->id;
         }
+
         $autos = settingModel::join('scenario as scen', "setting_models.accountId", "=", "scen.accountId")
             ->leftJoin('templates as t', 'scen.template_id', "=", "t.id")
             ->join('automation_scenarios as a_scen', "scen.id", "=", "a_scen.scenario_id")
@@ -94,7 +96,7 @@ class AutomatizationService{
                 "a.messenger"
             )->get()
             ->all();
-        
+
 
         $filteredTemplatesAuto = [];
         if($channel_id !== false && $project_id !== false){
@@ -111,7 +113,7 @@ class AutomatizationService{
         }
 
         if(count($filteredTemplatesAuto) == 0)
-            return $this->res->success("Не найдены автоматизации, соответствующие $type c Id=$entityId");
+            return $this->res->error("Не найдены автоматизации, соответствующие $type c Id=$entityId");
 
         $templateS = new TemplateService($this->accountId);
         $messengerAttributes = MainSettings::join("messenger_attributes as mes", "main_settings.id", "=", "mes.main_settings_id")
@@ -137,7 +139,7 @@ class AutomatizationService{
                     $body->description += PHP_EOL . $messengerErr;
                 $this->msC->put($type, $body, $entityId);
                 continue;
-                
+
             } else {
                 //chatapp/db
                 $compliances = [
@@ -152,13 +154,9 @@ class AutomatizationService{
                 $dbMessenger = $compliances[$messenger];
                 $messengerId = $messengerAttributes[$dbMessenger];
                 $findedAttribute = array_filter($agentAttributes, fn($val) => $val->id == $messengerId);
+
                 if(count($findedAttribute) == 0){
-                    $messengerErr = "У данного $type у контрагента не заполнен месседжер {$messenger}";
-                    if($desc == false)
-                        $body->description = $messengerErr;
-                    else
-                        $body->description += PHP_EOL . $messengerErr;
-                    $this->msC->put($type, $body, $entityId);
+                    $chatId = 0;
                     if($messenger == "whatsapp" || $messenger == "telegram"){
                         if($agentPhone)
                             $chatId = $agentPhone;
@@ -170,14 +168,28 @@ class AutomatizationService{
                         $body->description = $messengerErr;
                         $this->msC->put($type, $body, $entityId);
                     }
+
+                    if ($chatId == 0) {
+                        $messengerErr = "У данного $type у контрагента не заполнен месседжер {$messenger}";
+                        if($desc === false)
+                            $body->description = $messengerErr;
+                        else {
+                            $body->description = $desc;
+                            $body->description .= PHP_EOL . $messengerErr;
+                        }
+                        $this->msC->put($type, $body, $entityId);
+                    }
+
                     continue;
                 } else {
                     $firstAttr = array_shift($findedAttribute);
                     $chatId = $firstAttr->value;
                 }
-                
+
             }
-        
+
+
+
             $prepTemplRes = $templateS->getTemplate($type, $entityId, $template_uuid);
             if(!$prepTemplRes->status){
                 return $prepTemplRes;
@@ -190,9 +202,9 @@ class AutomatizationService{
             } catch (BadResponseException $e) {
                 return $newClient->ResponseExceptionHandler($e);
             }
-            
+
         }
         return $this->res->success("Все шаблоны отправлены");
-        
+
     }
 }

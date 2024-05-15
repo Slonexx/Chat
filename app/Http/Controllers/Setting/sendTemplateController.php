@@ -13,7 +13,7 @@ use stdClass;
 class sendTemplateController extends Controller{
 
     function sendTemplate(Request $request){
-        try{
+       // try{
             $req = $request->all();
             $handlerS = new HandlerService();
 
@@ -33,7 +33,7 @@ class sendTemplateController extends Controller{
                 if($startUid != ""){
                     $employeeIdRes = $employeeS->getByUid($startUid);
                     if(!$employeeIdRes->status){
-                        
+
                         $obj->href = $href;
                         $obj->message = $employeeIdRes->message;
                         $errors[] = $obj;
@@ -46,7 +46,7 @@ class sendTemplateController extends Controller{
                     $obj->message = "по uid не был найден сотрудник";
                     $errors[] = $obj;
                     continue;
-                    
+
                 }
 
                 $stateHasChanged = in_array('state', $event['updatedFields']);
@@ -55,7 +55,8 @@ class sendTemplateController extends Controller{
                     $autoS = new AutomatizationService($accountId);
                     $res = $autoS->sendTemplate($type, $href, $employeeId);
                     $obj->href = $href;
-                    $obj->message = $res->message;
+                    if (isset($res->message)) $obj->message = $res->message;
+                    if (isset($res->data)) $obj->message = $res->data;
                     if(!$res->status)
                         $messageStack[] = $obj;
                     else
@@ -78,9 +79,9 @@ class sendTemplateController extends Controller{
                 $mesAr = array_merge($messageStack, $errors);
                 return response()->json($mesAr, 400);
             }
-        } catch(Exception | Error $e){
+       /* } catch(Exception | Error $e){
             return response()->json($e->getMessage(), 500);
-        }
+        }*/
     }
 
 
