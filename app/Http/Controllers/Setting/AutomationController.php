@@ -170,7 +170,7 @@ class AutomationController extends Controller
 
         $client = new Client();
         try {
-            $client->get(Config::get("Global.url") . '/api/customerorder/create/'.$accountId);
+            $client->get(Config::get("Global.url") . 'api/customerorder/create/'.$accountId);
         }  catch (GuzzleException) {}
 
 
