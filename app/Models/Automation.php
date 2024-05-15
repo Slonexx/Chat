@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Ramsey\Uuid\Uuid;
+use App\Models\employeeModel;
 
 class Automation extends Model
 {
@@ -91,6 +92,6 @@ class Automation extends Model
 
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(EmployeeModel::class, 'employee_id');
+        return $this->belongsTo(employeeModel::class, 'employee_id');
     }
 }
