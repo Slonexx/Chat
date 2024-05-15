@@ -75,7 +75,10 @@ class oldCustomOrderService {
             if(!empty($salesChannel))
                 $preppedChangeList["{salesChannel}"] = $salesChannel->name;
             $preppedChangeList["{rate}"] = $objectMs->rate->currency->name;
-            $preppedChangeList["{store}"] = $objectMs->store->name;
+
+            $store = $objectMs->store ?? false;
+            if(!empty($store))
+                $preppedChangeList["{store}"] = $objectMs->store->name;
 
             $contract = $objectMs->contract ?? false;
             if(!empty($contract))

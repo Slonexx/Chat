@@ -78,7 +78,6 @@ class TemplateService {
             return $expandRes;
         $expandedInfo = $expandRes->data;
         $objectWithNeededValues = $service->cutMsObjectFromReqExpand($expandedInfo, $expandParams);
-
         //3)getTemplate and replace
         $template = Templates::where('uuid', $templateId)
             ->get();
@@ -88,6 +87,7 @@ class TemplateService {
         $content = $template->first()->content;
 
         $templateValues = $objectWithNeededValues->data;
+
 
         if($entityType != "counterparty"){
             $objectWithTextPositions = $templateLogicS->preparePositions($templateValues);

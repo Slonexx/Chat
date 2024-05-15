@@ -62,13 +62,13 @@ class DemandService {
             } else {
                 $preppedChangeList["{agentFIO}"] = "{agentFIO}";
             }
-            
+
             $preppedChangeList["{name}"] = $objectMs->name;
             $preppedChangeList["{organization}"] = $objectMs->organization->name;
-            
+
             $salesChannel = $objectMs->salesChannel ?? false;
             if(!empty($salesChannel))
-                $preppedChangeList["{salesChannel}"] = $salesChannel;
+                $preppedChangeList["{salesChannel}"] = $salesChannel->name;
             $preppedChangeList["{rate}"] = $objectMs->rate->currency->name;
             $preppedChangeList["{store}"] = $objectMs->store->name;
 
@@ -121,9 +121,9 @@ class DemandService {
         try{
             $url = Config::get("Global")[self::URL_IDENTIFIER] . "metadata/";
             $statusesRes = $this->msC->getByUrl($url);
-            
+
             $res = new Response();
-            
+
             if($statusesRes->status){
                 $statuses = $statusesRes->data->states ?? null;
                 if($statuses === null)
@@ -148,7 +148,7 @@ class DemandService {
     //     $result;
     //     try {
     //         if($obj !== false) {
-    //             $data = $obj->data;       
+    //             $data = $obj->data;
     //             $statusCode = $obj->statusCode;
     //             $result = response()->json($data, $statusCode);
     //             return $result;
@@ -167,5 +167,5 @@ class DemandService {
     //         $response->message = "Не удалось создать отгрузку";
     //     return $response;
     // }
-    
+
 }
