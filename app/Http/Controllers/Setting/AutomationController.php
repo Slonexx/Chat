@@ -7,8 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Automation;
 use App\Models\employeeModel;
 use App\Models\Scenario;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class AutomationController extends Controller
 {
@@ -164,6 +167,11 @@ class AutomationController extends Controller
         ]);
 
         Automation::createOrUpdateIsArray($accountId, $data);
+
+        $client = new Client();
+        try {
+            $client->get(Config::get("Global.url") . '/api/customerorder/create/'.$accountId);
+        }  catch (GuzzleException) {}
 
 
         return to_route('lid', [
