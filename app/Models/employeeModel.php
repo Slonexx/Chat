@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class employeeModel extends Model
 {
-    use HasFactory;
+    protected $table = "employee_models";
 
     protected $fillable = [
         'accountId',
@@ -48,7 +48,7 @@ class employeeModel extends Model
 
     public function getEmployee()
     {
-        return $this->belongsTo(employeeModel::class, 'employee_id');
+        return $this->belongsTo(employeeModel::class, 'employeeId');
     }
 
 }
