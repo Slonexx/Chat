@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
-class HandlerService{
+class HandlerService
+{
     private mixed $response = [
         "statusCode" => 200,
         "status" => true
@@ -14,10 +16,12 @@ class HandlerService{
         "status" => false
     ];
 
-    function __construct() {
+    function __construct()
+    {
         $this->response = json_decode(json_encode($this->response));
         $this->badResponse = json_decode(json_encode($this->badResponse));
     }
+
     /**
      * Обрабатывает ответ response/badResponse(в основном для Controllers)
      * @param object $response response/badResponse
@@ -25,11 +29,12 @@ class HandlerService{
      * @param bool $returnFullBadResponse
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseHandler(object $response, bool $returnOnlyDataWithMessage = true, bool $returnFullBadResponse = true) {
+    public function responseHandler(object $response, bool $returnOnlyDataWithMessage = true, bool $returnFullBadResponse = true)
+    {
         $answer = null;
-        if($response->status) {
-            if($returnOnlyDataWithMessage){
-                $answer = (object) [
+        if ($response->status) {
+            if ($returnOnlyDataWithMessage) {
+                $answer = (object)[
                     "data" => $response->data,
                     "message" => $response->message ?? ""
                 ];
@@ -38,11 +43,11 @@ class HandlerService{
             }
 
         } else {
-            if($returnFullBadResponse){
+            if ($returnFullBadResponse) {
                 $answer = $response;
 
             } else {
-                $answer = (object) [
+                $answer = (object)[
                     "data" => $response->data,
                     "message" => $response->message ?? ""
                 ];
@@ -50,11 +55,12 @@ class HandlerService{
         }
         $message = $answer->message ?? null;
         //check property and its content
-        if($message !== null && $message === "")
+        if ($message !== null && $message === "")
             unset($answer->message);
         return response()->json($answer, $response->statusCode);
 
     }
+
     /**
      * Обрабатывает ответ response/badResponse и возращает ответ с сообщением в начале (использовать вместе с createResponseMessageFirst) (в основном для Controllers)
      * @param object $response response/badResponse
@@ -62,11 +68,12 @@ class HandlerService{
      * @param bool $returnFullBadResponse
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseHandlerFirstMessage(object $response, bool $returnOnlyDataWithMessage = true, bool $returnFullBadResponse = true) {
+    public function responseHandlerFirstMessage(object $response, bool $returnOnlyDataWithMessage = true, bool $returnFullBadResponse = true)
+    {
         $answer = null;
-        if($response->status) {
-            if($returnOnlyDataWithMessage){
-                $answer = (object) [
+        if ($response->status) {
+            if ($returnOnlyDataWithMessage) {
+                $answer = (object)[
                     "message" => $response->message ?? "",
                     "data" => $response->data
                 ];
@@ -75,11 +82,11 @@ class HandlerService{
             }
 
         } else {
-            if($returnFullBadResponse){
+            if ($returnFullBadResponse) {
                 $answer = $response;
 
             } else {
-                $answer = (object) [
+                $answer = (object)[
                     "message" => $response->message ?? "",
                     "data" => $response->data
                 ];
@@ -87,11 +94,12 @@ class HandlerService{
         }
         $message = $answer->message ?? null;
         //check property and its content
-        if($message !== null && $message === "")
+        if ($message !== null && $message === "")
             unset($answer->message);
         return response()->json($answer, $response->statusCode);
 
     }
+
     /**
      * Создаёт ответ для последующей обработки(в основном для Services)
      * @param bool $isSuccess good=true/bad=false
@@ -100,23 +108,24 @@ class HandlerService{
      * @param string $message additional message (empty by default)
      * @return object response/badResponse
      */
-    public function createResponse(bool $isSuccess, mixed $data, bool $always200=false, string $message ="") : object {
-        if($isSuccess) {
+    public function createResponse(bool $isSuccess, mixed $data, bool $always200 = false, string $message = ""): object
+    {
+        if ($isSuccess) {
             $this->response->data = $data;
-            if($message !== "")
+            if ($message !== "")
                 $this->response->message = $message;
             return $this->response;
         } else {
-            if($always200){
+            if ($always200) {
                 $mixedResponse = $this->badResponse;
                 $mixedResponse->data = $data;
                 $mixedResponse->statusCode = 200;
-                if($message !== "")
+                if ($message !== "")
                     $mixedResponse->message = $message;
                 return $mixedResponse;
             }
             $this->badResponse->data = $data;
-            if($message !== "")
+            if ($message !== "")
                 $this->badResponse->message = $message;
             return $this->badResponse;
         }
@@ -130,78 +139,82 @@ class HandlerService{
      * @param string $message additional message (empty by default)
      * @return object response/badResponse
      */
-    public function createResponseMessageFirst(bool $isSuccess, mixed $data, bool $always200=false, string $message ="") : object {
-        if($isSuccess) {
+    public function createResponseMessageFirst(bool $isSuccess, mixed $data, bool $always200 = false, string $message = ""): object
+    {
+        if ($isSuccess) {
             $this->response->data = $data;
-            if($message !== "")
-                $this->response = (object) (['message' => $message] + (array) $this->response);
+            if ($message !== "")
+                $this->response = (object)(['message' => $message] + (array)$this->response);
             return $this->response;
         } else {
-            if($always200){
+            if ($always200) {
                 $mixedResponse = $this->badResponse;
-                if($message !== "")
+                if ($message !== "")
                     $mixedResponse->message = $message;
                 $mixedResponse->data = $data;
                 $mixedResponse->statusCode = 200;
                 return $mixedResponse;
             }
             $this->badResponse->data = $data;
-            if($message !== "")
-                $this->badResponse = (object) (['message' => $message] + (array) $this->badResponse);
+            if ($message !== "")
+                $this->badResponse = (object)(['message' => $message] + (array)$this->badResponse);
             return $this->badResponse;
         }
     }
 
     /**
-     * Создаёт ответ 200 для последующей обработки(в основном для Services) 
+     * Создаёт ответ 200 для последующей обработки(в основном для Services)
      * Является улучшенным методом
-     * +  
+     * +
      * @param bool $isSuccess good=true/bad=false
      * @param mixed $data message/response object
      * @param bool $always200 override status code of answer to 200 (false by default)
      * @param string $message additional message (empty by default)
      * @return object response/badResponse
      */
-    public function success(mixed $data, string $message =null) : object {
+    public function success(mixed $data, string $message = null): object
+    {
         $this->response->data = $data;
-        if($message !== "")
+        if ($message !== "")
             $this->response->message = $message;
         return $this->response;
     }
 
-    public function error(mixed $data, string $message = null, bool $always200=false) : object {
-        if($always200){
+    public function error(mixed $data, string $message = null, bool $always200 = false): object
+    {
+        if ($always200) {
             $mixedResponse = $this->badResponse;
             $mixedResponse->data = $data;
             $mixedResponse->statusCode = 200;
-            if($message !== "")
+            if ($message !== "")
                 $mixedResponse->message = $message;
             return $mixedResponse;
         }
         $this->badResponse->data = $data;
-        if($message !== null)
+        if ($message !== null)
             $this->badResponse->message = $message;
         return $this->badResponse;
     }
 
 
-
-    public function getInfoByRequest(Request $request){
+    public function getInfoByRequest(Request $request)
+    {
         $arrayData = $request->all();
         $objData = json_decode(json_encode($arrayData));
         return $objData;
     }
 
-    public function checkAccountIdAndBody($inputObject) : object {
+    public function checkAccountIdAndBody($inputObject): object
+    {
         $hasBody = property_exists($inputObject, "body");
         $hasAccountId = property_exists($inputObject, "accountId");
 
-        if(!$hasBody || !$hasAccountId) {
-            if(!$hasBody && !$hasAccountId)
+        if (!$hasBody || !$hasAccountId) {
+            if (!$hasBody && !$hasAccountId)
                 $this->badResponse->data = "отсутствует accountId и body";
-            else if(!$hasAccountId)
+            else if (!$hasAccountId)
                 $this->badResponse->data = "отсутствует accountId";
-            else if(!$hasBody)
+            else if (!$hasBody)
                 $this->badResponse->data = "отсутствует body";
             return $this->badResponse;
         }
@@ -210,10 +223,11 @@ class HandlerService{
         return $response;
     }
 
-    public function checkAccountId($inputObject) : object {
+    public function checkAccountId($inputObject): object
+    {
         $hasAccountId = property_exists($inputObject, "accountId");
 
-        if(!$hasAccountId) {
+        if (!$hasAccountId) {
             $this->badResponse->data = "отсутствует accountId";
             return $this->badResponse;
         }
@@ -222,16 +236,18 @@ class HandlerService{
         return $response;
     }
 
-    public function FormationMeta($obj) : object {
-        return (object) [
+    public function FormationMeta($obj): object
+    {
+        return (object)[
             "meta" => $obj
         ];
     }
 
-    public function FormationAttribute(object $attributeMeta, mixed $value) : object {
+    public function FormationAttribute(object $attributeMeta, mixed $value): object
+    {
         $attributeObj = $this->FormationMeta($attributeMeta);
         $attributeObj->value = $value;
-        $objectOfAttributes = (object) [
+        $objectOfAttributes = (object)[
             "attributes" => [
                 $attributeObj
             ]
@@ -246,7 +262,7 @@ class HandlerService{
     // public function FormationAttributeElement(string $attrsUrlIdentifier, string $entityId, mixed $value) : object {
     //     $valueHref = Config::get("Global")[$urlIdentifier];
     //     $joinedUrlWithId = $valueHref . $attrId;
-        
+
     //     $meta = (object)[
     //         "href" => $joinedUrlWithId,
     //         "type" => "attributemetadata"
@@ -262,10 +278,11 @@ class HandlerService{
     //     return $objectOfAttributes;
     // }
 
-    public function FormationFileAttribute(object $attributeMeta, mixed $value) : object {
+    public function FormationFileAttribute(object $attributeMeta, mixed $value): object
+    {
         $attributeObj = $this->FormationMeta($attributeMeta);
         $attributeObj->file = $value;
-        $objectOfAttributes = (object) [
+        $objectOfAttributes = (object)[
             "attributes" => [
                 $attributeObj
             ]
@@ -273,9 +290,10 @@ class HandlerService{
         return $objectOfAttributes;
     }
 
-    public function FormationMetaById($urlIdentifier, $typeMeta, $id){
+    public function FormationMetaById($urlIdentifier, $typeMeta, $id)
+    {
         $url = Config::get("Global")[$urlIdentifier];
-        return (object) [
+        return  (object)[
             "href" => $url . $id,
             "type" => $typeMeta
         ];

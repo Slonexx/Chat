@@ -3,10 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Jobs\CheckCounterparty;
-use App\Models\employeeModel;
 use App\Models\Lid;
 use App\Models\MainSettings;
-use App\Models\organizationModel;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
@@ -46,10 +44,9 @@ class createCustomerOrder extends Command
         foreach($lids as $key => $item){
             try {
                 if($item){
-                    $accountId = $item->account_id;
-                    $url = Config::get('Global.url') /*''*/ . "api/customerorder/create/${$key}";
-                    CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
-
+                    $accountId = $key;
+                    $url = Config::get('Global.url') . "api/customerorder/create/{$key}";
+                    CheckCounterparty::dispatch($params, $url, 'get')->onConnection('database')->onQueue("high");
                     $this->info('Продолжение выполнения команды.');
 
                 }

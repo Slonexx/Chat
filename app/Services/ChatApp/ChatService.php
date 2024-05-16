@@ -19,7 +19,7 @@ class ChatService{
     }
 
     function getAllChatForEmployee($countConversation, $lineId){
-        
+
         $res = new Response();
         $chatReq = new ChatappRequest($this->employeeId);
         $licenseRes = $chatReq->getLicenses();
@@ -65,9 +65,9 @@ class ChatService{
                         }
 
                     }
-                    
+
                 }, $conversations);
-                
+
             }
             //chatapp/db
             $compliances = [
@@ -82,9 +82,9 @@ class ChatService{
 
             $resChat[$compliances[$messenger]] = $conversations;
 
-            
+
         }
         return $res->success($resChat, "По сотруднику {$this->employeeId} получены все чаты");
-        
+
     }
 }

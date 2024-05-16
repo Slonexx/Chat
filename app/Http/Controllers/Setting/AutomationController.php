@@ -168,10 +168,10 @@ class AutomationController extends Controller
 
         Automation::createOrUpdateIsArray($accountId, $data);
 
-        $client = new Client();
-        try {
-            $client->get(Config::get("Global.url") . 'api/customerorder/create/'.$accountId);
-        }  catch (GuzzleException) {}
+//        $client = new Client();
+//        try {
+//            $client->get(Config::get("Global.url") . 'api/customerorder/create/'.$accountId);
+//        }  catch (GuzzleException) {}
 
 
         return to_route('lid', [

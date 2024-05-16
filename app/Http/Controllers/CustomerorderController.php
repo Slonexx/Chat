@@ -25,6 +25,7 @@ use stdClass;
 class CustomerorderController extends Controller
 {
     function create(Request $request, $accountId){
+        set_time_limit(3600);
         $messageStack = [];
         try{
             $handlerS = new HandlerService();
@@ -57,6 +58,11 @@ class CustomerorderController extends Controller
                     $attribute_id = $attribute->attribute_id;
                     $attrMeta = $handlerS->FormationMetaById("agentMetadataAttributes", "attributemetadata", $attribute_id);
                     foreach($chats as $chat){
+
+                        //dd($chat);
+
+                        if (property_exists($chat, 'unreadMessages') and $chat->unreadMessages == 0) continue;
+
                         $phone = $chat->phone;
                         $username = $chat->username;
                         $name = $chat->name;
@@ -89,7 +95,8 @@ class CustomerorderController extends Controller
                             $orderDbSettings->sales_channel_uid = $lid->sales_channel_uid;
                             $orderDbSettings->states = $lid->states;
                             $orderDbSettings->lid = $lid->lid;
-                            
+                            $orderDbSettings->tasks = $lid->tasks;
+
                             $agentHref = $agents[0]->meta->href;
                             $customOrderS = new CustomerorderCreateLogicService($accountId, $msCnew);
                             $ordersByAgentRes = $customOrderS->findFirst(10, $agentHref);
@@ -101,21 +108,22 @@ class CustomerorderController extends Controller
                             $infoForTask->lineName = $lineName;
                             $infoForTask->messenger = $messenger;
 
+                            if ($responsible == 2 and property_exists($agents[0], 'owner')) $responsibleUuid = basename($agents[0]->owner->meta->href);
+
                             if(count($customerOrders) == 0){
                                 $agentControllerS->createOrderAndAttributes($orderDbSettings, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder, $infoForTask);
                             } else {
                                 $isCreate = $customOrderS->checkStateTypeEqRegular($customerOrders);
-                                if($isCreate){
-                                    //Regular
+                                if(!$isCreate){
+                                     //Final
                                     $agentControllerS->createOrderAndAttributes($orderDbSettings, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder, $infoForTask);
-
                                 } else {
-                                    //Final
+                                    //Regular
                                     $agentControllerS->updateAttributesIfNecessary($customerOrders);
                                 }
 
                             }
-                            
+
                         } else if(empty($agents)){
                             match($messenger){
                                 "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMeta),
@@ -134,8 +142,8 @@ class CustomerorderController extends Controller
                 $messageStack[] = "Для сотрудника $employeeId была создана задача";
             }
 
-            return response()->json();
-            
+            return response()->json([],200);
+
         } catch(Exception | Error $e){
             $current = $e;
             $messages = [];
@@ -145,7 +153,7 @@ class CustomerorderController extends Controller
                 $filePath = $current->getFile();
                 $fileLine = $current->getLine();
                 $message = $current->getMessage();
-                
+
                 $nextError = $current->getPrevious();
 
                 $parts = explode('|', $message);
@@ -180,7 +188,7 @@ class CustomerorderController extends Controller
                 $fileName = basename($filePath);
 
                 $key = "{$fileName}:{$fileLine}";
-                
+
                 $messages[] = [
                     $key => $value
                 ];

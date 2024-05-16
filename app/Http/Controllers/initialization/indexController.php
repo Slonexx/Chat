@@ -64,11 +64,12 @@ class indexController extends Controller
             $model = new settingModel();
             $model->accountId = $accountId;
             $model->tokenMs = $setting->TokenMoySklad;
+            $model->is_activate = true;
             $model->save();
         } else {
             $Attributes = $existingRecord->getAttributes();
             if ($Attributes['tokenMs'] != $setting->TokenMoySklad) {
-                settingModel::updateOrInsert(['accountId' => $accountId], ['accountId' => $accountId, 'tokenMs' => $setting->TokenMoySklad,]);
+                settingModel::updateOrInsert(['accountId' => $accountId], ['accountId' => $accountId, 'tokenMs' => $setting->TokenMoySklad, 'is_activate' => true]);
             }
         }
 
@@ -87,6 +88,7 @@ class indexController extends Controller
             try {
                 $ms->get('https://api.moysklad.ru/api/remap/1.2/entity/employee');
             } catch (BadResponseException) {
+                settingModel::updateOrInsert(['accountId' => $accountId], ['accountId' => $accountId, 'tokenMs' => $setting->TokenMoySklad, 'is_activate' => false]);
                 return view('setting.error', [
                     'message' => "Токен приложение умер, просьба сообщить разработчикам приложения",
 

@@ -28,6 +28,9 @@ class TaskService {
         $this->accountId = $accountId;
     }
 
+    /**
+     * @throws MsException
+     */
     public function create($body){
         $fullKey = "msUrls." . self::URL_IDENTIFIER;
         $url = Config::get($fullKey, null);

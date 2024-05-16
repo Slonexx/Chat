@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,16 +19,18 @@ class CheckCounterparty implements ShouldQueue
     public mixed $params;
 
     public string $url;
+    public string $method;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($params, $url)
+    public function __construct($params, $url, $method = 'GET')
     {
         $this->params = $params;
         $this->url = $url;
+        $this->method = $method;
     }
 
     /**
@@ -39,36 +42,41 @@ class CheckCounterparty implements ShouldQueue
     {
         $client = new Client([
             'verify' => false,
-            'timeout' => 7
+            'timeout' => 1200
         ]);
-        try {
-            $delay = mt_rand(20000, 500000);
-            usleep($delay);
-            $response = $client->post($this->url, $this->params);
 
-        } catch(ClientException $e) {
-            $msError = "Превышено ограничение на количество запросов в единицу времени";
+        $attempts = 3;
+        $delay = 20000;
 
-            $statusCode = $e->getResponse()->getStatusCode();
-            $body_encoded = $e->getResponse()->getBody()->getContents();
-
-            $body = json_decode($body_encoded);
-
-            $data = $body->data ?? false;
-
-            $inputMessage = null;
-            if($data){
-                $inputMessage = $response->data["errors"][0]["error"] ?? false;
-
-            }
-
-            if($statusCode == 429 && $inputMessage == $msError){
-                $delay = mt_rand(20000, 500000);
+        for ($i = 0; $i < $attempts; $i++) {
+            try {
+                $method = $this->method;
+                $client->$method($this->url, $this->params);
+                return; // Успешное выполнение, выходим из функции
+            } catch (ClientException $e) {
+                $this->handleClientException($e);
+                return;
+            } catch (RequestException $e) {
+                if ($i == $attempts - 1) {
+                    throw $e; // Повторные попытки исчерпаны, выбрасываем исключение
+                }
                 usleep($delay);
-                CheckCounterparty::dispatch($this->params, $this->url)->onConnection('database')->onQueue("low");
+                $delay *= 2; // Увеличиваем задержку экспоненциально
             }
-
         }
+    }
 
+    private function handleClientException(ClientException $e): void
+    {
+        $msError = "Превышено ограничение на количество запросов в единицу времени";
+        $statusCode = $e->getResponse()->getStatusCode();
+        $body_encoded = $e->getResponse()->getBody()->getContents();
+        $body = json_decode($body_encoded);
+        $data = $body->data ?? false;
+        $inputMessage = $data->errors[0]->error ?? false;
+
+        if ($statusCode == 429 && $inputMessage == $msError) {
+            CheckCounterparty::dispatch($this->params, $this->url)->onConnection('database')->onQueue("low");
+        }
     }
 }

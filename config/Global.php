@@ -3,6 +3,8 @@ $MsURL = "https://api.moysklad.ru/api/remap/1.2/";
 //$restartCommand = "c:\OSPanel\Open Server Panel.exe" /restart;
 return [
 
+    "state" => "{$MsURL}entity/customerorder/metadata/states/",
+
     "agent" => "{$MsURL}entity/counterparty/",
     "agentMetadataAttributes" => "{$MsURL}entity/counterparty/metadata/attributes/",
 

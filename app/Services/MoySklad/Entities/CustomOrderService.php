@@ -53,6 +53,9 @@ class CustomOrderService {
             return $expandedRes;
     }
 
+    /**
+     * @throws MsException
+     */
     public function create($body){
         $fullKey = "msUrls." . self::URL_IDENTIFIER;
         $url = Config::get($fullKey, null);
@@ -79,9 +82,9 @@ class CustomOrderService {
         try{
             $url = Config::get("Global")[self::URL_IDENTIFIER] . "metadata/";
             $statusesRes = $this->msC->getByUrl($url);
-            
+
             $res = new Response();
-            
+
             if($statusesRes->status){
                 $statuses = $statusesRes->data->states ?? null;
                 if($statuses === null)
@@ -121,5 +124,5 @@ class CustomOrderService {
         }
     }
 
-    
+
 }
