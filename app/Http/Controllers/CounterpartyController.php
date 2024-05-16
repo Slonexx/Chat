@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Clients\MoySklad;
-use App\Clients\MoySkladAsync;
 use App\Clients\oldMoySklad;
 use App\Exceptions\AgentFindLogicException;
 use App\Exceptions\CounterpartyControllerException;
@@ -22,21 +21,21 @@ use App\Services\MoySklad\Attributes\oldCounterpartyS;
 use App\Services\MoySklad\CreateNotesLogicService;
 use App\Services\MoySklad\Entities\CounterpartyNotesService;
 use App\Services\MoySklad\Entities\CounterpartyService;
-use App\Services\Response;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
 use DateTime;
 use Error;
 use Exception;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Laravel\Telescope\Telescope;
 use stdClass;
 
 class CounterpartyController extends Controller
 {
-    function create(Request $request, string $accountId){
+    function create(string $accountId)
+    {
         $messageStack = [];
-        try{
+        try {
             $handlerS = new HandlerService();
             $msC = new oldMoySklad($accountId);
             $setAttrS = new CreatingAttributeService($accountId, $msC);
@@ -45,25 +44,25 @@ class CounterpartyController extends Controller
             $attrNames = array_keys($mesAttr);
             $agentAttrS = new oldCounterpartyS($accountId, $msC);
             $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, $agentAttrS);
-            if(!$resAttr->status)
+            if (!$resAttr->status)
                 return $handlerS->responseHandler($resAttr);
             else
                 $messageStack[] = $resAttr->message;
 
             $orgs = organizationModel::getLineIdByAccountId($accountId);
             $msCnew = new MoySklad($accountId);
-            foreach($orgs as $item){
+            foreach ($orgs as $item) {
                 $employeeId = $item->employeeId;
                 $chatS = new ChatService($employeeId);
                 $lineId = $item->lineId;
                 $chatsRes = $chatS->getAllChatForEmployee(50, $lineId);
                 $messageStack[] = $chatsRes->message;
                 $agentH = new AgentMessengerHandler($accountId, $msCnew);
-                foreach($chatsRes->data as $messenger => $chats){
+                foreach ($chatsRes->data as $messenger => $chats) {
                     $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $messenger);
                     $attribute_id = $attribute->attribute_id;
                     $attrMeta = $handlerS->FormationMetaById("agentMetadataAttributes", "attributemetadata", $attribute_id);
-                    foreach($chats as $chat){
+                    foreach ($chats as $chat) {
                         $phone = $chat->phone;
                         $username = $chat->username;
                         $name = $chat->name;
@@ -72,18 +71,18 @@ class CounterpartyController extends Controller
                         $phoneForCreating = "+{$phone}";
 
                         $findLogicS = new AgentFindLogicService($accountId, $msCnew);
-                        try{
+                        try {
                             $agentByRequisitesRes = $findLogicS->findByRequisites($messenger, $chatId, $username, $name, $phone, $email, $attribute_id);
-                        } catch(AgentFindLogicException $e){
-                            if($e->getCode() == 1)
+                        } catch (AgentFindLogicException $e) {
+                            if ($e->getCode() == 1)
                                 continue;
                         }
                         $agents = $agentByRequisitesRes->data->rows;
                         //update
-                        if(!empty($agents)){
+                        if (!empty($agents)) {
                             $updateLogicS = new AgentUpdateLogicService($accountId, $msCnew);
                             $atUsername = "@{$username}";
-                            $addFieldValue = match($messenger){
+                            $addFieldValue = match ($messenger) {
                                 "telegram" => $atUsername,
                                 "whatsapp" => $chatId,
                                 "email" => $email,
@@ -94,9 +93,9 @@ class CounterpartyController extends Controller
                             };
                             $bodyWithAttr = $handlerS->FormationAttribute($attrMeta, $addFieldValue);
                             $updateLogicS->addTagsAndAttr($agents, $messenger, $bodyWithAttr);
-                        //create
-                        } else if(empty($agents)){
-                            match($messenger){
+                            //create
+                        } else if (empty($agents)) {
+                            match ($messenger) {
                                 "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMeta),
                                 "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMeta),
                                 "email" => $agentH->email($email, $attrMeta),
@@ -112,7 +111,7 @@ class CounterpartyController extends Controller
             }
             return response()->json();
 
-        } catch(Exception | Error $e){
+        } catch (Exception|Error $e) {
             $current = $e;
             $messages = [];
             $statusCode = 500;//or HTTP Exception code
@@ -134,20 +133,20 @@ class CounterpartyController extends Controller
                         "message" => $text,
                         "data" => json_decode($json_str)
                     ];
-                    if($nextError === null){
+                    if ($nextError === null) {
                         $messageStack["message"] = $text;
                         $code = $current->getCode();
-                        if($code >= 400)
+                        if ($code >= 400)
                             $statusCode = $code;
                     }
                 } else {
                     $value = [
                         "message" => $message
                     ];
-                    if($nextError === null){
+                    if ($nextError === null) {
                         $messageStack["message"] = $message;
                         $code = $current->getCode();
-                        if($code >= 400)
+                        if ($code >= 400)
                             $statusCode = $code;
                     }
                 }
@@ -168,9 +167,10 @@ class CounterpartyController extends Controller
 
     }
 
-    function importConversationsInNotes(Request $request, string $accountId){
+    function importConversationsInNotes(string $accountId)
+    {
         $messageStack = [];
-        try{
+        try {
             $handlerS = new HandlerService();
             $msC = new oldMoySklad($accountId);
             $setAttrS = new CreatingAttributeService($accountId, $msC);
@@ -179,14 +179,14 @@ class CounterpartyController extends Controller
             $attrNames = array_keys($mesAttr);
             $agentAttrS = new oldCounterpartyS($accountId, $msC);
             $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, $agentAttrS);
-            if(!$resAttr->status)
+            if (!$resAttr->status)
                 return $handlerS->responseHandler($resAttr);
             else
                 $messageStack[] = $resAttr->message;
 
             $orgs = organizationModel::getLineIdByAccountId($accountId);
             $notes = Notes::getByAccountId($accountId);
-            if($notes->isEmpty()){
+            if ($notes->isEmpty()) {
                 return response()->json();
             }
             $msCnew = new MoySklad($accountId);
@@ -194,7 +194,7 @@ class CounterpartyController extends Controller
             $isAddMessengerInfo = $firstNote->is_messenger;
             $lastStart = $firstNote->last_start;
             $date = new DateTime();
-            foreach($orgs as $item){
+            foreach ($orgs as $item) {
                 $lineId = $item->lineId;
                 $lineName = $item->lineName;
                 $employeeId = $item->employeeId;
@@ -204,11 +204,11 @@ class CounterpartyController extends Controller
                 $messageStack[] = $chatsRes->message;
                 $agentH = new AgentMessengerHandler($accountId, $msCnew);
                 $messageS = new MessageService($employeeId, $chatappReq);
-                foreach($chatsRes->data as $messenger => $chats){
+                foreach ($chatsRes->data as $messenger => $chats) {
                     $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $messenger);
                     $attribute_id = $attribute->attribute_id;
                     $attrMeta = $handlerS->FormationMetaById("agentMetadataAttributes", "attributemetadata", $attribute_id);
-                    foreach($chats as $chat){
+                    foreach ($chats as $chat) {
                         $phone = $chat->phone;
                         $username = $chat->username;
                         $name = $chat->name;
@@ -217,17 +217,17 @@ class CounterpartyController extends Controller
                         $phoneForCreating = "+{$phone}";
 
                         $findLogicS = new AgentFindLogicService($accountId, $msCnew);
-                        try{
+                        try {
                             $agentByRequisitesRes = $findLogicS->findByRequisites($messenger, $chatId, $username, $name, $phone, $email, $attribute_id);
-                        } catch(AgentFindLogicException $e){
-                            if($e->getCode() == 1)
+                        } catch (AgentFindLogicException $e) {
+                            if ($e->getCode() == 1)
                                 continue;
                         }
                         $agents = $agentByRequisitesRes->data->rows;
                         //update
-                        if(!empty($agents)){
+                        if (!empty($agents)) {
                             $atUsername = "@{$username}";
-                            $usernameOrPhone = match($messenger){
+                            $usernameOrPhone = match ($messenger) {
                                 "telegram" => $atUsername,
                                 "whatsapp" => $chatId,
                                 "email" => $email,
@@ -240,7 +240,7 @@ class CounterpartyController extends Controller
                             $MAX_UPLOAD_MESSAGE = 200;
                             $limitMessages = 100;
                             $messages = $createNotesS->getAllFromOldToNew($lineId, $messenger, $chatId, $limitMessages, $lastStart, $MAX_UPLOAD_MESSAGE);
-                            if(count($messages) == 0)
+                            if (count($messages) == 0)
                                 continue;
                             $preparedMessages = $messageS->prepareMessages($lineName, $lineId, $messenger, $usernameOrPhone, $isAddMessengerInfo, $messages);
                             //$messageS
@@ -256,11 +256,11 @@ class CounterpartyController extends Controller
                                 ]
                             ];
                             $appUrl = Config::get("Global.url", null);
-                            if(!is_string($appUrl) || $appUrl == null)
+                            if (!is_string($appUrl) || $appUrl == null)
                                 throw new Error("url отсутствует или имеет некорректный формат");
                             $preppedUrl = $appUrl . "api/counterparty/sendNotes/$accountId";
                             //foreach ($chunks as $chunk) {
-                            if(!empty($preparedMessages)){
+                            if (!empty($preparedMessages)) {
                                 $body = new stdClass();
                                 $body->messages = $preparedMessages;
                                 $body->url = $agents[0]->meta->href . "/notes";
@@ -270,9 +270,9 @@ class CounterpartyController extends Controller
 
                             //}
 
-                        //create
-                        } else if(empty($agents)){
-                            match($messenger){
+                            //create
+                        } else if (empty($agents)) {
+                            match ($messenger) {
                                 "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMeta),
                                 "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMeta),
                                 "email" => $agentH->email($email, $attrMeta),
@@ -289,9 +289,10 @@ class CounterpartyController extends Controller
             Notes::where('accountId', $accountId)
                 ->update(['last_start' => $date]);
 
+            Telescope::stopRecording();
             return response()->json();
 
-        } catch(Exception | Error $e){
+        } catch (Exception|Error $e) {
             $current = $e;
             $messages = [];
             $statusCode = 500;//or HTTP Exception code
@@ -313,20 +314,20 @@ class CounterpartyController extends Controller
                         "message" => $text,
                         "data" => json_decode($json_str)
                     ];
-                    if($nextError === null){
+                    if ($nextError === null) {
                         $messageStack["message"] = $text;
                         $code = $current->getCode();
-                        if($code >= 400)
+                        if ($code >= 400)
                             $statusCode = $code;
                     }
                 } else {
                     $value = [
                         "message" => $message
                     ];
-                    if($nextError === null){
+                    if ($nextError === null) {
                         $messageStack["message"] = $message;
                         $code = $current->getCode();
-                        if($code >= 400)
+                        if ($code >= 400)
                             $statusCode = $code;
                     }
                 }
@@ -346,120 +347,56 @@ class CounterpartyController extends Controller
         }
     }
 
-    function sendNotes(Request $request, $accountId){
-        try{
+    function sendNotes(Request $request, $accountId)
+    {
+        try {
             $data = json_decode(json_encode($request->all()));
             $url = $data->url;
             $messages = $data->messages;
-            // $maxCountRequest = $data->maxRequest;
-            // $loop = Loop::get();
-            // $promises = [];
-            // $start_time = microtime(true);
-            // $countStart = 1;
             $msClient = new MoySklad($accountId);
 
-            //$msClientA = new MoySkladAsync($accountId);
             foreach ($messages as $item) {
                 $body = (object)[
                     "description" => $item
                 ];
-                try {
-                    $msClient->post($url, $body);
-                    // $encodedBody = json_encode($body);
-                    // $msClientA->postAsync($url, $encodedBody, $loop)->then(
-                    //     function ($res) use ($maxCountRequest, $start_time, &$countStart, $loop) {
-                    //         //$this->info("Success {$item['accountId']}");
-                    //         $info = $res->getBody()->getContents();
-                    //         $promises[] = $info;
-                    //         if($countStart == $maxCountRequest){
-                    //             $decodedInfo = json_decode($info);
-                    //             $end_time =  $decodedInfo->data->time;
-                    //             $res_time = round($end_time - $start_time, 2);
-                    //             //$this->info("Время выполнения = {$res_time}c.");
-                    //             $loop->stop();
-                    //             //$this->info(strval($res->body()));
-                    //         }
-                    //         $countStart++;
-                    //     },
-                    //     function (Exception $e) use ($item){
-                    //         throw $e;
-                    //         //$this->info("Fail {$item['accountId']}");
-                    //         //$this->info(strval($e->getMessage()));
-                    //     }
-                    // );
-
-                } catch (RequestException $e) {
-                    throw $e;
-                    // $this->info('Что-то пошло не так при создании'. $item['UID_ms'] . $e->getMessage());
-                    // continue;
-                }
+                Telescope::stopRecording();
+                $msClient->post($url, $body);
             }
-            $peakMemoryUsage = memory_get_peak_usage(true);
-            //$this->info("Пиковое использование памяти: ".($peakMemoryUsage/1024));
-            // $resolvedPromises = all($promises);
-            return response()->json();
-            // if($countStart == $maxCountRequest){
-            //     $loop->run();
-            // }
 
-        } catch(Exception | Error $e){
-            $current = $e;
+            return response()->json();
+        } catch (Exception|Error $e) {
+            $statusCode = 500;
             $messages = [];
-            $statusCode = 500;//or HTTP Exception code
+            $current = $e;
 
             while ($current !== null) {
+                $message = $current->getMessage();
                 $filePath = $current->getFile();
                 $fileLine = $current->getLine();
-                $message = $current->getMessage();
-
-                $nextError = $current->getPrevious();
-
                 $parts = explode('|', $message);
 
-                if (count($parts) === 2) {
-                    $text = $parts[0];
-                    $json_str = array_pop($parts);
+                $value = count($parts) === 2
+                    ? ["message" => $parts[0], "data" => json_decode($parts[1])]
+                    : ["message" => $message];
 
-                    $value = [
-                        "message" => $text,
-                        "data" => json_decode($json_str)
-                    ];
-                    if($nextError === null){
-                        $messageStack["message"] = $text;
-                        $code = $current->getCode();
-                        if($code >= 400)
-                            $statusCode = $code;
-                    }
-                } else {
-                    $value = [
-                        "message" => $message
-                    ];
-                    if($nextError === null){
-                        $messageStack["message"] = $message;
-                        $code = $current->getCode();
-                        if($code >= 400)
-                            $statusCode = $code;
-                    }
+                if ($current->getPrevious() === null) {
+                    $statusCode = max($statusCode, $current->getCode());
+                    $messageStack["message"] = $message;
                 }
 
-
-                $fileName = basename($filePath);
-
-                $key = "{$fileName}:{$fileLine}";
-
                 $messages[] = [
-                    $key => $value
+                    basename($filePath) . ":$fileLine" => $value
                 ];
                 $current = $current->getPrevious();
             }
+
             $messageStack["error"] = $messages;
             return response()->json($messageStack, $statusCode);
         }
-
-
     }
 
-    function checkRate(Request $request, $accountId){
+    function checkRate($accountId)
+    {
         $messageStack = [];
         try {
             $msClient = new MoySklad($accountId);
@@ -468,7 +405,7 @@ class CounterpartyController extends Controller
 
             $counterparty = $agentRes->data->rows;
             $messageStack[] = $agentRes->message;
-            if(count($counterparty) == 0)
+            if (count($counterparty) == 0)
                 throw new CounterpartyControllerException("Отсутствуют контрагенты в МС");
 
             $counterpartyId = $counterparty[0]->id;
@@ -508,20 +445,20 @@ class CounterpartyController extends Controller
                         "message" => $text,
                         "data" => json_decode($json_str)
                     ];
-                    if($nextError === null){
+                    if ($nextError === null) {
                         $messageStack["message"] = $text;
                         $code = $current->getCode();
-                        if($code >= 400)
+                        if ($code >= 400)
                             $statusCode = $code;
                     }
                 } else {
                     $value = [
                         "message" => $message
                     ];
-                    if($nextError === null){
+                    if ($nextError === null) {
                         $messageStack["message"] = $message;
                         $code = $current->getCode();
-                        if($code >= 400)
+                        if ($code >= 400)
                             $statusCode = $code;
                     }
                 }
@@ -541,3 +478,120 @@ class CounterpartyController extends Controller
         }
     }
 }
+
+/*
+ *
+ * OLD CODE
+function sendNotes(Request $request, $accountId)
+{
+    try {
+        $data = json_decode(json_encode($request->all()));
+        $url = $data->url;
+        $messages = $data->messages;
+        // $maxCountRequest = $data->maxRequest;
+        // $loop = Loop::get();
+        // $promises = [];
+        // $start_time = microtime(true);
+        // $countStart = 1;
+        $msClient = new MoySklad($accountId);
+
+        //$msClientA = new MoySkladAsync($accountId);
+        foreach ($messages as $item) {
+            $body = (object)[
+                "description" => $item
+            ];
+            try {
+                $msClient->post($url, $body);
+                // $encodedBody = json_encode($body);
+                // $msClientA->postAsync($url, $encodedBody, $loop)->then(
+                //     function ($res) use ($maxCountRequest, $start_time, &$countStart, $loop) {
+                //         //$this->info("Success {$item['accountId']}");
+                //         $info = $res->getBody()->getContents();
+                //         $promises[] = $info;
+                //         if($countStart == $maxCountRequest){
+                //             $decodedInfo = json_decode($info);
+                //             $end_time =  $decodedInfo->data->time;
+                //             $res_time = round($end_time - $start_time, 2);
+                //             //$this->info("Время выполнения = {$res_time}c.");
+                //             $loop->stop();
+                //             //$this->info(strval($res->body()));
+                //         }
+                //         $countStart++;
+                //     },
+                //     function (Exception $e) use ($item){
+                //         throw $e;
+                //         //$this->info("Fail {$item['accountId']}");
+                //         //$this->info(strval($e->getMessage()));
+                //     }
+                // );
+
+            } catch (RequestException $e) {
+                throw $e;
+                // $this->info('Что-то пошло не так при создании'. $item['UID_ms'] . $e->getMessage());
+                // continue;
+            }
+        }
+        $peakMemoryUsage = memory_get_peak_usage(true);
+        //$this->info("Пиковое использование памяти: ".($peakMemoryUsage/1024));
+        // $resolvedPromises = all($promises);
+        return response()->json();
+        // if($countStart == $maxCountRequest){
+        //     $loop->run();
+        // }
+
+    } catch (Exception|Error $e) {
+        $current = $e;
+        $messages = [];
+        $statusCode = 500;//or HTTP Exception code
+
+        while ($current !== null) {
+            $filePath = $current->getFile();
+            $fileLine = $current->getLine();
+            $message = $current->getMessage();
+
+            $nextError = $current->getPrevious();
+
+            $parts = explode('|', $message);
+
+            if (count($parts) === 2) {
+                $text = $parts[0];
+                $json_str = array_pop($parts);
+
+                $value = [
+                    "message" => $text,
+                    "data" => json_decode($json_str)
+                ];
+                if ($nextError === null) {
+                    $messageStack["message"] = $text;
+                    $code = $current->getCode();
+                    if ($code >= 400)
+                        $statusCode = $code;
+                }
+            } else {
+                $value = [
+                    "message" => $message
+                ];
+                if ($nextError === null) {
+                    $messageStack["message"] = $message;
+                    $code = $current->getCode();
+                    if ($code >= 400)
+                        $statusCode = $code;
+                }
+            }
+
+
+            $fileName = basename($filePath);
+
+            $key = "{$fileName}:{$fileLine}";
+
+            $messages[] = [
+                $key => $value
+            ];
+            $current = $current->getPrevious();
+        }
+        $messageStack["error"] = $messages;
+        return response()->json($messageStack, $statusCode);
+    }
+
+
+}*/

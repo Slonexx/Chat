@@ -50,7 +50,7 @@ class webCounterpartyController extends Controller
 
         if ($notes == '1') {
             $newController = new CounterpartyController();
-            $notes_check = $newController->checkRate($request, $accountId);
+            $notes_check = $newController->checkRate($accountId);
 
 
             if ($notes_check->status() == 401){

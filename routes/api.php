@@ -4,7 +4,6 @@ use App\Http\Controllers\CounterpartyController;
 use App\Http\Controllers\CustomerorderController;
 use App\Http\Controllers\integration\connectController;
 use App\Http\Controllers\integration\entity\counterparty;
-use App\Http\Controllers\Setting\AutomatizationController;
 use App\Http\Controllers\Setting\sendTemplateController;
 use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;

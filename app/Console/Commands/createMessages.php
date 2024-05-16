@@ -37,17 +37,15 @@ class createMessages extends Command
         $params = [
             "headers" => [
                 'Content-Type' => 'application/json'
-                ]
-            ];
+            ]
+        ];
 
         foreach ($allUsers as $item) {
             try {
-                $accountId = $item->accountId;
-                $notesCollection = Notes::where("accountId", $accountId)
-                    ->where("notes", true)
-                    ->get();
-                if($notesCollection->isNotEmpty()){
-                    $url = Config::get('Global.url') /*''*/ . "api/counterparty/import_dialogs/${$accountId}";
+                $accountId = $item->account_id;
+                $notesCollection = Notes::where("accountId", $accountId)->where("notes", true)->get();
+                if ($notesCollection->isNotEmpty()) {
+                    $url = Config::get('Global.url') . "api/counterparty/import_dialogs/{$accountId}";
                     CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
                     $this->info('Продолжение выполнения команды.');
                 }

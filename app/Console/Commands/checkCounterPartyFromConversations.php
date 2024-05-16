@@ -39,17 +39,17 @@ class checkCounterPartyFromConversations extends Command
                 'Content-Type' => 'application/json'
                 ]
             ];
-            
+
         foreach ($allUsers as $item) {
             try {
-                $accountId = $item->accountId;
-                $notesCollection = Notes::where("is_activity_agent", true)->get();
+                $accountId = $item->account_id;
+                $notesCollection = Notes::where('accountId', $accountId)->where("is_activity_agent", true)->get();
                 if($notesCollection->isNotEmpty()){
-                    $url = Config::get('Global.url') /*''*/ . "api/counterparty/create/${$accountId}";
+                    $url = Config::get('Global.url') . "api/counterparty/create/{$accountId}";
                     CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
                     $this->info('Продолжение выполнения команды.');
                 }
-                
+
             } catch (Exception $e) {
                 Log::info('Непредвиденная ошибка' . $e->getMessage());
                 continue;
