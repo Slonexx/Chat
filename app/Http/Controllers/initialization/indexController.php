@@ -57,19 +57,18 @@ class indexController extends Controller
         $uid = $request->uid ?? "логин аккаунта";
 
         $setting = new getSettingVendorController($accountId);
-        MainSettings::updateOrInsert(['account_id' => $accountId], ['account_id' => $accountId, 'ms_token' => $setting->TokenMoySklad]);
+        MainSettings::updateOrInsert(['account_id' => $accountId], ['account_id' => $accountId, 'ms_token' => $setting->TokenMoySklad, 'is_activate' => true]);
         $existingRecord = settingModel::find($accountId);
 
         if ($existingRecord == null) {
             $model = new settingModel();
             $model->accountId = $accountId;
             $model->tokenMs = $setting->TokenMoySklad;
-            $model->is_activate = true;
             $model->save();
         } else {
             $Attributes = $existingRecord->getAttributes();
             if ($Attributes['tokenMs'] != $setting->TokenMoySklad) {
-                settingModel::updateOrInsert(['accountId' => $accountId], ['accountId' => $accountId, 'tokenMs' => $setting->TokenMoySklad, 'is_activate' => true]);
+                settingModel::updateOrInsert(['accountId' => $accountId], ['accountId' => $accountId, 'tokenMs' => $setting->TokenMoySklad]);
             }
         }
 
