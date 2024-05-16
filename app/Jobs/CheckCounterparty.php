@@ -6,7 +6,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -17,15 +16,13 @@ class CheckCounterparty implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public mixed $params;
-
     public string $url;
     public string $method;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
+    // Установка количества попыток и тайм-аута
+    public int $tries = 5;
+    public int $timeout = 600;
+
     public function __construct($params, $url, $method = 'GET')
     {
         $this->params = $params;
@@ -33,11 +30,6 @@ class CheckCounterparty implements ShouldQueue
         $this->method = $method;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle()
     {
         $client = new Client([
@@ -66,7 +58,7 @@ class CheckCounterparty implements ShouldQueue
         }
     }
 
-    private function handleClientException(ClientException $e): void
+    private function handleClientException(ClientException $e)
     {
         $msError = "Превышено ограничение на количество запросов в единицу времени";
         $statusCode = $e->getResponse()->getStatusCode();
@@ -80,3 +72,4 @@ class CheckCounterparty implements ShouldQueue
         }
     }
 }
+
