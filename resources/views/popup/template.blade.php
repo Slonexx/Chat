@@ -20,7 +20,6 @@
                     </div>
                 </div>
                 <hr>
-                <!-- <div id="templates" class="mt-2" style="display: block"></div> -->
                 <ul id="toc" class="toc-list-h1-title" style="display: block">
                 </ul>
             </div>

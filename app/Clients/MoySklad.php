@@ -1,6 +1,7 @@
 <?php
 namespace App\Clients;
 
+use App\Services\Response;
 use GuzzleHttp\Client;
 use App\Models\MainSettings;
 use InvalidArgumentException;
@@ -53,6 +54,33 @@ class MoySklad {
 
     public function delete($url){
         return $this->client->delete($url);
+    }
+
+    public function getByUrl($url){
+        try {
+            $answer = $this->client->get($url, ['http_errors' => false]);
+            return $this->ResponseHandler($answer);
+
+        } catch(Exception $e) {
+            return $this->ResponseExceptionHandler($e);
+        }
+    }
+
+    public function ResponseExceptionHandler($e){
+        $res = new Response();
+
+        return $res->customResponse($e, 500, false, $e->getMessage());
+    }
+
+    public function ResponseHandler($response){
+        $res = new Response();
+
+        $body = $response->getBody()->getContents();
+        $responseData = json_decode($body);
+        $statusCode = $response->getStatusCode();
+        $statusCondition = $statusCode < 400;
+
+        return $res->customResponse($responseData, $statusCode, $statusCondition);
     }
 
 }

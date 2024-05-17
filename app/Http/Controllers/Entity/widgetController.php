@@ -19,12 +19,12 @@ class widgetController extends Controller
 {
     public function widgetObject(Request $request, $object): Factory|View|Application
     {
-        /* $accountId = '1dd5bd55-d141-11ec-0a80-055600047495';
+        $accountId = '1dd5bd55-d141-11ec-0a80-055600047495';
 
-          $client = new MsClient($accountId);
-          $employee = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/employee/9989675d-5130-11ee-0a80-0c7f00028929');*/
+        $client = new MsClient($accountId);
+        $employee = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/employee/e793faeb-e63a-11ec-0a80-0b4800079eb3');
 
-        try {
+       /* try {
             $vendorAPI = new VendorApiController();
             $employee = $vendorAPI->context($request->contextKey);
             if (!$employee->status) {
@@ -42,7 +42,7 @@ class widgetController extends Controller
                 'code' => 400,
                 'message' => "Проблема с получением данных виджета, просьба срочно сообщить разработчиком ",
             ]);
-        }
+        }*/
 
         $employeeModel = employeeModel::where('employeeId', $employee->id)->first();
         if ($employeeModel == null) {
@@ -64,7 +64,6 @@ class widgetController extends Controller
 
         $accountId = $employee->accountId;
         $Client = new MsClient($accountId);
-        $newClient = new newClient($employee->id);
 
         try {
             $Client->get("https://api.moysklad.ru/api/remap/1.2/entity/employee");
@@ -92,6 +91,7 @@ class widgetController extends Controller
         $accountId = $request->accountId ?? '';
         $entity_type = $request->entity_type ?? '';
         $entityId = $request->entityId ?? '';
+        $phone = '';
         $employee = json_decode(json_encode($request->employee ?? null)) ?? '';
 
 
@@ -104,51 +104,41 @@ class widgetController extends Controller
                 $error = json_decode($e->getResponse()->getBody()->getContents());
 
                 if ($error->error->code == 'ApiInvalidTokenError') {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Ошибка токена сотрудника, просьба зайти в приложение в раздел " Сотрудники и доступы ", напротив сотрудника ' .
-                            $employee->employeeName . ' нажмите на кнопку "изменить", после в всплывающем окне нажмите на кнопку "изменить"',
-                        'onToken' => ""
-                    ]);
-                } else
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Ошибка получение линий в ChatApp, просьба сообщить разработчиком приложения, ' . $e->getMessage(),
-                        'onToken' => ""
-                    ]);
+                    return $this->returnJson(
+                        'Ошибка токена сотрудника, просьба зайти в приложение в раздел " Сотрудники и доступы ", напротив сотрудника ' .
+                        $employee->employeeName . ' нажмите на кнопку "изменить", после в всплывающем окне нажмите на кнопку "изменить"',
+                        ""
+                    );
+                } else return $this->returnJson('Ошибка получение линий в ChatApp, просьба сообщить разработчиком приложения, ' . $e->getMessage(), "");
             }
             if ($license->data == []) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Ошибка получение линий в ChatApp',
-                    'onToken' => http_build_query([
+                return $this->returnJson(
+                    'Ошибка получение линий в ChatApp',
+                    http_build_query([
                         'api' => [
                             'access_token' => $employee->accessToken,
                         ],
-                    ]),
-                ]);
+                    ])
+                );
             }
 
 
             try {
-                $url = 'https://api.moysklad.ru/api/remap/1.2/entity/' . $entity_type . '/' . $entityId;
-                if ($entity_type == 'counterparty') {
-                    $agent = $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $entity_type . '/' . $entityId);
-                } else {
-                    $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $entity_type . '/' . $entityId.'?expand=agent');
+                if ($entity_type == 'counterparty') $agent = $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $entity_type . '/' . $entityId);
+                else {
+                    $documents = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $entity_type . '/' . $entityId . '?expand=agent');
                     $agent = $documents->agent;
                 }
 
             } catch (BadResponseException $e) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Ошибка запроса в МС = ' . $e->getMessage(),
-                    'onToken' => http_build_query([
+                return $this->returnJson(
+                    'Ошибка запроса в МС = ' . $e->getMessage(),
+                    http_build_query([
                         'api' => [
                             'access_token' => $employee->accessToken,
                         ],
-                    ]),
-                ]);
+                    ])
+                );
             }
             if ($entity_type == 'counterparty') $organId = 0;
             else $organId = basename($documents->organization->meta->href);
@@ -159,50 +149,48 @@ class widgetController extends Controller
 
             $existingRecords = organizationModel::where('accountId', $accountId)->where('employeeId', $employee->employeeId)->get();
             if (!$existingRecords->isEmpty()) {
-                foreach ($existingRecords as $record) {
-                    if ($record->organId == 0) {
+                foreach ($existingRecords as $record)
+                    if ($record->organId == 0 or $record->organId == $organId) {
                         $license_id = $record->lineId;
                         $license_full = $record->lineName;
                         break;
                     }
-                    if ($record->organId == $organId) {
-                        $license_id = $record->lineId;
-                        $license_full = $record->lineName;
-                        break;
-                    }
-                }
             }
-
 
             if (property_exists($agent, 'phone')) {
                 $phone = str_replace(" ", "", $agent->phone);
                 $phone = str_replace("(", "", $phone);
                 $phone = str_replace(")", "", $phone);
                 $phone = substr($phone, -10);
-                if (strlen($phone) > 16) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => "Некорректный номер телефона контрагента",
-                        'onToken' => http_build_query([
-                            'api' => [
-                                'access_token' => $employee->accessToken,
-                            ],
-                        ]),
-                    ]);
+                if (strlen($phone) > 16) return $this->returnJson('Некорректный номер телефона контрагента', http_build_query([
+                    'api' => [
+                        'access_token' => $employee->accessToken,
+                    ],
+                ]));
+            }
+
+            $dialogIds = [];
+            if (property_exists($agent, 'attributes')) {
+                $name_attributes = [
+                    'WhatsApp для ChatApp', 'Telegram для ChatApp', 'Telegram bot для ChatApp',
+                    'VKontakte для ChatApp', 'Email для ChatApp', 'Instagram для ChatApp',
+                    'Avito для ChatApp', 'Facebook для ChatApp'
+                ];
+                foreach ($agent->attributes as $item) {
+                    if (in_array($item->name, $name_attributes)) $dialogIds[] = $item->value;
+                    if ($item->name == 'WhatsApp для ChatApp' and $phone == '') {
+                        $phone = preg_replace('/\D/', '', $item->value);
+                        $phone = substr($phone, -10);
+                    }
                 }
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => "Отсутствует номер телефона контрагента",
-                    'onToken' => http_build_query([
-                        'api' => [
-                            'access_token' => $employee->accessToken,
-                        ],
-                    ]),
-                ]);
             }
 
 
+            if ($phone == '') return $this->returnJson('Отсутствует номер телефона контрагента', http_build_query([
+                'api' => [
+                    'access_token' => $employee->accessToken,
+                ],
+            ]));
             $all = [
                 'api' => [
                     'access_token' => $employee->accessToken,
@@ -214,9 +202,7 @@ class widgetController extends Controller
                     'phones' => [
                         $phone,
                     ],
-                    'dialogIds' => [
-                        //Сделать изменения по Диалог
-                    ]
+                    'dialogIds' => $dialogIds
                 ],
             ];
             if ($all['api']['license_id'] == 0) {
@@ -229,6 +215,7 @@ class widgetController extends Controller
                 'license_full' => $license_full,
                 'agent' => $agent->name,
                 'phone' => $phone,
+                'dialogIds' => $dialogIds,
 
                 'all' => http_build_query($all),
                 'onToken' => http_build_query([
@@ -237,14 +224,21 @@ class widgetController extends Controller
                     ],
                 ]),
             ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Ошибка загрузки данных'
-            ]);
-        }
-
+        } else return $this->returnJson('Ошибка загрузки данных', '', true);
     }
 
+
+    private function returnJson(string $message, $onToken = "", $bool = false)
+    {
+
+        $arr = [
+            'status' => false,
+            'message' => $message,
+            'onToken' => $onToken
+        ];
+        if ($bool) unset($arr['onToken']);
+
+        return response()->json($arr);
+    }
 
 }

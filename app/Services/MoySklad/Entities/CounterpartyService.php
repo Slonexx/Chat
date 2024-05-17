@@ -118,6 +118,7 @@ class CounterpartyService{
             return $expandedRes->addMessage("Ошибка при получении расширенного контрагента");
         else
             return $expandedRes;
+
     }
 
     public function create($body){

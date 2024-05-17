@@ -64,7 +64,7 @@ class createCustomerOrder extends Command
                 try {
                     if ($item) {
                         $url = Config::get('Global.url') . "api/customerorder/create/$key";
-                        CheckCounterparty::dispatch($params, $url, 'get')->onConnection('database')->onQueue("high");
+                        CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
                         $this->info('Продолжение выполнения команды.');
 
                     }
