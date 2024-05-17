@@ -7,6 +7,14 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+
+    protected $commands = [
+        \App\Console\Commands\checkCounterPartyFromConversations::class,
+        \App\Console\Commands\createCustomerOrder::class,
+        \App\Console\Commands\createMessages::class,
+        \App\Console\Commands\updateAccessTokenEmployeeChatApp::class,
+    ];
+
     /**
      * Define the application's command schedule.
      *

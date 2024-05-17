@@ -13,30 +13,32 @@ use Illuminate\Support\Facades\Log;
 
 class checkCounterPartyFromConversations extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'counterparty:check';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Команда проверяет последние 50 чатов по всем мессенджерам на наличие контрагентов в МС';
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function handle()
+    public function handle(): void
     {
+        // Время блокировки в секундах (например, 1 час)
+        $lockTime = 6300;
 
-        $mutex = Cache::lock('counterparty_check', 6300);
-        if ($mutex->get()) {
+        // Ключ кеша для хранения времени последнего выполнения
+        $cacheKey = 'counterparty_run';
+
+        // Получаем текущее время
+        $currentTime = now()->timestamp;
+
+        // Проверяем время последнего выполнения
+        $lastRunTime = Cache::get($cacheKey, 0);
+
+        if ($currentTime - $lastRunTime < $lockTime) {
+            $this->info('Команда уже недавно выполнялась. Повторный запуск не требуется.');
+            return;
+        }
+
+        // Обновляем время последнего выполнения задачи
+        Cache::put($cacheKey, $currentTime, $lockTime);
+
+        try {
             $allUsers = MainSettings::where("is_activate", true)->get()->all();
             $params = [
                 "headers" => [
@@ -49,7 +51,7 @@ class checkCounterPartyFromConversations extends Command
                     $accountId = $item->account_id;
                     $notesCollection = Notes::where('accountId', $accountId)->where("is_activity_agent", true)->get();
                     if ($notesCollection->isNotEmpty()) {
-                        $url = Config::get('Global.url') . "api/counterparty/create/{$accountId}";
+                        $url = Config::get('Global.url') . "api/counterparty/create/$accountId";
                         CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
                         $this->info('Продолжение выполнения команды.');
                     }
@@ -59,6 +61,11 @@ class checkCounterPartyFromConversations extends Command
                     continue;
                 }
             }
+        } catch (Exception $e) {
+            Log::error('Ошибка при выполнении команды: ' . $e->getMessage());
         }
+
     }
+
+
 }
