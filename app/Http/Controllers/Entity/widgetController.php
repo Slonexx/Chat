@@ -186,7 +186,7 @@ class widgetController extends Controller
             }
 
 
-            if ($phone == '') return $this->returnJson('Отсутствует номер телефона контрагента', http_build_query([
+            if ($phone == '' and $dialogIds == []) return $this->returnJson('Отсутствует номер телефона контрагента', http_build_query([
                 'api' => [
                     'access_token' => $employee->accessToken,
                 ],
