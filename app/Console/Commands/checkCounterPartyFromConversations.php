@@ -7,6 +7,7 @@ use App\Models\MainSettings;
 use App\Models\Notes;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
@@ -33,26 +34,30 @@ class checkCounterPartyFromConversations extends Command
      */
     public function handle()
     {
-        $allUsers = MainSettings::where("is_activate", true)->get()->all();
-        $params = [
-            "headers" => [
-                'Content-Type' => 'application/json'
+
+        $mutex = Cache::lock('counterparty_check', 6300);
+        if ($mutex->get()) {
+            $allUsers = MainSettings::where("is_activate", true)->get()->all();
+            $params = [
+                "headers" => [
+                    'Content-Type' => 'application/json'
                 ]
             ];
 
-        foreach ($allUsers as $item) {
-            try {
-                $accountId = $item->account_id;
-                $notesCollection = Notes::where('accountId', $accountId)->where("is_activity_agent", true)->get();
-                if($notesCollection->isNotEmpty()){
-                    $url = Config::get('Global.url') . "api/counterparty/create/{$accountId}";
-                    CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
-                    $this->info('Продолжение выполнения команды.');
-                }
+            foreach ($allUsers as $item) {
+                try {
+                    $accountId = $item->account_id;
+                    $notesCollection = Notes::where('accountId', $accountId)->where("is_activity_agent", true)->get();
+                    if ($notesCollection->isNotEmpty()) {
+                        $url = Config::get('Global.url') . "api/counterparty/create/{$accountId}";
+                        CheckCounterparty::dispatch($params, $url)->onConnection('database')->onQueue("high");
+                        $this->info('Продолжение выполнения команды.');
+                    }
 
-            } catch (Exception $e) {
-                Log::info('Непредвиденная ошибка' . $e->getMessage());
-                continue;
+                } catch (Exception $e) {
+                    Log::info('Непредвиденная ошибка' . $e->getMessage());
+                    continue;
+                }
             }
         }
     }

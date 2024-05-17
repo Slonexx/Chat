@@ -19,7 +19,6 @@ return [
             'retry_after' => 90,
             'after_commit' => false,
             'timeout' => 600, // время в секундах
-            'tries' => 5, // количество попыток
         ],
 
         'beanstalkd' => [

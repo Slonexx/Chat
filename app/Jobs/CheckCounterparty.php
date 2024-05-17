@@ -20,7 +20,6 @@ class CheckCounterparty implements ShouldQueue
     public string $method;
 
     // Установка количества попыток и тайм-аута
-    public int $tries = 5;
     public int $timeout = 600;
 
     public function __construct($params, $url, $method = 'GET')
@@ -30,35 +29,27 @@ class CheckCounterparty implements ShouldQueue
         $this->method = $method;
     }
 
-    public function handle()
+    public function handle(): void
     {
         $client = new Client([
             'verify' => false,
             'timeout' => 1200
         ]);
-
-        $attempts = 3;
-        $delay = 20000;
-
-        for ($i = 0; $i < $attempts; $i++) {
-            try {
-                $method = $this->method;
-                $client->$method($this->url, $this->params);
-                return; // Успешное выполнение, выходим из функции
-            } catch (ClientException $e) {
-                $this->handleClientException($e);
-                return;
-            } catch (RequestException $e) {
-                if ($i == $attempts - 1) {
-                    throw $e; // Повторные попытки исчерпаны, выбрасываем исключение
-                }
-                usleep($delay);
-                $delay *= 2; // Увеличиваем задержку экспоненциально
-            }
+        $delay = mt_rand(20000, 500000);
+        usleep($delay);
+        try {
+            $method = $this->method;
+            $client->$method($this->url, $this->params);
+            return; // Успешное выполнение, выходим из функции
+        } catch (ClientException $e) {
+            $this->handleClientException($e);
+            return;
+        } catch (RequestException) {
+            return;
         }
     }
 
-    private function handleClientException(ClientException $e)
+    private function handleClientException(ClientException $e): void
     {
         $msError = "Превышено ограничение на количество запросов в единицу времени";
         $statusCode = $e->getResponse()->getStatusCode();

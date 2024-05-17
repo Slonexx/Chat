@@ -64,7 +64,7 @@ class AddFieldsController extends Controller
                     $attrs = AttributeSettings::where("entity_type", $entityType)
                         ->whereIn("attribute_id", $attrForDeleting);
                     $varIdsForDeleting = $attrs->get()->pluck('id')->all();
-                    
+
                     Variables::whereIn("attribute_settings_id", $varIdsForDeleting)->delete();
 
                     $attrs->delete();
@@ -72,14 +72,14 @@ class AddFieldsController extends Controller
                 foreach($attrForDeleting as $key => $item){
                     unset($attrSetAfterDeleting[$entityType][$key]);
                 }
-                
+
             }
 
             $attrForDeleting = [];
             $attrSet = [];
 
             $attributesWithoutFilled = (array) $msAttr;
-            
+
             //2)delete filled attributes from all available attributes
             foreach($attrSetAfterDeleting as $entityType => $attributeArray){
                 $attributesWithoutFilled[$entityType] = array_filter($msAttr->$entityType, fn($value)=> !in_array($value->id, $attributeArray));
@@ -89,7 +89,7 @@ class AddFieldsController extends Controller
                 $attributesWithoutFilled[$entityType] = $cuttedAttrArray;
             }
 
-            
+
 
             return view('setting.add_fields.add_fields', [
                 'addFieldsWithValues' => $attrSetAfterDeleting,
@@ -101,7 +101,8 @@ class AddFieldsController extends Controller
                 'fullName' => $fullName,
                 'uid' => $uid,
             ]);
-        } catch(Exception $e){
+        }
+        catch(Exception $e){
             return response()->json($e->getMessage(), 500);
         }
     }
@@ -148,7 +149,7 @@ class AddFieldsController extends Controller
                 foreach($attrForDeleting as $key => $item){
                     unset($attrSetAfterDeleting[$entityType][$key]);
                 }
-                
+
             }
 
             $attrForDeleting = [];
@@ -159,7 +160,7 @@ class AddFieldsController extends Controller
             $res->data = $attrSetAfterDeleting;
             return response()->json($res);
 
-            
+
 
         } catch(Exception $e){
             return response()->json($e->getMessage(), 500);
@@ -187,7 +188,7 @@ class AddFieldsController extends Controller
                         $entity_type,
                         $name,
                         $attribute_id
-                    ], 
+                    ],
                 "Один или несколько параметров пусты");
                 return $handlerS->responseHandler($er, true, false);
             }
@@ -206,7 +207,7 @@ class AddFieldsController extends Controller
             return response()->json($res);
 
 
-            //чисто теоретически клиент Б может добавить доп.поле клиенту А зная его UUID в моём складе. 
+            //чисто теоретически клиент Б может добавить доп.поле клиенту А зная его UUID в моём складе.
             //Но так как клиенту выдаются только его доп.поля это не представляется возможным
             //AttributeSettings::where("attribute_id", )
 
@@ -216,12 +217,12 @@ class AddFieldsController extends Controller
             // $rolesIds = Role::whereIn('uuid', $roleUuids)->pluck('id')->toArray();
 
             // $user->roles()->attach($rolesIds);
-            
+
         } catch(Exception $e){
             return response()->json($e->getMessage(), 500);
         }
     }
-    
+
     function deleteAddField($accountId, $uuid){
         try{
             $res = new Response();
