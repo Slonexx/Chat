@@ -6,6 +6,7 @@ use App\Http\Controllers\integration\connectController;
 use App\Http\Controllers\integration\entity\counterparty;
 use App\Http\Controllers\Setting\sendTemplateController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\webhook\webHookController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(["prefix" => "integration"], function () {
@@ -27,3 +28,4 @@ Route::get('counterparty/notes/check/{accountId}', [CounterpartyController::clas
 
 Route::get("check", [TestController::class, "check"]);
 Route::post("webhook/yes", [TestController::class, "yes"]);
+Route::post("webhook/{accountId}/licenses/{lineId}/messengers/{messengers}", [webHookController::class, "callbackUrls"]);
