@@ -26,4 +26,4 @@ Route::post('counterparty/sendNotes/{accountId}', [CounterpartyController::class
 Route::get('counterparty/notes/check/{accountId}', [CounterpartyController::class, 'checkRate'])->name('checkNotes');
 
 Route::get("check", [TestController::class, "check"]);
-Route::get("webhook/yes", [TestController::class, "yes"]);
+Route::post("webhook/yes", [TestController::class, "yes"]);
