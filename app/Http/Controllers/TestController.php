@@ -18,6 +18,9 @@ class TestController extends Controller
     }
 
     function testReturnMainFields(){
-        
+
+    }
+    function yes(){
+        return response()->json([],200);
     }
 }
