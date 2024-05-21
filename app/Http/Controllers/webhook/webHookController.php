@@ -27,7 +27,7 @@ class webHookController extends Controller
     {
         if ($request->all() == []) return response()->json();
 
-        $requestData = $request->data;
+        $requestData = json_decode(json_encode($request->data));
 
         if (empty($requestData)){
             return response()->json((object)[
