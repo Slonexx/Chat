@@ -16,19 +16,29 @@ class CreateNotesLogicService{
 
     private MoySklad $msC;
 
-    private ChatappRequest $chatappReq;
-
     private string $accountId;
 
     private Response $res;
 
-    function __construct(string $accountId, MoySklad $MoySklad = null, string $employeeId, ChatappRequest $chatappReq = null) {
+    function __construct(string $accountId, MoySklad $MoySklad = null) {
         if ($MoySklad == null) $this->msC = new MoySklad($accountId);
         else  $this->msC = $MoySklad;
-        if ($employeeId == null) $this->chatappReq = new ChatappRequest($employeeId);
-        else  $this->chatappReq = $chatappReq;
         $this->accountId = $accountId;
         $this->res = new Response();
+    }
+
+    function create($lineId, $messenger, $chatId, $limitMessages, $timeFromDb = null, $MAX_UPLOAD_MESSAGE){
+        $messages = [];
+        $compliances = [
+            "whatsapp" => "grWhatsApp",
+            "telegram" => "telegram",
+            "email" => "email",
+            "vk" => "vkontakte",
+            "instagram" => "instagram",
+            "telegram_bot" => "telegramBot",
+            "avito" => "avito"
+        ];
+        
     }
 
     function getAllFromOldToNew($lineId, $messenger, $chatId, $limitMessages, $timeFromDb = null, $MAX_UPLOAD_MESSAGE){
