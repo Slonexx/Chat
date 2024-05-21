@@ -47,6 +47,28 @@ class organizationModel extends Model
             ];
         }
     }
+
+    public static function getInformationByEmployee(mixed $employeeId): object
+    {
+        $model = organizationModel::where('employeeId', $employeeId)->get();
+        if (!$model->isEmpty()) {
+            $toArray = null;
+            foreach ($model as $item) {
+                $toArray[] = $item->toArray();
+            }
+
+            return (object)[
+                'query' => $model,
+                'toArray' => $toArray,
+            ];
+        } else {
+            return (object)[
+                'query' => $model,
+                'toArray' => null,
+            ];
+        }
+    }
+
     /**
      * @return object[] lineId for Chatapp
      */

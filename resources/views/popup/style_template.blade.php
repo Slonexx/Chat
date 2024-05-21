@@ -191,8 +191,8 @@
     }
 
     .container {
-        margin-top: 4rem;
-        width: 50%;
+        margin-top: 2rem;
+        width: 70%;
       /*  height: 630px; !* Задайте нужную высоту контейнера *!
         max-height: 630px; !* Задайте нужную высоту контейнера *!
         min-height: 60%; !* Задайте нужную высоту контейнера *!*/

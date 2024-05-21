@@ -4,20 +4,15 @@ namespace App\Http\Controllers\Entity;
 
 use App\Clients\MsClient;
 use App\Clients\newClient;
-use App\Http\Controllers\BD\getMainSettingBD;
 use App\Http\Controllers\Controller;
-use App\Models\organizationModel;
 use App\Models\polesModel;
 use App\Models\templateModel;
-use App\Services\ticket\DevService;
-use App\Services\ticket\TicketService;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use JetBrains\PhpStorm\ArrayShape;
 
 class PopapController extends Controller
 {
@@ -31,54 +26,6 @@ class PopapController extends Controller
         return view('popup.template');
     }
 
-    public function getTemplate(Request $request): JsonResponse
-    {
-        $data = json_decode(json_encode([
-            'accountId' => $request->accountId ?? "",
-            'object_Id' => $request->object_Id ?? "",
-            'entity_type' => $request->entity_type ?? "",
-        ]));
-
-        $client = new MsClient($data->accountId);
-        try {
-            $entity = $client->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $data->entity_type . '/' . $data->object_Id);
-        } catch (BadResponseException $e) {
-            return response()->json([
-                'status' => true,
-                'data' => $e->getMessage(),
-            ]);
-        }
-
-        $res = [];
-        try {
-            $model = templateModel::where('accountId', $data->accountId)->get();
-            if (!$model->isEmpty()) {
-                foreach ($model as $item) {
-                    $array = $item->toArray();
-
-                    $polesModel = polesModel::where('accountId', $data->accountId)->where('name_uid', ($item->toArray())['name_uid'])->get();
-                    if (!$polesModel->isEmpty()) {
-                        foreach ($polesModel as $polesModelItem) {
-                            $polesModelItemToArray = $polesModelItem->toArray();
-                            $array['message'] = $this->messageUpdate($client, $entity, $array['message'], $polesModelItemToArray['i'], $polesModelItemToArray['pole'], $polesModelItemToArray['add_pole']);
-                        }
-                    }
-                    $res[] = $array;
-                }
-            }
-        } catch (BadResponseException $e) {
-            return response()->json([
-                'status' => true,
-                'data' => $e->getMessage(),
-            ]);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $res,
-        ]);
-
-    }
     public function searchTemplate(Request $request): JsonResponse
     {
         $data = json_decode(json_encode([
@@ -154,11 +101,10 @@ class PopapController extends Controller
         } catch (BadResponseException $e) {
             if ($e->getCode() == 403) {
                 return response()->json([
-                'status' => false,
-                'message' => 'Ошибка токена сотрудника, просьба зайти в приложение в раздел " Сотрудники и доступы ", напротив сотрудника нажмите на кнопку "изменить", после в всплывающем окне нажмите на кнопку "изменить"',
-            ]);
-            }
-            else {
+                    'status' => false,
+                    'message' => 'Ошибка токена сотрудника, просьба зайти в приложение в раздел " Сотрудники и доступы ", напротив сотрудника нажмите на кнопку "изменить", после в всплывающем окне нажмите на кнопку "изменить"',
+                ]);
+            } else {
                 return response()->json([
                     'status' => false,
                     'message' => 'Ошибка получение линий в chatApp в шаблоне сообщений, просьба сообщить разработчиком',
@@ -166,7 +112,6 @@ class PopapController extends Controller
                 ]);
             }
         }
-
 
 
         foreach ($linesChatApp->data as $item) {
@@ -180,12 +125,13 @@ class PopapController extends Controller
             }
         }
 
-       return response()->json([
-           'status'=> true,
-           'data' => $messenger
-       ]);
+        return response()->json([
+            'status' => true,
+            'data' => $messenger
+        ]);
 
     }
+
     public function information(Request $request): JsonResponse
     {
         $data = json_decode(json_encode([
@@ -204,12 +150,13 @@ class PopapController extends Controller
             'phone' => $request->phone ?? '',
         ]));
 
+
         $msClient = new MsClient($data->accountId);
         $newClient = new newClient($data->employee);
 
 
         try {
-            $entity = $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/'.$data->entity_type.'/'.$data->object_Id);
+            $msClient->get('https://api.moysklad.ru/api/remap/1.2/entity/' . $data->entity_type . '/' . $data->object_Id);
         } catch (BadResponseException $e) {
             return response()->json([
                 'status' => false,
@@ -229,7 +176,7 @@ class PopapController extends Controller
                             'message' => 'Не смогли по имени пользователя в телеграмм, отправка не возможна',
                         ]);
                     } else $chatId = $dataChatApp->data->chatId;
-                } catch (BadResponseException $e){
+                } catch (BadResponseException $e) {
                     return response()->json([
                         'status' => false,
                         'message' => 'Ошибка проверки пользователя по имени в телеграмма, просьба сообщить разработчиком',
@@ -246,7 +193,7 @@ class PopapController extends Controller
                             'message' => 'Не удается проверить по номер телефона в телеграмм, отправка не возможна',
                         ]);
                     } else $chatId = $dataChatApp->data->chatId;
-                } catch (BadResponseException $e){
+                } catch (BadResponseException $e) {
                     return response()->json([
                         'status' => false,
                         'message' => 'Ошибка проверки пользователя по имени в телеграмма, просьба сообщить разработчиком',
@@ -254,7 +201,18 @@ class PopapController extends Controller
                     ]);
                 }
             }
-        } else {
+        }
+        elseif ($data->messenger == 'grWhatsApp') {
+            if (str_ends_with($data->phoneOrName, "@c.us")) $chatId = $data->phoneOrName;
+            else {
+                $chatId = '7' . substr($data->phoneOrName, -10);
+                if (strlen($data->phoneOrName) > 16) return response()->json([
+                    'status' => true,
+                    'message' => 'Некорректный номер для данного мессенджера. Вы можете отправить сообщение, если только вы уверены, что в данный номер существует',
+                    'data' => $data,
+                ]);
+            }
+           /* else
             try {
                 $dataChatApp = json_decode(($newClient->phonesCheck($data->linesId, $data->messenger, $data->phoneOrName)->getBody()->getContents()))->data->chatId;
                 if ($dataChatApp == null) {
@@ -264,15 +222,20 @@ class PopapController extends Controller
                         'message' => 'Ошибка проверки пользователя по номеру телефона. Вы можете отправить сообщение, если только вы уверены, что в данный мессенджер существует',
                     ]);
                 } else $chatId = $dataChatApp;
-            } catch (BadResponseException $e){
+            }
+            catch (BadResponseException) {
                 $data->chatId = $data->phoneOrName;
                 return response()->json([
                     'status' => true,
                     'message' => 'Ошибка проверки пользователя по номеру телефона. Вы можете отправить сообщение, если только вы уверены, что в данный мессенджер существует',
                     'data' => $data,
                 ]);
-            }
-        }
+            }*/
+        } else  return response()->json([
+            'status' => true,
+            'message' => 'Невозможно проверить по данному мессенджеру. Вы можете отправить сообщение, если только вы уверены, что в данный чат существует',
+            'data' => $data,
+        ]);
 
         $data->chatId = $chatId;
 
@@ -281,9 +244,10 @@ class PopapController extends Controller
             'data' => $data
         ]);
     }
+
     public function sendMessage(Request $request): JsonResponse
     {
-        $data = json_decode(json_encode([
+        $data = (object) [
             'accountId' => $request->accountId ?? '',
             'object_Id' => $request->object_Id ?? '',
             'entity_type' => $request->entity_type ?? '',
@@ -292,6 +256,7 @@ class PopapController extends Controller
             'license_full' => $request->license_full ?? '',
             'employee' => $request->employee ?? '',
 
+            'doubleName' => $request->doubleName ?? '',
             'phoneOrName' => $request->phoneOrName ?? '',
             'messenger' => $request->messenger ?? '',
             'linesId' => $request->linesId ?? '',
@@ -299,11 +264,12 @@ class PopapController extends Controller
             'phone' => $request->phone ?? '',
             'chatId' => $request->chatId ?? '',
             'text' => $request->text ?? '',
-        ]));
+        ];
 
+        if ($data->chatId == '') $data->chatId = $data->phoneOrName;
 
-//        $msClient = new MsClient($data->accountId);
         $newClient = new newClient($data->employee);
+
         try {
             $res = ($newClient->sendMessage($data->linesId, $data->messenger, $data->chatId, $data->text))->getBody()->getContents();
         } catch (BadResponseException $e) {
@@ -502,12 +468,11 @@ class PopapController extends Controller
         }
 
 
-        $new_message = implode('', $words);
-
-        return $new_message;
+        return implode('', $words);
     }
 
-    private function containsLetters($inputString) {
-    return preg_match("/[a-zA-Z]/", $inputString);
+    private function containsLetters($inputString)
+    {
+        return preg_match("/[a-zA-Z]/", $inputString);
     }
 }

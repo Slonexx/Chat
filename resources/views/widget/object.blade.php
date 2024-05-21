@@ -47,6 +47,7 @@
         let license_full
         let agent
         let phone
+        let dialogIds
 
         let all
         let onToken
@@ -97,9 +98,6 @@
                 //receivedMessage = []
 
                 let settings = ajax_settings("{{ Config::get("Global.url") }}" + 'widget/get/Data', 'GET', data)
-                console.log('Widget setting attributes: ↓')
-                console.log(settings)
-
                 $.ajax(settings).done(function (json) {
                     window.document.getElementById('main').style.display = 'inline'
                     window.document.getElementById('GifOrImageHideOrGifHide').style.display = 'inline'
@@ -110,6 +108,7 @@
                         license_full = json.license_full
                         agent = json.agent
                         phone = json.phone
+                        dialogIds = json.dialogIds
 
                         all = json.all
                         onToken = json.onToken
@@ -168,6 +167,7 @@
                     employee: employeeId,
                     nameAgent: agent,
                     phone: phone,
+                    dialogIds: dialogIds,
                 },
             };
             console.log("Widget Sending : ↓")

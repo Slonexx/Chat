@@ -178,6 +178,25 @@ class newClient
         }
     }
 
+    public function putCallbackUrls($urlCallback, $licenseId, $messengerType): Response
+    {
+        try{
+            $answer = $this->client->put($this->URL_->url_.'v1/licenses/'.$licenseId.'/messengers/'.$messengerType.'/callbackUrl',[
+                'headers' => [
+                    'Authorization' => $this->Setting->accessToken
+                ],
+                'json'=>[
+                    'events' => ["message", "messageStatus", "chatTag", "chatStatus", "chatConversation"],
+                    'url' => $urlCallback,
+                ]
+            ]);
+            return $this->ResponseHandler($answer);
+
+        } catch(Exception $e) {
+            return $this->ResponseExceptionHandler($e);
+        }
+    }
+
     public function ResponseHandler($response){
         $res = new Response();
 

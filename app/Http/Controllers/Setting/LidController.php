@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Setting;
 
+use App\Clients\newClient;
 use App\Clients\oldMoySklad;
 use App\Http\Controllers\Controller;
+use App\Models\employeeModel;
 use App\Models\Lid;
+use App\Models\organizationModel;
 use App\Services\MoySklad\LidAttributesCreateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
@@ -133,6 +136,33 @@ class LidController extends Controller
 
         if ($model->status) $message = '';
         else $message = $model->message;
+
+
+
+        $model = employeeModel::getAllEmpl($accountId);
+        if ($model->toArray!=null){
+            $messengers = ['telegram', 'telegramBot', 'avito', 'vkontakte', 'grWhatsApp', 'email', 'instagram'];
+            $lineId = [];
+            foreach ($model->toArray as $item){
+                $client = new newClient($item['employeeId']);
+
+                $org_model = organizationModel::getInformationByEmployee($item['employeeId']);
+                if ($org_model->toArray!=null){
+                    foreach ($org_model->toArray as $item_org){
+                        if (!in_array($item_org['lineId'], $lineId)){
+                            $lineId[] = $item_org['lineId'];
+                            $licenses = $item_org['lineId'];
+                            foreach ($messengers as $messenger){
+                                $urlCallBack = 'https://smartchatapp.kz/api/webhook/'.$accountId.'/licenses/'.$licenses.'/messengers/'.$messenger;
+                                $res = $client->putCallbackUrls($urlCallBack, $licenses, $messenger);
+                                if (!$res->status and $res->statusCode == 403) break 2;
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
 
 
         return to_route('counterparty', [

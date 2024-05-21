@@ -170,6 +170,7 @@ class widgetController extends Controller
             }
 
             $dialogIds = [];
+            $dialogIds_name = [];
             if (property_exists($agent, 'attributes')) {
                 $name_attributes = [
                     'WhatsApp для ChatApp', 'Telegram для ChatApp', 'Telegram bot для ChatApp',
@@ -177,7 +178,10 @@ class widgetController extends Controller
                     'Avito для ChatApp', 'Facebook для ChatApp'
                 ];
                 foreach ($agent->attributes as $item) {
-                    if (in_array($item->name, $name_attributes)) $dialogIds[] = $item->value;
+                    if (in_array($item->name, $name_attributes)) {
+                        $dialogIds[] = $item->value;
+                        $dialogIds_name[str_replace(" для ChatApp", '', $item->name)] = $item->value;
+                    }
                     if ($item->name == 'WhatsApp для ChatApp' and $phone == '') {
                         $phone = preg_replace('/\D/', '', $item->value);
                         $phone = substr($phone, -10);
@@ -191,6 +195,11 @@ class widgetController extends Controller
                     'access_token' => $employee->accessToken,
                 ],
             ]));
+
+            if ($phone != '') $dialogIds_name['Номер телефона'] = $phone;
+            if (property_exists($agent, 'email')) $dialogIds_name['Электронная почта'] = $agent->email;
+
+
             $all = [
                 'api' => [
                     'access_token' => $employee->accessToken,
@@ -215,7 +224,7 @@ class widgetController extends Controller
                 'license_full' => $license_full,
                 'agent' => $agent->name,
                 'phone' => $phone,
-                'dialogIds' => $dialogIds,
+                'dialogIds' => $dialogIds_name,
 
                 'all' => http_build_query($all),
                 'onToken' => http_build_query([
