@@ -61,7 +61,16 @@ class webHookController extends Controller
 
             $msCnew = new MoySklad($accountId);
             
-            $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $messenger);
+            $compliances = [
+                "grWhatsApp" => "whatsapp",
+                "telegram" => "telegram",
+                "email" => "email",
+                "vkontakte" => "vk",
+                "instagram" => "instagram",
+                "telegramBot" => "telegram_bot",
+                "avito" => "avito"
+            ];
+            $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $compliances[$messenger]);
             $attribute_id = $attribute->attribute_id;
 
             $msCnew = new MoySklad($accountId);
@@ -78,13 +87,13 @@ class webHookController extends Controller
                 $agentLogicS = new webHookAgentLogicService($accountId, $msCnew);
 
                 try{
-                    $agent = $agentLogicS->createOrUpdate($userInfo, $messenger, $attribute_id);
+                    $agent = $agentLogicS->createOrUpdate($userInfo, $compliances[$messenger], $attribute_id);
 
                     $atUsername = "@{$userInfo->username}";
                     $email = $userInfo->email;
                     $chatId = $userInfo->id;
 
-                    $usernameOrPhone = match ($messenger) {
+                    $usernameOrPhone = match ($compliances[$messenger]) {
                         "telegram" => $atUsername,
                         "whatsapp" => $chatId,
                         "email" => $email,
@@ -116,25 +125,22 @@ class webHookController extends Controller
                     $lastStart = $firstNote->last_start;
 
                     if($lastStart == null || $lastStart < $message->time){
+                        $messageS = new MessageService();
+                        $preparedMessage = $messageS->prepareMessages($lineName, $lineId, $messenger, $usernameOrPhone, $isAddMessengerInfo, $message);
+                        
+                        $agentId = $agent->data->id;
+                        $agentNotesS = new CounterpartyNotesService($accountId, $msCnew);
+                        $body = (object)[
+                            "description" => $preparedMessage
+                        ];
+                        $agentNotesS->create($agentId, $body);
 
+                        $messageStack[] = "Сообщение '$message->text' создано у контрагента $usernameOrPhone";
                     } else {
                         $messageStack[] = "новых заметок у контрагента $usernameOrPhone не было найдено";
                         continue;
                     }
                 
-                    $messageS = new MessageService();
-                    $preparedMessage = $messageS->prepareMessages($lineName, $lineId, $messenger, $usernameOrPhone, $isAddMessengerInfo, $message);
-                    
-                    $agentId = $agent->data->id;
-                    $agentNotesS = new CounterpartyNotesService($accountId, $msCnew);
-                    $body = (object)[
-                        "description" => $preparedMessage
-                    ];
-                    $agentNotesS->create($agentId, $body);
-
-                    $messageStack[] = "Сообщение '$message->text' создано у контрагента $usernameOrPhone";
-
-                    
                 } catch(Exception $e){
                     $messageStack[] = $e->getMessage();
                     continue;
