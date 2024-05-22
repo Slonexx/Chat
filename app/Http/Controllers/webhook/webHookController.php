@@ -124,6 +124,11 @@ class webHookController extends Controller
                     $isAddMessengerInfo = $firstNote->is_messenger;
                     $lastStart = $firstNote->last_start;
 
+                    if($lastStart != null){
+                        $tempTime = new DateTime($lastStart);
+                        $lastStart = $tempTime->getTimestamp();
+                    }
+
                     if($lastStart == null || $lastStart < $message->time){
                         $messageS = new MessageService();
                         $preparedMessage = $messageS->prepareMessages($lineName, $lineId, $messenger, $usernameOrPhone, $isAddMessengerInfo, $message);
