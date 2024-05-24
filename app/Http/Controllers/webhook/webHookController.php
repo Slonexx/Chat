@@ -131,7 +131,7 @@ class webHookController extends Controller
 
                     if($lastStart == null || $lastStart < $message->time){
                         $messageS = new MessageService();
-                        $preparedMessage = $messageS->prepareMessages($lineName, $lineId, $messenger, $usernameOrPhone, $isAddMessengerInfo, $message);
+                        $preparedMessage = $messageS->prepareMessage($lineName, $lineId, $messenger, $usernameOrPhone, $isAddMessengerInfo, $message);
                         
                         $agentId = $agent->data->id;
                         $agentNotesS = new CounterpartyNotesService($accountId, $msCnew);

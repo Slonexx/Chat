@@ -18,7 +18,7 @@ use App\Services\ChatappRequest;
 use App\Services\HandlerService;
 use App\Services\MoySklad\AgentUpdateLogicService;
 use App\Services\MoySklad\Attributes\oldCounterpartyS;
-use App\Services\MoySklad\CreateNotesLogicService;
+use App\Services\MoySklad\GetNotesLogicService;
 use App\Services\MoySklad\Entities\CounterpartyNotesService;
 use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
@@ -236,7 +236,7 @@ class CounterpartyController extends Controller
                                 "telegram_bot" => $atUsername,
                                 "avito" => $chatId
                             };
-                            $createNotesS = new CreateNotesLogicService($accountId, $msCnew, $employeeId, $chatappReq);
+                            $createNotesS = new GetNotesLogicService($accountId, $msCnew, $employeeId, $chatappReq);
                             $MAX_UPLOAD_MESSAGE = 200;
                             $limitMessages = 100;
                             $messages = $createNotesS->getAllFromOldToNew($lineId, $messenger, $chatId, $limitMessages, $lastStart, $MAX_UPLOAD_MESSAGE);
