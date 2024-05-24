@@ -60,7 +60,7 @@ class webHookController extends Controller
                 $messageStack[] = $resAttr->message;
 
             $msCnew = new MoySklad($accountId);
-            
+
             $compliances = [
                 "grWhatsApp" => "whatsapp",
                 "telegram" => "telegram",
@@ -77,13 +77,15 @@ class webHookController extends Controller
             $firstNote = $notes->first();
             $date = new DateTime();
             foreach($requestData as $itemData){
+                if (property_exists($itemData, 'fromUser'))
                 $userInfo = $itemData->fromUser;
+                else continue;
 
                 $message = new stdClass();
                 $message->text = $itemData->message->text;
                 $message->fromMe = $itemData->fromMe;
                 $message->time = $itemData->time;
-                
+
                 $agentLogicS = new webHookAgentLogicService($accountId, $msCnew);
 
                 try{
@@ -120,7 +122,7 @@ class webHookController extends Controller
                     }
 
                     $lineName = $org->lineName;
-                        
+
                     $isAddMessengerInfo = $firstNote->is_messenger;
                     $lastStart = $firstNote->last_start;
 
@@ -132,7 +134,7 @@ class webHookController extends Controller
                     if($lastStart == null || $lastStart < $message->time){
                         $messageS = new MessageService();
                         $preparedMessage = $messageS->prepareMessage($lineName, $lineId, $messenger, $usernameOrPhone, $isAddMessengerInfo, $message);
-                        
+
                         $agentId = $agent->data->id;
                         $agentNotesS = new CounterpartyNotesService($accountId, $msCnew);
                         $body = (object)[
@@ -145,17 +147,17 @@ class webHookController extends Controller
                         $messageStack[] = "новых заметок у контрагента $usernameOrPhone не было найдено";
                         continue;
                     }
-                
+
                 } catch(Exception $e){
                     $messageStack[] = $e->getMessage();
                     continue;
                 }
 
-                
+
             }
             Notes::where('accountId', $accountId)
                 ->update(['last_start' => $date]);
-            
+
             return response()->json($messageStack);
 
         } catch (Exception|Error $e) {

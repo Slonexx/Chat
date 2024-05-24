@@ -58,7 +58,8 @@ class CustomEntityService {
         try{
             $res = $this->msClient->get($url);
             $customEntitiesRes = $resHandler->handleOK($res);
-            $rows = (array) $customEntitiesRes->data->customEntities ?? [];
+            if (property_exists($customEntitiesRes->data, 'customEntities')) $rows = (array) $customEntitiesRes->data->customEntities ?? [];
+            else $rows = [];
             return $rows;
         } catch(RequestException $e){
             if($e->hasResponse()){
@@ -112,7 +113,7 @@ class CustomEntityService {
         $url = Config::get($fullKey, null);
         if(!is_string($url) || $url == null)
             throw new Error("url отсутствует или имеет некорректный формат");
-        
+
         try{
             $this->msClient->post($url, $body);
         } catch(RequestException $e){
@@ -124,7 +125,7 @@ class CustomEntityService {
             } else {
                 throw new MsException("неизвестная ошибка при создании аттрибута типа справочник", previous:$e);
             }
-        }    
+        }
     }
 
     /**
@@ -172,7 +173,7 @@ class CustomEntityService {
     public function tryToFind(string $dictionaryName, array $dictionaries){
         if(!$dictionaryName)
             throw new CustomEntityException("Не найдено имя справочника: $dictionaryName", 1);
-        
+
         //в мс не создано ни одного справочника
         if(empty($dictionaries))
             return null;
