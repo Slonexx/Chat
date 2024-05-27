@@ -39,6 +39,16 @@ class webHookController extends Controller
                 "message" => "поле data не является массивом"
             ],400);
         }
+        $hasMessage = false;
+        foreach($requestData as $itemData){
+            if (property_exists($itemData, 'chat'))
+                $hasMessage = true;
+        }
+        if(!$hasMessage){
+            return response()->json((object)[
+                "message" => "type webhook'a != text"
+            ]);
+        }
 
         $messageStack = [];
         try {
