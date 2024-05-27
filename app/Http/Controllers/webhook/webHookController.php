@@ -41,12 +41,12 @@ class webHookController extends Controller
         }
         $hasMessage = false;
         foreach($requestData as $itemData){
-            if (property_exists($itemData, 'chat'))
+            if ($itemData->type == "text")
                 $hasMessage = true;
         }
         if(!$hasMessage){
             return response()->json((object)[
-                "message" => "type webhook'a != text"
+                "message" => "Прошлись по всей data. Ни в одной из них type webhook'a != text"
             ]);
         }
 
@@ -85,13 +85,6 @@ class webHookController extends Controller
             $msCnew = new MoySklad($accountId);
             $firstNote = $notes->first();
             foreach($requestData as $itemData){
-                if (!property_exists($itemData, 'chat'))
-                    continue;
-                if(property_exists($itemData, 'fromMe')){
-                    //Не создаём себя любимых
-                    if($itemData->fromMe)
-                        continue;
-                }
                 
                 $userInfo = $itemData->chat;
                 $message = new stdClass();
