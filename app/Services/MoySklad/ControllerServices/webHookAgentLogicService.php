@@ -31,8 +31,8 @@ class webHookAgentLogicService{
         $handlerS = new HandlerService();
         $agentH = new AgentMessengerHandler($this->accountId, $this->msC);
         $findLogicS = new AgentFindLogicService($this->accountId, $this->msC);
-        $attrMeta = $handlerS->FormationMetaById("agentMetadataAttributes", "attributemetadata", $attribute_id);
-
+        $attrMetaAgent = $handlerS->FormationMetaById("agentMetadataAttributes", "attributemetadata", $attribute_id);
+        
         $phone = $userInfo->phone;
         $username = $userInfo->username;
         $name = $userInfo->name;
@@ -47,13 +47,13 @@ class webHookAgentLogicService{
         //create
         if (empty($agents)) {
             return match ($messenger) {
-                "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMeta),
-                "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMeta),
-                "email" => $agentH->email($email, $attrMeta),
-                "vk" => $agentH->vk($name, $chatId, $attrMeta),
-                "instagram" => $agentH->inst($name, $username, $attrMeta),
-                "telegram_bot" => $agentH->tg_bot($name, $username, $attrMeta),
-                "avito" => $agentH->avito($name, $chatId, $attrMeta),
+                "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMetaAgent),
+                "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMetaAgent),
+                "email" => $agentH->email($email, $attrMetaAgent),
+                "vk" => $agentH->vk($name, $chatId, $attrMetaAgent),
+                "instagram" => $agentH->inst($name, $username, $attrMetaAgent),
+                "telegram_bot" => $agentH->tg_bot($name, $username, $attrMetaAgent),
+                "avito" => $agentH->avito($name, $chatId, $attrMetaAgent),
             };
         //update
         } else {
@@ -68,7 +68,7 @@ class webHookAgentLogicService{
                 "telegram_bot" => $atUsername,
                 "avito" => $chatId
             };
-            $bodyWithAttr = $handlerS->FormationAttribute($attrMeta, $addFieldValue);
+            $bodyWithAttr = $handlerS->FormationAttribute($attrMetaAgent, $addFieldValue);
             return $updateLogicS->addTagsAndAttr($agents, $messenger, $bodyWithAttr);
         }
         

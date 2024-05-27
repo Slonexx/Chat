@@ -14,7 +14,6 @@ use App\Services\MoySklad\Attributes\oldCounterpartyS;
 use App\Services\MoySklad\ControllerServices\webHookAgentLogicService;
 use App\Services\MoySklad\Entities\CounterpartyNotesService;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
-use DateTime;
 use Error;
 use Exception;
 use Illuminate\Http\Request;
@@ -75,7 +74,6 @@ class webHookController extends Controller
 
             $msCnew = new MoySklad($accountId);
             $firstNote = $notes->first();
-            $date = new DateTime();
             foreach($requestData as $itemData){
                 if (!property_exists($itemData, 'chat'))
                     continue;
@@ -128,29 +126,17 @@ class webHookController extends Controller
                     $lineName = $org->lineName;
 
                     $isAddMessengerInfo = $firstNote->is_messenger;
-                    $lastStart = $firstNote->last_start;
+                    $messageS = new MessageService();
+                    $preparedMessage = $messageS->prepareMessage($lineName, $lineId, $messenger, $usernameOrPhone, $isAddMessengerInfo, $message);
 
-                    if($lastStart != null){
-                        $tempTime = new DateTime($lastStart);
-                        $lastStart = $tempTime->getTimestamp();
-                    }
+                    $agentId = $agent->data->id;
+                    $agentNotesS = new CounterpartyNotesService($accountId, $msCnew);
+                    $body = (object)[
+                        "description" => $preparedMessage
+                    ];
+                    $agentNotesS->create($agentId, $body);
 
-                    if($lastStart == null || $lastStart < $message->time){
-                        $messageS = new MessageService();
-                        $preparedMessage = $messageS->prepareMessage($lineName, $lineId, $messenger, $usernameOrPhone, $isAddMessengerInfo, $message);
-
-                        $agentId = $agent->data->id;
-                        $agentNotesS = new CounterpartyNotesService($accountId, $msCnew);
-                        $body = (object)[
-                            "description" => $preparedMessage
-                        ];
-                        $agentNotesS->create($agentId, $body);
-
-                        $messageStack[] = "Сообщение '$message->text' создано у контрагента $usernameOrPhone";
-                    } else {
-                        $messageStack[] = "новых заметок у контрагента $usernameOrPhone не было найдено";
-                        continue;
-                    }
+                    $messageStack[] = "Сообщение '$message->text' создано у контрагента $usernameOrPhone";
 
                 } catch(Exception $e){
                     $messageStack[] = $e->getMessage();
@@ -159,8 +145,8 @@ class webHookController extends Controller
 
 
             }
-            Notes::where('accountId', $accountId)
-                ->update(['last_start' => $date]);
+            // Notes::where('accountId', $accountId)
+            //     ->update(['last_start' => $date]);
 
             return response()->json($messageStack);
 

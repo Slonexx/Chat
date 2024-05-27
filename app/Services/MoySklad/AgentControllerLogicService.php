@@ -258,5 +258,61 @@ class AgentControllerLogicService
 
     }
 
+    function setAttributeWaitAnswer(){
+        $agentUpdateS = new AgentUpdateLogicService($this->accountId, $this->msC);
+        $orderUpdateS = new CustomerorderUpdateLogicService($this->accountId, $this->msC);
+        $updateValuesS = new UpdateValuesService($this->accountId, $this->msC);
+        $customEntityS = new CustomEntityService($this->accountId, $this->msC);
+        $serviceFieldsNames = [
+            "lid",
+        ];
+
+        //вынести выше
+        $config = Config::get("lidAttributes");
+        $serviceFields = array_filter($config, fn($key) => in_array($key, $serviceFieldsNames), ARRAY_FILTER_USE_KEY);
+        $lidName = $serviceFields["lid"]->name;
+        //ожидает ответа
+        $waitAnswerValueName = $serviceFields["lid"]->values[0]->name;
+
+        //вынести выше
+        $agentId = $order->agent->id;
+        $orderId = $order->id;
+        $stateType = $order->state->stateType;
+        $agentAttr = $order->agent->attributes;
+        $orderAttr = $order->attributes ?? [];
+
+        $nameAttr = "";
+        if ($stateType == "Successful")
+            $nameAttr = $answeredValueName;
+        else
+            $nameAttr = $waitAnswerValueName;
+
+        try {
+            $settedAttribute = array_filter($agentAttr, fn($value) => $value->name == $lidName);
+            $settedAttribute = array_shift($settedAttribute);
+            $settedAttributeValueName = $settedAttribute->value->name;
+            if ($settedAttributeValueName != $nameAttr) {
+                $agentUpdateS->agentUpdateLidAttribute($agentId, $lidName, $nameAttr, $updateValuesS, $customEntityS);
+            }
+        } catch (Exception|Error $e) {
+            throw new AgentControllerLogicException("Ошибка при обновлении контрагента во время создания заказа(find RegularStateType)", 1, $e);
+        }
+
+
+        $settedAttribute = array_filter($orderAttr, fn($value) => $value->name == $lidName);
+        $settedAttribute = array_shift($settedAttribute);
+
+        if (isset( $settedAttribute->value)) $settedAttributeValueName = $settedAttribute->value->name;
+        else $settedAttributeValueName = '';
+
+        try {
+            if ($settedAttributeValueName != $nameAttr) {
+                $orderUpdateS->orderUpdateLidAttribute($orderId, $lidName, $nameAttr, $updateValuesS, $customEntityS);
+            }
+        } catch (Exception|Error $e) {
+            throw new AgentControllerLogicException("Ошибка во время обновления доп.поля lid в заказе", 2, $e);
+        }
+    }
+
 
 }

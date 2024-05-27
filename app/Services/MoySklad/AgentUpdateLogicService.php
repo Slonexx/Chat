@@ -9,6 +9,7 @@ use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\MoySklad\Entities\CustomEntityService;
 use App\Services\MoySklad\RequestBody\Attributes\UpdateValuesService;
 use App\Services\Response;
+use Illuminate\Support\Facades\Config;
 
 class AgentUpdateLogicService{
 
@@ -44,9 +45,32 @@ class AgentUpdateLogicService{
         }
         $agentS = new CounterpartyService($this->accountId, $this->msC);
         try{
+            $serviceFieldsNames = [
+                "lid",
+            ];
+    
+            $config = Config::get("lidAttributes");
+            $serviceFields = array_filter($config, fn($key) => in_array($key, $serviceFieldsNames), ARRAY_FILTER_USE_KEY);
+            $lidName = $serviceFields["lid"]->name;
+            //ожидает ответа
+            $waitAnswerValueName = $serviceFields["lid"]->values[0]->name;
+    
+            $lidAttrS = new LidAttributesCreateService($this->accountId, $this->msC);
+            $lidAttrS->findOrCreate($serviceFields, false);
+    
+            $agentAttrS = new CounterpartyS($this->accountId, $this->msC);
+            $agentAttrRes = $agentAttrS->getAllAttributes(true);
+            $agentAllAttributes = $agentAttrRes->data;
+            $agentLidAttr = array_filter($agentAllAttributes, fn($value)=> $value->name == $lidName);
+            $agentAttr = array_shift($agentLidAttr);
+    
+            $customEntityS = new CustomEntityService($this->accountId, $this->msC);
+            $updateValuesS = new UpdateValuesService($this->accountId, $this->msC);
+            $preparedDictionary = $updateValuesS->dictionary($customEntityS, $agentAttr, $waitAnswerValueName);
+            $body->attributes[] = $preparedDictionary->attributes[0];
             return $agentS->update($id, $body);
         } catch(MsException $e){
-            throw new AgentUpdateLogicException("Невозможно обновить теги контрагента", previous: $e);
+            throw new AgentUpdateLogicException("Невозможно обновить теги и аттрибуты контрагента", previous: $e);
         }
     }
 
