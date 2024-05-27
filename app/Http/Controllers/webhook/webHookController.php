@@ -77,10 +77,13 @@ class webHookController extends Controller
             $firstNote = $notes->first();
             $date = new DateTime();
             foreach($requestData as $itemData){
-                if (property_exists($itemData, 'fromUser'))
-                $userInfo = $itemData->fromUser;
-                else continue;
-
+                if (!property_exists($itemData, 'chat'))
+                    continue;
+                //Не создаём себя любимых
+                if($itemData->fromMe)
+                    continue;
+                
+                $userInfo = $itemData->chat;
                 $message = new stdClass();
                 $message->text = $itemData->message->text;
                 $message->fromMe = $itemData->fromMe;
@@ -120,6 +123,7 @@ class webHookController extends Controller
                         $messageStack[] = "Сообщение $messageId не является типом 'text'";
                         continue;
                     }
+                    
 
                     $lineName = $org->lineName;
 

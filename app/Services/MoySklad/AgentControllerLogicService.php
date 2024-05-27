@@ -136,8 +136,12 @@ class AgentControllerLogicService
                 $preparedMetas->salesChannel = $handlerS->FormationMeta($salesChannelMeta);
                 $preparedMetas->state = $handlerS->FormationMeta($stateMeta);
 
+                if(property_exists($agent, 'owner'))
+                    $agentOwnerId = basename($agent->owner->meta->href);
+                else
+                    $agentOwnerId = null;
 
-                $order = $customOrderS->createBySettings($agentId, $preparedMetas, $responsible, $responsibleUuid, $attributes);
+                $order = $customOrderS->createBySettings($agentId, $agentOwnerId, $preparedMetas, $responsible, $responsibleUuid, $attributes);
                 $tasks = $orderDbSettings->tasks;
                 $lid = $orderDbSettings->lid;
 

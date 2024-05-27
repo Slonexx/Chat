@@ -60,7 +60,7 @@ class CustomerorderCreateLogicService{
     /**
      * @throws MsException
      */
-    function createBySettings($agentId, $preparedMetas, $responsible, $responsibleUuid, $attributes){
+    function createBySettings($agentOwnerId, $preparedMetas, $responsible, $responsibleUuid, $attributes){
         $customerOrderS = new CustomOrderService($this->accountId, $this->msC);
         $body = new stdClass();
         $body->agent = $preparedMetas->agent;
@@ -86,22 +86,18 @@ class CustomerorderCreateLogicService{
         $handlerS = new HandlerService();
 
         if ($responsibleUuid !== null) {
-            $employeeMeta = $handlerS->FormationMetaById("employee", "employee", $responsibleUuid);
-            $preparedEmployeeMeta = $handlerS->FormationMeta($employeeMeta);
-
             switch($responsible){
                 case "1":
+                    $employeeMeta = $handlerS->FormationMetaById("employee", "employee", $responsibleUuid);
+                    $preparedEmployeeMeta = $handlerS->FormationMeta($employeeMeta);
                     $body->owner = $preparedEmployeeMeta;
                     break;
                 case "2":
-
-                    $bodyForChangeAgent = new stdClass();
-                    $bodyForChangeAgent->owner = $preparedEmployeeMeta;
-                    $agentS = new CounterpartyService($this->accountId, $this->msC);
-                    $agentS->update($agentId, $bodyForChangeAgent);
-
-                    $body->owner = $preparedEmployeeMeta;
-
+                    if(isset($agentOwnerId)){
+                        $employeeMeta = $handlerS->FormationMetaById("employee", "employee", $agentOwnerId);
+                        $preparedEmployeeMeta = $handlerS->FormationMeta($employeeMeta);
+                        $body->owner = $preparedEmployeeMeta;
+                    }
                     break;
                 default:
                     break;

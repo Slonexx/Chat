@@ -108,8 +108,6 @@ class CustomerorderController extends Controller
                             $infoForTask->lineName = $lineName;
                             $infoForTask->messenger = $messenger;
 
-                            if ($responsible == 2 and property_exists($agents[0], 'owner')) $responsibleUuid = basename($agents[0]->owner->meta->href);
-
                             if(count($customerOrders) == 0){
                                 $agentControllerS->createOrderAndAttributes($orderDbSettings, $agents[0], $customOrderS, $responsible, $responsibleUuid, $isCreateOrder, $infoForTask);
                             } else {
