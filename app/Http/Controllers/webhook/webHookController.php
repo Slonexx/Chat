@@ -87,9 +87,11 @@ class webHookController extends Controller
             foreach($requestData as $itemData){
                 if (!property_exists($itemData, 'chat'))
                     continue;
-                //Не создаём себя любимых
-                if($itemData->fromMe)
-                    continue;
+                if(property_exists($itemData, 'fromMe')){
+                    //Не создаём себя любимых
+                    if($itemData->fromMe)
+                        continue;
+                }
                 
                 $userInfo = $itemData->chat;
                 $message = new stdClass();
