@@ -21,6 +21,15 @@ return [
             'timeout' => 600, // время в секундах
         ],
 
+        'webhook_agent' => [
+            'driver' => 'database',
+            'table' => 'jobs_webhook_agent',
+            'queue' => 'default',
+            'retry_after' => 90,
+            'after_commit' => false,
+            'timeout' => 600, // время в секундах
+        ],
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => 'localhost',
