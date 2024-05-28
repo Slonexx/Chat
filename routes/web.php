@@ -82,7 +82,6 @@ Route::get('/Setting/template/info/fields/', [templateController::class, 'getMai
 Route::post('/Setting/getTemplate/{accountId}', [templateController::class, 'getTemplate']);
 
 Route::get('/Setting/template/get/attributes/{accountId}', [templateController::class, 'getAttributes']);
-Route::get('/Setting/template/delete/poles/{accountId}', [templateController::class, 'deletePoles']);
 
 
 
