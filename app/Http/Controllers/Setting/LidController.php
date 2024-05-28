@@ -8,7 +8,10 @@ use App\Http\Controllers\Controller;
 use App\Models\employeeModel;
 use App\Models\Lid;
 use App\Models\organizationModel;
+use App\Services\ChatappRequest;
 use App\Services\MoySklad\LidAttributesCreateService;
+use Error;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
@@ -145,7 +148,24 @@ class LidController extends Controller
             $lineId = [];
             foreach ($model->toArray as $item){
                 $client = new newClient($item['employeeId']);
-
+                try{
+                    $chatappReq = new ChatappRequest($item['employeeId']);
+                    $webhooksRes = $chatappReq->getWebhooks();
+                    $webhooks = $webhooksRes->data->data;
+                    if(!empty($webhooks)){
+                        $licenses = array_column($webhooks, "licenseId");
+                        $lineId[] = array_unique($licenses);
+                    }
+                } catch(Exception | Error $e){
+                    return to_route('counterparty', [
+                        'accountId' => $accountId,
+                        'isAdmin' => $isAdmin,
+                        'fullName' => $request->fullName ?? "Имя аккаунта",
+                        'uid' => $request->uid ?? "логин аккаунта",
+            
+                        'message' => $e->getMessage(),
+                    ]);
+                }
                 $org_model = organizationModel::getInformationByEmployee($item['employeeId']);
                 if ($org_model->toArray!=null){
                     foreach ($org_model->toArray as $item_org){
