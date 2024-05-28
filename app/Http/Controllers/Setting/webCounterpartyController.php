@@ -93,6 +93,7 @@ class webCounterpartyController extends Controller
         else $message = $model->message;
 
         $lineId = [];
+        $appUrl = Config::get("Global.url", null);
         $model = employeeModel::getAllEmpl($accountId);
         if ($model->toArray!=null){
             foreach ($model->toArray as $item){
@@ -100,9 +101,13 @@ class webCounterpartyController extends Controller
                     $chatappReq = new ChatappRequest($item['employeeId']);
                     $webhooksRes = $chatappReq->getWebhooks();
                     $webhooks = $webhooksRes->data->data;
-                    if(!empty($webhooks)){
-                        $licenses = array_column($webhooks, "licenseId");
-                        $lineId[] = array_unique($licenses);
+                    foreach($webhooks as $webhookItem){
+                        $url = $webhookItem->url;
+                        if(str_starts_with($appUrl, $url)){
+                            $licenseId = $webhookItem->licenseId;
+                            if(!in_array($licenseId, $lineId))
+                                $lineId[] = $licenseId;
+                        }
                     }
                 } catch(Exception | Error){
                     continue;
