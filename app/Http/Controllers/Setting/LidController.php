@@ -142,10 +142,23 @@ class LidController extends Controller
 
 
 
+        $lineId = [];
         $model = employeeModel::getAllEmpl($accountId);
         if ($model->toArray!=null){
+            foreach ($model->toArray as $item){
+                try{
+                    $chatappReq = new ChatappRequest($item['employeeId']);
+                    $webhooksRes = $chatappReq->getWebhooks();
+                    $webhooks = $webhooksRes->data->data;
+                    if(!empty($webhooks)){
+                        $licenses = array_column($webhooks, "licenseId");
+                        $lineId[] = array_unique($licenses);
+                    }
+                } catch(Exception | Error){
+                    return;
+                }
+            }
             $messengers = ['telegram', 'telegramBot', 'avito', 'vkontakte', 'grWhatsApp', 'email', 'instagram'];
-            $lineId = [];
             foreach ($model->toArray as $item){
                 $client = new newClient($item['employeeId']);
                 try{
