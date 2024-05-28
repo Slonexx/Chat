@@ -186,7 +186,7 @@ class newClient
                     'Authorization' => $this->Setting->accessToken
                 ],
                 'json'=>[
-                    'events' => ["message", "messageStatus", "chatTag", "chatStatus", "chatConversation"],
+                    'events' => ["message"],
                     'url' => $urlCallback,
                 ]
             ]);

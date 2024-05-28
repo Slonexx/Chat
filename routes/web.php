@@ -97,16 +97,12 @@ Route::group(["prefix" => "Setting"], function () {
     Route::get('/automation/{accountId}', [AutomationController::class, 'getAutomation'])->name('automation');
     Route::post('/automation/{accountId}', [AutomationController::class, 'postAutomation']);
 });
-/***
-НОВЫЕ ОБНОВЛЕНИЯ ПО ЛИД
- **/
+/** НОВЫЕ ОБНОВЛЕНИЯ ПО ЛИД **/
 Route::group(["prefix" => "Setting"], function () {
     Route::get('/lid/{accountId}', [LidController::class, 'getLid'])->name('lid');
     Route::post('/lid/{accountId}', [LidController::class, 'saveLid']);
 });
-/***
-НОВЫЕ ОБНОВЛЕНИЯ ВЫГРУЗКИ КОТРАГЕНТОВ
- **/
+/** НОВЫЕ ОБНОВЛЕНИЯ ВЫГРУЗКИ КОТРАГЕНТОВ **/
 Route::group(["prefix" => "Setting"], function () {
     Route::get('/counterparty/{accountId}', [webCounterpartyController::class, 'get'])->name('counterparty');
     Route::post('/counterparty/{accountId}', [webCounterpartyController::class, 'save']);
