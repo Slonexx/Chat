@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Automation_scenario extends Model
 {
-    use HasFactory;
     public $incrementing = false;
     protected $fillable = [
         'id',

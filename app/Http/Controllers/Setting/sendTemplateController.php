@@ -13,7 +13,7 @@ use stdClass;
 class sendTemplateController extends Controller{
 
     function sendTemplate(Request $request){
-       // try{
+        try{
             $req = $request->all();
             $handlerS = new HandlerService();
 
@@ -79,9 +79,9 @@ class sendTemplateController extends Controller{
                 $mesAr = array_merge($messageStack, $errors);
                 return response()->json($mesAr, 400);
             }
-       /* } catch(Exception | Error $e){
+        } catch(Exception | Error $e){
             return response()->json($e->getMessage(), 500);
-        }*/
+        }
     }
 
 
