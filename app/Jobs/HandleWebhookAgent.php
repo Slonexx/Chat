@@ -17,20 +17,17 @@ class HandleWebhookAgent implements ShouldQueue
 
     public mixed $params;
     public string $url;
+    public string $conn;
 
-    // Установка количества попыток и тайм-аута
-    public int $timeout = 600;
-
-    public function __construct($params, $url)
+    public function __construct($params, $url, $connection)
     {
         $this->params = $params;
         $this->url = $url;
+        $this->connection = $connection;
     }
 
     public function handle(): void
     {
-        $connection = "webhook_agent";
-        $queue = "high";
         $client = new Client([
             'verify' => false,
             'timeout' => 1200
@@ -42,14 +39,14 @@ class HandleWebhookAgent implements ShouldQueue
             return; // Успешное выполнение, выходим из функции
         } catch (ClientException $e) {
             $queue = "low";
-            $this->handleClientException($e, $connection, $queue);
+            $this->handleClientException($e, $queue);
             return;
         } catch (RequestException) {
             return;
         }
     }
 
-    private function handleClientException(ClientException $e, $connection, $queue): void
+    private function handleClientException(ClientException $e, $queue): void
     {
         $msError = "Превышено ограничение на количество запросов в единицу времени";
         $statusCode = $e->getResponse()->getStatusCode();
@@ -59,7 +56,7 @@ class HandleWebhookAgent implements ShouldQueue
         $inputMessage = $data->errors[0]->error ?? false;
 
         if ($statusCode == 429 && $inputMessage == $msError) {
-            HandleWebhookAgent::dispatch($this->params, $this->url)->onConnection($connection)->onQueue($queue);
+            HandleWebhookAgent::dispatch($this->params, $this->url, $this->connection)->onConnection($this->connection)->onQueue($queue);
         }
     }
 }

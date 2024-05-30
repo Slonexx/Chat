@@ -133,29 +133,6 @@ class oldCustomOrderService {
             return $res;
     }
 
-    function getStatuses(){
-        try{
-            $url = Config::get("Global")[self::URL_IDENTIFIER] . "metadata/";
-            $statusesRes = $this->msC->getByUrl($url);
-
-            $res = new Response();
-
-            if($statusesRes->status){
-                $statuses = $statusesRes->data->states ?? null;
-                if($statuses === null)
-                    return $res->success([]);
-                return $res->success($statuses);
-            }
-            else
-                return $res->error($statusesRes, "Невозможно получить статусы заказа покупателя");
-
-        } catch (Exception $e){
-            $res = new Response();
-            $answer = $res->error($e, $e->getMessage());
-            return $answer;
-        }
-    }
-
     function update($id, $body, $errorMes){
         $res = $this->msC->put(self::URL_IDENTIFIER, $body, $id);
         if(!$res->status)

@@ -6,7 +6,6 @@ use App\Clients\MoySklad;
 use App\Exceptions\AgentControllerLogicException;
 use App\Services\HandlerService;
 use App\Services\MoySklad\Attributes\CustomorderS;
-use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\MoySklad\Entities\CustomEntityService;
 use App\Services\MoySklad\Entities\TaskService;
 use App\Services\MoySklad\RequestBody\Attributes\UpdateValuesService;
@@ -65,7 +64,7 @@ class AgentControllerLogicService
         //ожидает ответа
         $valueName = $serviceFields["lid"]->values[0]->name;
         //вынести выше
-        $updateValuesS = new UpdateValuesService($this->accountId, $this->msC);
+        $updateValuesS = new UpdateValuesService();
         $customEntityS = new CustomEntityService($this->accountId, $this->msC);
         $agentUpdateS = new AgentUpdateLogicService($this->accountId, $this->msC);
 
@@ -199,7 +198,7 @@ class AgentControllerLogicService
     {
         $agentUpdateS = new AgentUpdateLogicService($this->accountId, $this->msC);
         $orderUpdateS = new CustomerorderUpdateLogicService($this->accountId, $this->msC);
-        $updateValuesS = new UpdateValuesService($this->accountId, $this->msC);
+        $updateValuesS = new UpdateValuesService();
         $customEntityS = new CustomEntityService($this->accountId, $this->msC);
         $serviceFieldsNames = [
             "lid",
@@ -261,7 +260,7 @@ class AgentControllerLogicService
     function setAttributeWaitAnswer(){
         $agentUpdateS = new AgentUpdateLogicService($this->accountId, $this->msC);
         $orderUpdateS = new CustomerorderUpdateLogicService($this->accountId, $this->msC);
-        $updateValuesS = new UpdateValuesService($this->accountId, $this->msC);
+        $updateValuesS = new UpdateValuesService();
         $customEntityS = new CustomEntityService($this->accountId, $this->msC);
         $serviceFieldsNames = [
             "lid",

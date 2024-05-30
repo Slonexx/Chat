@@ -2,7 +2,6 @@
 namespace App\Services\MoySklad\Entities;
 
 use App\Clients\oldMoySklad;
-use App\Services\MoySklad\CutLogicService;
 use App\Services\Response;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -116,56 +115,5 @@ class DemandService {
             return $answer;
         }
     }
-
-    function getStatuses(){
-        try{
-            $url = Config::get("Global")[self::URL_IDENTIFIER] . "metadata/";
-            $statusesRes = $this->msC->getByUrl($url);
-
-            $res = new Response();
-
-            if($statusesRes->status){
-                $statuses = $statusesRes->data->states ?? null;
-                if($statuses === null)
-                    return $res->success([]);
-                else
-                    return $res->success($statuses);
-            }
-            else
-                return $res->error($statusesRes, "Невозможно получить статусы отгрузки");
-
-        } catch (Exception $e){
-            $res = new Response();
-            $answer = $res->error($e, $e->getMessage());
-            return $answer;
-        }
-    }
-
-
-    // public function getAll() {
-    //     $urlIdentifier = "demandURL";
-    //     $obj = $this->msClient->getAll($urlIdentifier);
-    //     $result;
-    //     try {
-    //         if($obj !== false) {
-    //             $data = $obj->data;
-    //             $statusCode = $obj->statusCode;
-    //             $result = response()->json($data, $statusCode);
-    //             return $result;
-    //         } else {
-
-    //             throw new Error();
-    //         }
-    //     } catch(e){
-    //         return new Response("Something wrong", $obj->statusCode);
-    //     }
-    // }
-
-    // public function create($template) {
-    //     $response =  $this->msClient->post($this->urlIdentifier, $template);
-    //     if(!$response->status)
-    //         $response->message = "Не удалось создать отгрузку";
-    //     return $response;
-    // }
 
 }

@@ -1,31 +1,22 @@
 <?php
-namespace App\Services\MoySklad\Entities;
+namespace App\Services\Intgr\Entities;
 
-use App\Clients\MoySklad;
-use App\Exceptions\CounterpartyException;
+use App\Clients\MoySkladIntgr;
 use App\Exceptions\MsException;
 use App\Services\HTTPResponseHandler;
 use App\Services\MsFilterService;
-use App\Services\Response;
 use Error;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Config;
 
 class CounterpartyService{
 
-    private MoySklad $msC;
-
-    public string $accountId;
-
-    private Response $res;
+    private MoySkladIntgr $msC;
 
     private const URL_IDENTIFIER = "agent";
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
-        else  $this->msC = $MoySklad;
-        $this->res = new Response();
-        $this->accountId = $accountId;
+    function __construct(MoySkladIntgr $MoySklad) {
+        $this->msC = $MoySklad;
     }
 
     public function getById(string $id) {

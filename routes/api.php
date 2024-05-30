@@ -31,3 +31,7 @@ Route::get('counterparty/notes/check/{accountId}', [CounterpartyController::clas
 Route::post("webhook/yes", [TestController::class, "yes"]);
 Route::post("webhook/{accountId}/licenses/{lineId}/messengers/{messengers}", [webHookController::class, "callbackUrls"]);
 Route::post('counterparty/notes/create/{accountId}/line/{lineId}/messenger/{messenger}', [webHookController::class, 'createCounterpartyNotes']);
+
+Route::post("integration/webhook/counterparty/notes/create", [webHookController::class, "callbackUrlsIntrg"]);
+Route::post('integration/counterparty/notes/create', [webHookController::class, 'createCounterpartyNotesIntgr']);
+

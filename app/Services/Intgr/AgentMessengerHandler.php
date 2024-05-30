@@ -1,28 +1,24 @@
 <?php
-namespace App\Services\ChatApp;
+namespace App\Services\Intgr;
 
-use App\Clients\MoySklad;
+use App\Clients\MoySkladIntgr;
 use App\Services\HandlerService;
-use App\Services\MoySklad\Attributes\CounterpartyS;
-use App\Services\MoySklad\Entities\CounterpartyService;
-use App\Services\MoySklad\Entities\CustomEntityService;
-use App\Services\MoySklad\LidAttributesCreateService;
+use App\Services\Intgr\Attributes\CounterpartyS;
+use App\Services\Intgr\Entities\CounterpartyService;
+use App\Services\Intgr\Entities\CustomEntityService;
+use App\Services\Intgr\LidAttributesCreateService;
 use App\Services\MoySklad\RequestBody\Attributes\UpdateValuesService;
 use App\Services\Response;
 use Illuminate\Support\Facades\Config;
 
 class AgentMessengerHandler{
 
-    private MoySklad $msC;
-
-    private string $accountId;
+    private MoySkladIntgr $msC;
 
     private Response $res;
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
-        else  $this->msC = $MoySklad;
-        $this->accountId = $accountId;
+    function __construct(MoySkladIntgr $MoySklad) {
+        $this->msC = $MoySklad;
         $this->res = new Response();
     }
 
@@ -53,21 +49,21 @@ class AgentMessengerHandler{
         //ожидает ответа
         $waitAnswerValueName = $serviceFields["lid"]->values[0]->name;
 
-        $lidAttrS = new LidAttributesCreateService($this->accountId, $this->msC);
+        $lidAttrS = new LidAttributesCreateService($this->msC);
         $lidAttrS->findOrCreate($serviceFields, false);
 
-        $agentAttrS = new CounterpartyS($this->accountId, $this->msC);
+        $agentAttrS = new CounterpartyS($this->msC);
         $agentAttrRes = $agentAttrS->getAllAttributes(true);
         $agentAllAttributes = $agentAttrRes->data;
         $agentLidAttr = array_filter($agentAllAttributes, fn($value)=> $value->name == $lidName);
         $agentAttr = array_shift($agentLidAttr);
 
-        $customEntityS = new CustomEntityService($this->accountId, $this->msC);
+        $customEntityS = new CustomEntityService($this->msC);
         $updateValuesS = new UpdateValuesService();
         $preparedDictionary = $updateValuesS->dictionary($customEntityS, $agentAttr, $waitAnswerValueName);
         $body->attributes[] = $preparedDictionary->attributes[0];
         
-        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        $agentS = new CounterpartyService($this->msC);
         return $agentS->create($body);
     }
 
@@ -96,21 +92,21 @@ class AgentMessengerHandler{
         //ожидает ответа
         $waitAnswerValueName = $serviceFields["lid"]->values[0]->name;
 
-        $lidAttrS = new LidAttributesCreateService($this->accountId, $this->msC);
+        $lidAttrS = new LidAttributesCreateService($this->msC);
         $lidAttrS->findOrCreate($serviceFields, false);
 
-        $agentAttrS = new CounterpartyS($this->accountId, $this->msC);
+        $agentAttrS = new CounterpartyS($this->msC);
         $agentAttrRes = $agentAttrS->getAllAttributes(true);
         $agentAllAttributes = $agentAttrRes->data;
         $agentLidAttr = array_filter($agentAllAttributes, fn($value)=> $value->name == $lidName);
         $agentAttr = array_shift($agentLidAttr);
 
-        $customEntityS = new CustomEntityService($this->accountId, $this->msC);
+        $customEntityS = new CustomEntityService($this->msC);
         $updateValuesS = new UpdateValuesService();
         $preparedDictionary = $updateValuesS->dictionary($customEntityS, $agentAttr, $waitAnswerValueName);
         $body->attributes[] = $preparedDictionary->attributes[0];
         
-        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        $agentS = new CounterpartyService($this->msC);
         return $agentS->create($body);
     }
 
@@ -131,21 +127,21 @@ class AgentMessengerHandler{
         //ожидает ответа
         $waitAnswerValueName = $serviceFields["lid"]->values[0]->name;
 
-        $lidAttrS = new LidAttributesCreateService($this->accountId, $this->msC);
+        $lidAttrS = new LidAttributesCreateService($this->msC);
         $lidAttrS->findOrCreate($serviceFields, false);
 
-        $agentAttrS = new CounterpartyS($this->accountId, $this->msC);
+        $agentAttrS = new CounterpartyS($this->msC);
         $agentAttrRes = $agentAttrS->getAllAttributes(true);
         $agentAllAttributes = $agentAttrRes->data;
         $agentLidAttr = array_filter($agentAllAttributes, fn($value)=> $value->name == $lidName);
         $agentAttr = array_shift($agentLidAttr);
 
-        $customEntityS = new CustomEntityService($this->accountId, $this->msC);
+        $customEntityS = new CustomEntityService($this->msC);
         $updateValuesS = new UpdateValuesService();
         $preparedDictionary = $updateValuesS->dictionary($customEntityS, $agentAttr, $waitAnswerValueName);
         $body->attributes[] = $preparedDictionary->attributes[0];
         
-        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        $agentS = new CounterpartyService($this->msC);
         return $agentS->create($body);
     }
 
@@ -168,21 +164,21 @@ class AgentMessengerHandler{
         //ожидает ответа
         $waitAnswerValueName = $serviceFields["lid"]->values[0]->name;
 
-        $lidAttrS = new LidAttributesCreateService($this->accountId, $this->msC);
+        $lidAttrS = new LidAttributesCreateService($this->msC);
         $lidAttrS->findOrCreate($serviceFields, false);
 
-        $agentAttrS = new CounterpartyS($this->accountId, $this->msC);
+        $agentAttrS = new CounterpartyS($this->msC);
         $agentAttrRes = $agentAttrS->getAllAttributes(true);
         $agentAllAttributes = $agentAttrRes->data;
         $agentLidAttr = array_filter($agentAllAttributes, fn($value)=> $value->name == $lidName);
         $agentAttr = array_shift($agentLidAttr);
 
-        $customEntityS = new CustomEntityService($this->accountId, $this->msC);
+        $customEntityS = new CustomEntityService($this->msC);
         $updateValuesS = new UpdateValuesService();
         $preparedDictionary = $updateValuesS->dictionary($customEntityS, $agentAttr, $waitAnswerValueName);
         $body->attributes[] = $preparedDictionary->attributes[0];
         
-        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        $agentS = new CounterpartyService($this->msC);
         return $agentS->create($body);
     }
 
@@ -203,21 +199,21 @@ class AgentMessengerHandler{
         //ожидает ответа
         $waitAnswerValueName = $serviceFields["lid"]->values[0]->name;
 
-        $lidAttrS = new LidAttributesCreateService($this->accountId, $this->msC);
+        $lidAttrS = new LidAttributesCreateService($this->msC);
         $lidAttrS->findOrCreate($serviceFields, false);
 
-        $agentAttrS = new CounterpartyS($this->accountId, $this->msC);
+        $agentAttrS = new CounterpartyS($this->msC);
         $agentAttrRes = $agentAttrS->getAllAttributes(true);
         $agentAllAttributes = $agentAttrRes->data;
         $agentLidAttr = array_filter($agentAllAttributes, fn($value)=> $value->name == $lidName);
         $agentAttr = array_shift($agentLidAttr);
 
-        $customEntityS = new CustomEntityService($this->accountId, $this->msC);
+        $customEntityS = new CustomEntityService($this->msC);
         $updateValuesS = new UpdateValuesService();
         $preparedDictionary = $updateValuesS->dictionary($customEntityS, $agentAttr, $waitAnswerValueName);
         $body->attributes[] = $preparedDictionary->attributes[0];
         
-        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        $agentS = new CounterpartyService($this->msC);
         return $agentS->create($body);
     }
 
@@ -243,21 +239,21 @@ class AgentMessengerHandler{
         //ожидает ответа
         $waitAnswerValueName = $serviceFields["lid"]->values[0]->name;
 
-        $lidAttrS = new LidAttributesCreateService($this->accountId, $this->msC);
+        $lidAttrS = new LidAttributesCreateService($this->msC);
         $lidAttrS->findOrCreate($serviceFields, false);
 
-        $agentAttrS = new CounterpartyS($this->accountId, $this->msC);
+        $agentAttrS = new CounterpartyS($this->msC);
         $agentAttrRes = $agentAttrS->getAllAttributes(true);
         $agentAllAttributes = $agentAttrRes->data;
         $agentLidAttr = array_filter($agentAllAttributes, fn($value)=> $value->name == $lidName);
         $agentAttr = array_shift($agentLidAttr);
 
-        $customEntityS = new CustomEntityService($this->accountId, $this->msC);
+        $customEntityS = new CustomEntityService($this->msC);
         $updateValuesS = new UpdateValuesService();
         $preparedDictionary = $updateValuesS->dictionary($customEntityS, $agentAttr, $waitAnswerValueName);
         $body->attributes[] = $preparedDictionary->attributes[0];
         
-        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        $agentS = new CounterpartyService($this->msC);
         return $agentS->create($body);
     }
 
@@ -280,21 +276,21 @@ class AgentMessengerHandler{
         //ожидает ответа
         $waitAnswerValueName = $serviceFields["lid"]->values[0]->name;
 
-        $lidAttrS = new LidAttributesCreateService($this->accountId, $this->msC);
+        $lidAttrS = new LidAttributesCreateService($this->msC);
         $lidAttrS->findOrCreate($serviceFields, false);
 
-        $agentAttrS = new CounterpartyS($this->accountId, $this->msC);
+        $agentAttrS = new CounterpartyS($this->msC);
         $agentAttrRes = $agentAttrS->getAllAttributes(true);
         $agentAllAttributes = $agentAttrRes->data;
         $agentLidAttr = array_filter($agentAllAttributes, fn($value)=> $value->name == $lidName);
         $agentAttr = array_shift($agentLidAttr);
 
-        $customEntityS = new CustomEntityService($this->accountId, $this->msC);
+        $customEntityS = new CustomEntityService($this->msC);
         $updateValuesS = new UpdateValuesService();
         $preparedDictionary = $updateValuesS->dictionary($customEntityS, $agentAttr, $waitAnswerValueName);
         $body->attributes[] = $preparedDictionary->attributes[0];
         
-        $agentS = new CounterpartyService($this->accountId, $this->msC);
+        $agentS = new CounterpartyService($this->msC);
         return $agentS->create($body);
     }
 }

@@ -1,7 +1,7 @@
 <?php
-namespace App\Services\MoySklad\Entities;
+namespace App\Services\Intgr\Entities;
 
-use App\Clients\MoySklad;
+use App\Clients\MoySkladIntgr;
 use App\Exceptions\CustomEntityException;
 use App\Exceptions\MsException;
 use App\Services\HandlerService;
@@ -12,19 +12,15 @@ use Illuminate\Support\Facades\Config;
 use stdClass;
 
 class CustomEntityService {
-    private MoySklad $msClient;
-
-    private string $accountId;
+    private MoySkladIntgr $msClient;
 
     private HandlerService $handlerS;
 
     public const URL_IDENTIFIER = "customentity";
 
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msClient = new MoySklad($accountId);
-        else  $this->msClient = $MoySklad;
+    function __construct(MoySkladIntgr $MoySklad) {
+        $this->msClient = $MoySklad;
         $this->handlerS = new HandlerService();
-        $this->accountId = $accountId;
     }
 
     public function getById($id){
