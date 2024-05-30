@@ -21,13 +21,13 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
         // Обновление токена доступа для чата каждые 8 часов
         $schedule->exec("php artisan updateAccessTokenEmployeeChatApp:update")->cron('* */8 * * *')->runInBackground();
 
         // Команда проверяет последние 50 чатов по всем мессенджерам на наличие контрагентов в МС
-        $schedule->exec("php artisan counterparty:check")->cron('*45 */1 * * *')->runInBackground();
+        $schedule->exec("php artisan counterparty:check")->cron('*/45 */1 * * *')->runInBackground();
 
         //Команда отправляет запрос на создание заказа покупателя
         $schedule->exec("php artisan customer_order:create")->cron('*/20 * * * *')->runInBackground();
