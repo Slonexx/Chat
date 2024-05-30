@@ -292,7 +292,7 @@ class webHookController extends Controller
             foreach($webhookData as $itemData){
                 $itemMessage = new stdClass();
                 $itemMessage->type = $itemData->type;
-                $itemMessage->text = $itemData->text;
+                $itemMessage->text = $itemData->message->text;
                 $itemMessage->fromMe = $itemData->fromMe;
 
                 $userInfo = $itemData->chat;
