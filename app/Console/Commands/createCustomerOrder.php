@@ -32,7 +32,7 @@ class createCustomerOrder extends Command
     {
 
         // Время блокировки в секундах (например, 1 час)
-        $lockTime = 1500;
+        $lockTime = 1200;
 
         // Ключ кеша для хранения времени последнего выполнения
         $cacheKey = 'customer_order_run';
