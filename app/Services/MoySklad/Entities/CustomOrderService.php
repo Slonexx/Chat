@@ -29,28 +29,11 @@ class CustomOrderService {
     }
 
     public function getById(string $id) {
-        $res = $this->msC->getById(self::URL_IDENTIFIER, $id);
-        if(!$res->status)
-            return $res->addMessage("Ошибка при получении заказа покупателя");
-        else
-            return $res;
-    }
-
-    public function getByIdWithExpand(string $id, array $expandParams) {
-        $customOrderUrl = Config::get("Global")[self::URL_IDENTIFIER];
-        $preppedUrl = $customOrderUrl . $id . "?expand=";
-        if(count($expandParams) == 0){
-            return $this->res->error($expandParams, "Нет параметров для expand");
-        }
-        foreach($expandParams as $param){
-            if($param != null)
-            $preppedUrl = "{$preppedUrl}{$param},";
-        }
-        $expandedRes = $this->msC->getByUrl($preppedUrl);
-        if(!$expandedRes->status)
-            return $expandedRes->addMessage("Ошибка при получении расширенного заказа");
-        else
-            return $expandedRes;
+        // $res = $this->msC->getById(self::URL_IDENTIFIER, $id);
+        // if(!$res->status)
+        //     return $res->addMessage("Ошибка при получении заказа покупателя");
+        // else
+        //     return $res;
     }
 
     /**
@@ -75,29 +58,6 @@ class CustomOrderService {
             } else {
                 throw new MsException("неизвестная ошибка при создании заказа покупателя", previous:$e);
             }
-        }
-    }
-
-    function getStatuses(){
-        try{
-            $url = Config::get("Global")[self::URL_IDENTIFIER] . "metadata/";
-            $statusesRes = $this->msC->getByUrl($url);
-
-            $res = new Response();
-
-            if($statusesRes->status){
-                $statuses = $statusesRes->data->states ?? null;
-                if($statuses === null)
-                    return $res->success([]);
-                return $res->success($statuses);
-            }
-            else
-                return $res->error($statusesRes, "Невозможно получить статусы заказа покупателя");
-
-        } catch (Exception $e){
-            $res = new Response();
-            $answer = $res->error($e, $e->getMessage());
-            return $answer;
         }
     }
 

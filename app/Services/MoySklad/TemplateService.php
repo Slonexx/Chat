@@ -5,7 +5,7 @@ use App\Clients\oldMoySklad;
 use App\Models\MainSettings;
 use App\Models\MsEntities;
 use App\Models\Templates;
-use App\Services\MoySklad\Entities\CounterpartyService;
+use App\Services\MoySklad\Entities\oldCounterpartyService;
 use App\Services\MoySklad\Entities\oldCustomOrderService;
 use App\Services\MoySklad\Entities\DemandService;
 use App\Services\MoySklad\Entities\InvoiceoutService;
@@ -42,7 +42,7 @@ class TemplateService {
 
         $entityServices = [
             "demand" => new DemandService($this->accountId),
-            "counterparty" => new CounterpartyService($this->accountId),
+            "counterparty" => new oldCounterpartyService($this->accountId),
             "customerorder" => new oldCustomOrderService($this->accountId),
             "invoiceout" => new InvoiceoutService($this->accountId),
             "salesreturn" => new SalesReturnService($this->accountId),
@@ -152,7 +152,7 @@ class TemplateService {
 
         $entityServices = [
             "demand" => new DemandService($this->accountId),
-            "counterparty" => new CounterpartyService($this->accountId),
+            "counterparty" => new oldCounterpartyService($this->accountId),
             "customerorder" => new oldCustomOrderService($this->accountId),
             "invoiceout" => new InvoiceoutService($this->accountId),
             "salesreturn" => new SalesReturnService($this->accountId),

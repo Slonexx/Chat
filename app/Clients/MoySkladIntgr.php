@@ -2,10 +2,8 @@
 namespace App\Clients;
 
 use GuzzleHttp\Client;
-use App\Models\MainSettings;
-use InvalidArgumentException;
 
-class MoySklad {
+class MoySkladIntgr {
 
     private string $token;
 
@@ -15,13 +13,8 @@ class MoySklad {
 
     public mixed $url;
 
-    public function __construct($accountId) {
-        $setting = MainSettings::where("account_id", $accountId)->first();
-        $authToken = $setting->ms_token ?? null;
-        if($authToken == null)
-            throw new InvalidArgumentException("Токен MoySklad не найден");
-
-        $this->token = $authToken;
+    public function __construct(string $ms_token) {
+        $this->token = $ms_token;
         $auth = 'Bearer ' . $this->token;
 
         $this->headers = [

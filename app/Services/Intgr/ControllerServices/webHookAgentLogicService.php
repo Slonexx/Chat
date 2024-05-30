@@ -1,34 +1,27 @@
 <?php
-namespace App\Services\MoySklad\ControllerServices;
+namespace App\Services\Intgr\ControllerServices;
 
-use App\Clients\MoySklad;
-use App\Services\ChatApp\AgentMessengerHandler;
+use App\Clients\MoySkladIntgr;
+use App\Services\Intgr\AgentMessengerHandler;
 use App\Services\HandlerService;
-use App\Services\MoySklad\AgentFindLogicService;
-use App\Services\MoySklad\AgentUpdateLogicService;
+use App\Services\Intgr\AgentFindLogicService;
+use App\Services\Intgr\AgentUpdateLogicService;
 use App\Services\Response;
 
 class webHookAgentLogicService{
 
-    private MoySklad $msC;
+    private MoySkladIntgr $msC;
 
-    public string $accountId;
-
-    private Response $res;
-
-    function __construct($accountId, MoySklad $MoySklad = null) {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
-        else  $this->msC = $MoySklad;
-        $this->res = new Response();
-        $this->accountId = $accountId;
+    function __construct(MoySkladIntgr $MoySklad) {
+        $this->msC = $MoySklad;
     }
     /**
      * логика по созданию или обновлению контрагента в зависимости от поиска в мс
      */
     function createOrUpdate($userInfo, $messenger, $attribute_id){
         $handlerS = new HandlerService();
-        $agentH = new AgentMessengerHandler($this->accountId, $this->msC);
-        $findLogicS = new AgentFindLogicService($this->accountId, $this->msC);
+        $agentH = new AgentMessengerHandler($this->msC);
+        $findLogicS = new AgentFindLogicService($this->msC);
         $attrMetaAgent = $handlerS->FormationMetaById("agentMetadataAttributes", "attributemetadata", $attribute_id);
         
         $phone = $userInfo->phone;
@@ -55,7 +48,7 @@ class webHookAgentLogicService{
             };
         //update
         } else {
-            $updateLogicS = new AgentUpdateLogicService($this->accountId, $this->msC);
+            $updateLogicS = new AgentUpdateLogicService($this->msC);
             $atUsername = "@{$username}";
             $addFieldValue = match ($messenger) {
                 "telegram" => $atUsername,
