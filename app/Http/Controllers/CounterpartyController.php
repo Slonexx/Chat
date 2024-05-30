@@ -6,7 +6,6 @@ use App\Clients\MoySklad;
 use App\Clients\oldMoySklad;
 use App\Exceptions\AgentFindLogicException;
 use App\Exceptions\CounterpartyControllerException;
-use App\Jobs\ProcessNotes;
 use App\Models\MessengerAttributes;
 use App\Models\Notes;
 use App\Models\organizationModel;
@@ -14,12 +13,10 @@ use App\Services\MoySklad\AgentFindLogicService;
 use App\Services\ChatApp\AgentMessengerHandler;
 use App\Services\ChatApp\ChatService;
 use App\Services\ChatApp\MessageService;
-use App\Services\ChatappRequest;
 use App\Services\HandlerService;
 use App\Services\Intgr\ControllerServices\webHookAgentLogicService;
 use App\Services\MoySklad\AgentUpdateLogicService;
 use App\Services\MoySklad\Attributes\oldCounterpartyS;
-use App\Services\MoySklad\GetNotesLogicService;
 use App\Services\MoySklad\Entities\CounterpartyNotesService;
 use App\Services\MoySklad\Entities\CounterpartyService;
 use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
@@ -28,7 +25,6 @@ use Error;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Laravel\Telescope\Telescope;
 use stdClass;
 
 class CounterpartyController extends Controller
