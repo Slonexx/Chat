@@ -2,21 +2,13 @@
 
 namespace App\Http\Controllers\webhook;
 
-use App\Clients\MoySklad;
 use App\Clients\MoySkladIntgr;
-use App\Clients\oldMoySklad;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WebhookAgentIntgr;
 use App\Jobs\HandleWebhookAgent;
-use App\Models\MessengerAttributes;
-use App\Models\Notes;
-use App\Models\organizationModel;
 use App\Services\Intgr\MessageService;
-use App\Services\HandlerService;
-use App\Services\MoySklad\Attributes\oldCounterpartyS;
 use App\Services\Intgr\ControllerServices\webHookAgentLogicService;
 use App\Services\Intgr\Entities\CounterpartyNotesService;
-use App\Services\Settings\MessengerAttributes\CreatingAttributeService;
 use Error;
 use Exception;
 use Illuminate\Http\Request;
@@ -88,162 +80,6 @@ class webHookController extends Controller
         } catch (Exception | Error $e){
             return response()->json($e->getMessage(), 500);
         }
-    }
-
-    public function createCounterpartyNotes(Request $request, $accountId, $lineId, $messenger){
-        $requestData = json_decode(json_encode($request->all()));
-        $messageStack = [];
-        try {
-            $org = organizationModel::getByAccountIdAndLine($accountId, $lineId);
-            $notes = Notes::getByAccountId($accountId);
-
-            $handlerS = new HandlerService();
-            $msC = new oldMoySklad($accountId);
-            $setAttrS = new CreatingAttributeService($accountId, $msC);
-            //все добавленные в messengerAttributes будут созданы в мс
-            $mesAttr = Config::get("messengerAttributes");
-            $attrNames = array_keys($mesAttr);
-            $agentAttrS = new oldCounterpartyS($accountId, $msC);
-            $resAttr = $setAttrS->createAttribute("messengerAttributes", "counterparty", $attrNames, $agentAttrS);
-            if (!$resAttr->status)
-                return $handlerS->responseHandler($resAttr);
-            else
-                $messageStack[] = $resAttr->message;
-
-            $compliances = [
-                "grWhatsApp" => "whatsapp",
-                "telegram" => "telegram",
-                "email" => "email",
-                "vkontakte" => "vk",
-                "instagram" => "instagram",
-                "telegramBot" => "telegram_bot",
-                "avito" => "avito"
-            ];
-            $attribute = MessengerAttributes::getFirst($accountId, "counterparty", $compliances[$messenger]);
-            $attribute_id = $attribute->attribute_id;
-
-            $msCnew = new MoySklad($accountId);
-            $firstNote = $notes->first();
-            foreach($requestData as $itemData){
-                $userInfo = $itemData->chat;
-                $message = new stdClass();
-                $message->text = $itemData->text;
-                $message->fromMe = $itemData->fromMe;
-
-                $agentLogicS = new webHookAgentLogicService($accountId, $msCnew);
-
-                try{
-                    $agent = $agentLogicS->createOrUpdate($userInfo, $compliances[$messenger], $attribute_id);
-
-                    $atUsername = "@{$userInfo->username}";
-                    $email = $userInfo->email;
-                    $chatId = $userInfo->id;
-
-                    $usernameOrPhone = match ($compliances[$messenger]) {
-                        "telegram" => $atUsername,
-                        "whatsapp" => $chatId,
-                        "email" => $email,
-                        "vk" => ctype_digit($chatId) ? "id{$chatId}" : $chatId,
-                        "instagram" => $atUsername,
-                        "telegram_bot" => $atUsername,
-                        "avito" => $chatId
-                    };
-
-                    $messageStack[$usernameOrPhone] = [];
-                    $messageStack[$usernameOrPhone][] = $agent->message;
-
-                    if (empty($org)) {
-                        $messageStack[$usernameOrPhone][] = "отсутствуют организации у контрагента $usernameOrPhone";
-                        continue;
-                    }
-                    if(empty($firstNote)) {
-                        $messageStack[$usernameOrPhone][] = "отсутствуют настройки заметок у контрагента $usernameOrPhone";
-                        continue;
-                    }
-                    if ($itemData->type != "text"){
-                        $messageStack[$usernameOrPhone][] = "Сообщение '$message->text' не является типом 'text'";
-                        continue;
-                    }
-
-                    $lineName = $org->lineName;
-
-                    $isAddMessengerInfo = $firstNote->is_messenger;
-                    $messageS = new MessageService();
-                    $preparedMessage = $messageS->prepareMessage($lineName, $lineId, $messenger, $usernameOrPhone, $isAddMessengerInfo, $message);
-
-                    $agentId = $agent->data->id;
-                    $agentNotesS = new CounterpartyNotesService($accountId, $msCnew);
-                    $body = (object)[
-                        "description" => $preparedMessage
-                    ];
-                    $agentNotesS->create($agentId, $body);
-
-                    $messageStack[$usernameOrPhone][] = "Сообщение '$message->text' создано";
-
-                } catch(Exception $e){
-                    $messageStack[] = $e->getMessage();
-                    continue;
-                }
-
-
-            }
-
-            return response()->json($messageStack);
-
-        } catch (Exception|Error $e) {
-            $current = $e;
-            $messages = [];
-            $statusCode = 500;//or HTTP Exception code
-
-            while ($current !== null) {
-                $filePath = $current->getFile();
-                $fileLine = $current->getLine();
-                $message = $current->getMessage();
-
-                $nextError = $current->getPrevious();
-
-                $parts = explode('|', $message);
-
-                if (count($parts) === 2) {
-                    $text = $parts[0];
-                    $json_str = array_pop($parts);
-
-                    $value = [
-                        "message" => $text,
-                        "data" => json_decode($json_str)
-                    ];
-                    if ($nextError === null) {
-                        $messageStack["message"] = $text;
-                        $code = $current->getCode();
-                        if ($code >= 400)
-                            $statusCode = $code;
-                    }
-                } else {
-                    $value = [
-                        "message" => $message
-                    ];
-                    if ($nextError === null) {
-                        $messageStack["message"] = $message;
-                        $code = $current->getCode();
-                        if ($code >= 400)
-                            $statusCode = $code;
-                    }
-                }
-
-
-                $fileName = basename($filePath);
-
-                $key = "{$fileName}:{$fileLine}";
-
-                $messages[] = [
-                    $key => $value
-                ];
-                $current = $current->getPrevious();
-            }
-            $messageStack["error"] = $messages;
-            return response()->json($messageStack, $statusCode);
-        }
-
     }
 
     public function callbackUrlsIntrg(Request $request)
