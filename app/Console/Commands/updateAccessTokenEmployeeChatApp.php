@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Clients\MsClient;
-use App\Http\Controllers\getBaseTableByAccountId\getMainSettingBD;
 use App\Models\employeeModel;
 use App\Models\settingModel;
 use App\Services\updateAccessToken;
@@ -22,17 +21,17 @@ class updateAccessTokenEmployeeChatApp extends Command
         parent::__construct();
     }
 
-    public function handle()
+    public function handle(): void
     {
         $allSettings = settingModel::all();
         foreach ($allSettings as $settings) {
 
             try {
                 $ClientCheckMC = new MsClient($settings->accountId);
-                $body = $ClientCheckMC->get('https://api.moysklad.ru/api/remap/1.2/entity/employee');
-            } catch (BadResponseException $e) {continue;}
+                $ClientCheckMC->get('https://api.moysklad.ru/api/remap/1.2/entity/employee');
+            } catch (BadResponseException) {continue;}
 
-            $employeeModelsWhereAccountId= employeeModel::where('accountId', $settings->accountId )->get();
+            $employeeModelsWhereAccountId = employeeModel::where('accountId', $settings->accountId )->get();
 
             foreach ($employeeModelsWhereAccountId as $employee) {
                 $data = [
@@ -53,9 +52,7 @@ class updateAccessTokenEmployeeChatApp extends Command
 
                 ];
 
-                dispatch(function () use ($data) {
-                    app(updateAccessToken::class)->initialization($data);
-                })->onQueue('default');
+                (new updateAccessToken())->initialization($data);
             }
 
 
