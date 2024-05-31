@@ -38,6 +38,7 @@ class AgentMessengerHandler{
             $body->name = $name;
         $body->phone = $phone;
         $body->tags = ['chatapp', 'telegram'];
+        $body->companyType = "individual";
 
         $serviceFieldsNames = [
             "lid",
@@ -81,6 +82,7 @@ class AgentMessengerHandler{
         }
         $body->phone = $phone;
         $body->tags = ['chatapp', 'whatsapp'];
+        $body->companyType = "individual";
 
         $serviceFieldsNames = [
             "lid",
@@ -116,6 +118,7 @@ class AgentMessengerHandler{
 
         $body->name = $email;
         $body->tags = ['chatapp', 'email'];
+        $body->companyType = "individual";
 
         $serviceFieldsNames = [
             "lid",
@@ -153,6 +156,7 @@ class AgentMessengerHandler{
 
         $body->name = $name;
         $body->tags = ['chatapp', 'vk'];
+        $body->companyType = "individual";
 
         $serviceFieldsNames = [
             "lid",
@@ -188,6 +192,7 @@ class AgentMessengerHandler{
 
         $body->name = $name;
         $body->tags = ['chatapp', 'instagram'];
+        $body->companyType = "individual";
 
         $serviceFieldsNames = [
             "lid",
@@ -228,6 +233,7 @@ class AgentMessengerHandler{
         $body = $handlerS->FormationAttribute($attrMeta, $addFValue);
         $body->name = $name;
         $body->tags = ['chatapp', 'telegram_bot'];
+        $body->companyType = "individual";
 
         $serviceFieldsNames = [
             "lid",
@@ -265,6 +271,7 @@ class AgentMessengerHandler{
         $body = $handlerS->FormationAttribute($attrMeta, $chatId);
         $body->name = $name;
         $body->tags = ['chatapp', 'avito'];
+        $body->companyType = "individual";
 
         $serviceFieldsNames = [
             "lid",
