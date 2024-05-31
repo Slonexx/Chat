@@ -1,26 +1,26 @@
 <?php
-namespace App\Services\ChatApp;
+namespace App\Services\Intgr;
 
 use App\Exceptions\ChatappRequestException;
 use App\Exceptions\ChatServiceException;
-use App\Services\ChatappRequest;
+use App\Services\Intgr\ChatappRequest;
 use App\Services\Response;
 use Error;
 
 class ChatService{
 
-    private string $employeeId;
+    private string $accessToken;
 
-    function __construct($employeeId) {
-        if(!is_string($employeeId) || $employeeId == null)
-            throw new Error("employeeId отсутствует или имеет некорректный формат");
-        $this->employeeId = $employeeId;
+    function __construct(string $accessToken) {
+        if($accessToken == null)
+            throw new Error("accessToken пустой");
+        $this->accessToken = $accessToken;
     }
 
     function getAllChatForEmployee($countConversation, $lineId){
 
         $res = new Response();
-        $chatReq = new ChatappRequest($this->employeeId);
+        $chatReq = new ChatappRequest($this->accessToken);
         $licenseRes = $chatReq->getLicenses();
         $licenses = $licenseRes->data->data;
         $currentLine = array_filter($licenses, fn($val) => $val->licenseId == $lineId);
@@ -83,7 +83,7 @@ class ChatService{
 
 
         }
-        return $res->success($resChat, "По сотруднику {$this->employeeId} получены все чаты");
+        return $res->success($resChat, "По токену chatapp получены все чаты");
 
     }
 }

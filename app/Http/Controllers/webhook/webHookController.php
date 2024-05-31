@@ -3,12 +3,21 @@
 namespace App\Http\Controllers\webhook;
 
 use App\Clients\MoySkladIntgr;
+use App\Exceptions\AgentFindLogicException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CustomerorderIntgr;
 use App\Http\Requests\WebhookAgentIntgr;
+use App\Jobs\HandleCustomerorder;
 use App\Jobs\HandleWebhookAgent;
+use App\Services\Intgr\ChatService;
+use App\Services\HandlerService;
+use App\Services\Intgr\AgentFindLogicService;
+use App\Services\Intgr\AgentMessengerHandler;
 use App\Services\Intgr\MessageService;
 use App\Services\Intgr\ControllerServices\webHookAgentLogicService;
+use App\Services\Intgr\CustomerorderCreateLogicService;
 use App\Services\Intgr\Entities\CounterpartyNotesService;
+use App\Services\Intgr\ControllerServices\AgentControllerLogicService;
 use Error;
 use Exception;
 use Illuminate\Http\Request;
@@ -281,6 +290,218 @@ class webHookController extends Controller
                         $messageStack["message"] = $message;
                         $code = $current->getCode();
                         if ($code >= 400)
+                            $statusCode = $code;
+                    }
+                }
+
+
+                $fileName = basename($filePath);
+
+                $key = "{$fileName}:{$fileLine}";
+
+                $messages[] = [
+                    $key => $value
+                ];
+                $current = $current->getPrevious();
+            }
+            $messageStack["error"] = $messages;
+            return response()->json($messageStack, $statusCode);
+        }
+
+    }
+
+    public function callbackUrlsCustomerorderIntrg(Request $request)
+    {
+        try {
+            $requestData = $request->all();
+            $request = json_decode(json_encode($requestData));
+
+            $preparedBody = new stdClass();
+            $preparedBody->ms_token = $request->ms_token;
+            $preparedBody->org = [];
+
+            $org = $request->setting->org;
+            $lid = $request->setting->lid;
+            $messengerAttribute = $request->setting->messenger_attribute;
+
+            foreach($org as $orgItem){
+                $item = new stdClass();
+                $item->accessToken = $orgItem->employeeModel->accessToken;
+                $item->lineId = $orgItem->lineId;
+                $item->lineName = $orgItem->lineName;
+                $preparedBody->org[] = $item;
+            }
+
+            $preparedLid = new stdClass();
+            
+            $preparedLid->responsible = $lid->responsible;
+            $preparedLid->responsible_uuid = $lid->responsible_uuid;
+            $preparedLid->is_activity_order = $lid->is_activity_order;
+            $preparedLid->organization = $lid->organization;
+            $preparedLid->organization_account = $lid->organization_account;
+            $preparedLid->sales_channel_uid = $lid->sales_channel_uid;
+            $preparedLid->project_uid = $lid->project_uid;
+            $preparedLid->states = $lid->states;
+            $preparedLid->tasks = $lid->tasks;
+            
+            $preparedBody->lid = $preparedLid;
+
+            foreach($messengerAttribute as $attrItem){
+                $item = new stdClass();
+                $item->name = $attrItem->name;
+                $item->attribute_id = $attrItem->attribute_id;
+                $preparedBody->messengerAttributes[] = $item;
+            }
+            return response()->json($preparedBody);
+            $params = [
+                "headers" => [
+                    'Content-Type' => 'application/json'
+                ],
+                "json" => $preparedBody
+            ];
+            $appUrl = Config::get("Global.url", null);
+            if (!is_string($appUrl) || $appUrl == null)
+                throw new Error("url отсутствует или имеет некорректный формат");
+            $preppedUrl = $appUrl . "api/integration/customerorder/create";
+            $connection = "customerorder_intgr";
+            HandleCustomerorder::dispatch($params, $preppedUrl, $connection)->onConnection($connection)->onQueue("high");
+            return response()->json((object)["status" => true]);
+        } catch(Exception $e){
+            return response()->json($e->getMessage(), 400);
+        } catch (Error $e){
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    function createOrderIntgr(CustomerorderIntgr $request){
+        set_time_limit(3600);
+        $messageStack = [];
+        $request->validated();
+        $requestData = $request->all();
+        $request = json_decode(json_encode($requestData));
+        try{
+            $handlerS = new HandlerService();
+            $ms_token = $request->ms_token;
+            $orgs = $request->org;
+            $messengerAttributes = $request->messengerAttributes;
+            $lid = $request->lid;
+            $msIntgrClient = new MoySkladIntgr($ms_token);
+            //$orgEmployees = $orgsReq->pluck("employeeId")->all();
+            foreach($orgs as $orgItem){
+                //$employeeId = $orgItem->employeeId;
+                $lineId = $orgItem->lineId;
+                $lineName = $orgItem->lineName;
+                $accessToken = $orgItem->accessToken;
+                $chatS = new ChatService($accessToken);
+                $chatsRes = $chatS->getAllChatForEmployee(50, $lineId);
+                $messageStack[] = $chatsRes->message;
+                $agentH = new AgentMessengerHandler($msIntgrClient);
+                foreach($chatsRes->data as $messenger => $chats){
+                    $messengerAttribute = array_filter($messengerAttributes, fn($value) => $value->name == $messenger);
+                    $findedAttribute = array_shift($messengerAttribute);
+                    $attribute_id = $findedAttribute->attribute_id;
+                    $attrMeta = $handlerS->FormationMetaById("agentMetadataAttributes", "attributemetadata", $attribute_id);
+                    foreach($chats as $chat){
+
+                        if (property_exists($chat, 'unreadMessages') and $chat->unreadMessages == 0) continue;
+
+                        $phone = $chat->phone;
+                        $username = $chat->username;
+                        $name = $chat->name;
+                        $chatId = $chat->id;
+                        $email = $chat->email;
+                        $phoneForCreating = "+{$phone}";
+
+                        $findLogicS = new AgentFindLogicService($msIntgrClient);
+                        try{
+                            $agentByRequisitesRes = $findLogicS->findByRequisites($messenger, $chatId, $username, $name, $phone, $email, $attribute_id);
+                        } catch(AgentFindLogicException $e){
+                            if($e->getCode() == 1)
+                                continue;
+                        }
+                        $agents = $agentByRequisitesRes->data->rows;
+                        if(!empty($agents)){
+
+                            $agentHref = $agents[0]->meta->href;
+                            $customOrderS = new CustomerorderCreateLogicService($msIntgrClient);
+                            $ordersByAgentRes = $customOrderS->findFirst(10, $agentHref);
+
+                            $customerOrders = $ordersByAgentRes->data->rows;
+                            $agentControllerS = new AgentControllerLogicService($msIntgrClient);
+                            $infoForTask = new stdClass();
+                            $infoForTask->lineName = $lineName;
+                            $infoForTask->messenger = $messenger;
+
+                            if(count($customerOrders) == 0){
+                                $agentControllerS->createOrderAndAttributes($lid, $agents[0], $customOrderS, $infoForTask);
+                            } else {
+                                $isCreate = $customOrderS->checkStateTypeEqRegular($customerOrders);
+                                if(!$isCreate){
+                                     //Final
+                                    $agentControllerS->createOrderAndAttributes($lid, $agents[0], $customOrderS, $infoForTask);
+                                } else {
+                                    //Regular
+                                    $agentControllerS->updateAttributesIfNecessary($customerOrders);
+                                }
+
+                            }
+
+                        } else if(empty($agents)){
+                            match($messenger){
+                                "telegram" => $agentH->telegram($phoneForCreating, $username, $name, $attrMeta),
+                                "whatsapp" => $agentH->whatsapp($phoneForCreating, $chatId, $name, $attrMeta),
+                                "email" => $agentH->email($email, $attrMeta),
+                                "vk" => $agentH->vk($name, $chatId, $attrMeta),
+                                "instagram" => $agentH->inst($name, $username, $attrMeta),
+                                "telegram_bot" => $agentH->tg_bot($name, $username, $attrMeta),
+                                "avito" => $agentH->avito($name, $chatId, $attrMeta),
+                            };
+                        }
+                    }
+                }
+                $successMessage = "Для линии $lineName были созданы и/или обновлены все контрагенты";
+                $messageStack[] = $lid->is_activity_order ? $successMessage . " и созданы заказы" : $successMessage;
+                $messageStack[] = "Для линии $lineName была создана задача";
+            }
+
+            return response()->json($messageStack);
+
+        } catch(Exception | Error $e){
+            $current = $e;
+            $messages = [];
+            $statusCode = 500;//or HTTP Exception code
+
+            while ($current !== null) {
+                $filePath = $current->getFile();
+                $fileLine = $current->getLine();
+                $message = $current->getMessage();
+
+                $nextError = $current->getPrevious();
+
+                $parts = explode('|', $message);
+
+                if (count($parts) === 2) {
+                    $text = $parts[0];
+                    $json_str = array_pop($parts);
+
+                    $value = [
+                        "message" => $text,
+                        "data" => json_decode($json_str)
+                    ];
+                    if($nextError === null){
+                        $messageStack["message"] = $text;
+                        $code = $current->getCode();
+                        if($code >= 400)
+                            $statusCode = $code;
+                    }
+                } else {
+                    $value = [
+                        "message" => $message
+                    ];
+                    if($nextError === null){
+                        $messageStack["message"] = $message;
+                        $code = $current->getCode();
+                        if($code >= 400)
                             $statusCode = $code;
                     }
                 }

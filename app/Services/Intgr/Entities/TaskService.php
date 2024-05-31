@@ -1,28 +1,21 @@
 <?php
-namespace App\Services\MoySklad\Entities;
+namespace App\Services\Intgr\Entities;
 
-use App\Clients\MoySklad;
+use App\Clients\MoySkladIntgr;
 use App\Exceptions\MsException;
 use App\Services\HTTPResponseHandler;
-use App\Services\Response;
 use Error;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Config;
 
 class TaskService {
 
-    private MoySklad $msC;
-
-    public string $accountId;
-
-    private Response $res;
+    private MoySkladIntgr $msC;
 
     private const URL_IDENTIFIER = "task";
 
-    function __construct($accountId) {
-        $this->msC = new MoySklad($accountId);
-        $this->res = new Response();
-        $this->accountId = $accountId;
+    function __construct(MoySkladIntgr $MoySklad) {
+        $this->msC = $MoySklad;
     }
 
     /**

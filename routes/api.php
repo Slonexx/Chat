@@ -35,3 +35,6 @@ Route::post('counterparty/notes/create/{accountId}/line/{lineId}/messenger/{mess
 Route::post("integration/webhook/counterparty/notes/create", [webHookController::class, "callbackUrlsIntrg"]);
 Route::post('integration/counterparty/notes/create', [webHookController::class, 'createCounterpartyNotesIntgr']);
 
+Route::post("integration/webhook/customerorder/create", [webHookController::class, "callbackUrlsCustomerorderIntrg"]);
+Route::post('integration/check/customerorder/create', [webHookController::class, 'createOrderIntgr']);
+

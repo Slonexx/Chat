@@ -1,18 +1,19 @@
 <?php
-namespace App\Services;
+namespace App\Services\Intgr;
 
-use App\Clients\ChatApp;
+use App\Clients\ChatAppIntgr;
 use App\Exceptions\ChatappRequestException;
+use App\Services\HTTPResponseHandler;
 use Error;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Config;
 
 class ChatappRequest{
 
-    private ChatApp $chatappC;
+    private ChatAppIntgr $chatappC;
 
-    function __construct($employeeId) {
-        $this->chatappC = new ChatApp($employeeId);
+    function __construct(string $accessToken) {
+        $this->chatappC = new ChatAppIntgr($accessToken);
     }
 
     function getLicenses(){

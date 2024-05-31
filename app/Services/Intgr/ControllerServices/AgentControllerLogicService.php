@@ -1,15 +1,18 @@
 <?php
 
-namespace App\Services\MoySklad;
+namespace App\Services\Intgr\ControllerServices;
 
-use App\Clients\MoySklad;
+use App\Clients\MoySkladIntgr;
 use App\Exceptions\AgentControllerLogicException;
 use App\Services\HandlerService;
-use App\Services\MoySklad\Attributes\CustomorderS;
-use App\Services\MoySklad\Entities\CustomEntityService;
-use App\Services\MoySklad\Entities\TaskService;
+use App\Services\Intgr\AgentUpdateLogicService;
+use App\Services\Intgr\CustomerorderCreateLogicService;
+use App\Services\Intgr\LidAttributesCreateService;
+use App\Services\Intgr\Attributes\CustomorderS;
+use App\Services\Intgr\CustomerorderUpdateLogicService;
+use App\Services\Intgr\Entities\CustomEntityService;
+use App\Services\Intgr\Entities\TaskService;
 use App\Services\MoySklad\RequestBody\Attributes\UpdateValuesService;
-use App\Services\Response;
 use Error;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -18,30 +21,20 @@ use stdClass;
 class AgentControllerLogicService
 {
 
-    private MoySklad $msC;
+    private MoySkladIntgr $msC;
 
-    private string $accountId;
-
-    private Response $res;
-
-    function __construct($accountId, MoySklad $MoySklad = null)
+    function __construct(MoySkladIntgr $MoySklad)
     {
-        if ($MoySklad == null) $this->msC = new MoySklad($accountId);
-        else  $this->msC = $MoySklad;
-        $this->accountId = $accountId;
-        $this->res = new Response();
+        $this->msC = $MoySklad;
     }
 
     /**
      * @throws AgentControllerLogicException
      */
-    function createOrderAndAttributes($orderDbSettings, $agent, CustomerorderCreateLogicService $customOrderS, $responsible, $responsibleUuid, $isCreateOrder, $infoForTask)
+    function createOrderAndAttributes($lid, $agent, CustomerorderCreateLogicService $customOrderS, $infoForTask)
     {
         $handlerS = new HandlerService();
         //agentId
-        /* dd($responsible, $responsibleUuid);*/
-
-
         $agentHref = $agent->meta->href;
         $agentPhone = $agent->phone ?? false;
         $agentEmail = $agent->email ?? false;
@@ -49,7 +42,7 @@ class AgentControllerLogicService
         //agentId
         $agentAttr = $agent->attributes ?? null;
         //findOrCreateAttribute
-        $attributesS = new LidAttributesCreateService($this->accountId, $this->msC);
+        $attributesS = new LidAttributesCreateService($this->msC);
         $serviceFieldsNames = [
             "lid",
         ];
@@ -57,6 +50,7 @@ class AgentControllerLogicService
         $config = Config::get("lidAttributes");
         $serviceFields = array_filter($config, fn($key) => in_array($key, $serviceFieldsNames), ARRAY_FILTER_USE_KEY);
         //вынести выше
+        $isCreateOrder = $lid->is_activity_order;
         $attributesS->findOrCreate($serviceFields, $isCreateOrder);
         //вынести выше
         //getCreatedAttribute
@@ -65,8 +59,8 @@ class AgentControllerLogicService
         $valueName = $serviceFields["lid"]->values[0]->name;
         //вынести выше
         $updateValuesS = new UpdateValuesService();
-        $customEntityS = new CustomEntityService($this->accountId, $this->msC);
-        $agentUpdateS = new AgentUpdateLogicService($this->accountId, $this->msC);
+        $customEntityS = new CustomEntityService($this->msC);
+        $agentUpdateS = new AgentUpdateLogicService($this->msC);
 
 
         try {
@@ -94,13 +88,15 @@ class AgentControllerLogicService
         try {
             //createOrder
             if ($isCreateOrder) {
-                $organId = $orderDbSettings->organization;
-                $organization_account = $orderDbSettings->organization_account;
-                $project_uid = $orderDbSettings->project_uid;
-                $sales_channel_uid = $orderDbSettings->sales_channel_uid;
-                $states = $orderDbSettings->states;
+                $organId = $lid->organization;
+                $organization_account = $lid->organization_account;
+                $project_uid = $lid->project_uid;
+                $sales_channel_uid = $lid->sales_channel_uid;
+                $states = $lid->states;
+                $responsible = $lid->responsible;
+                $responsibleUuid = $lid->responsible_uuid;
 
-                $orderAttrS = new CustomorderS($this->accountId, $this->msC);
+                $orderAttrS = new CustomorderS($this->msC);
                 $orderAttrRes = $orderAttrS->getAllAttributes(true);
                 $orderLidAttr = array_filter($orderAttrRes->data, fn($value) => $value->name == $lidName);
                 $orderAttr = array_shift($orderLidAttr);
@@ -140,9 +136,8 @@ class AgentControllerLogicService
                 else
                     $agentOwnerId = null;
 
-                $order = $customOrderS->createBySettings($agentId, $agentOwnerId, $preparedMetas, $responsible, $responsibleUuid, $attributes);
-                $tasks = $orderDbSettings->tasks;
-                $lid = $orderDbSettings->lid;
+                $order = $customOrderS->createBySettings($agentOwnerId, $preparedMetas, $responsible, $responsibleUuid, $attributes);
+                $tasks = $lid->tasks;
 
                 //create task
                 if ($tasks) {
@@ -178,7 +173,7 @@ class AgentControllerLogicService
 
                         $body->description = $message;
                         $body->operation = $handlerS->FormationMeta($order->meta);
-                        $taskS = new TaskService($this->accountId);
+                        $taskS = new TaskService($this->msC);
 
                         $taskS->create($body);
                     }
@@ -195,10 +190,10 @@ class AgentControllerLogicService
 
     function updateAttributesIfNecessary($customerOrders)
     {
-        $agentUpdateS = new AgentUpdateLogicService($this->accountId, $this->msC);
-        $orderUpdateS = new CustomerorderUpdateLogicService($this->accountId, $this->msC);
+        $agentUpdateS = new AgentUpdateLogicService($this->msC);
+        $orderUpdateS = new CustomerorderUpdateLogicService($this->msC);
         $updateValuesS = new UpdateValuesService();
-        $customEntityS = new CustomEntityService($this->accountId, $this->msC);
+        $customEntityS = new CustomEntityService($this->msC);
         $serviceFieldsNames = [
             "lid",
         ];

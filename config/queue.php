@@ -39,6 +39,24 @@ return [
             'timeout' => 600, // время в секундах
         ],
 
+        'customerorder' => [
+            'driver' => 'database',
+            'table' => 'jobs_customerorder',
+            'queue' => 'default',
+            'retry_after' => 90,
+            'after_commit' => false,
+            'timeout' => 600, // время в секундах
+        ],
+
+        'customerorder_intgr' => [
+            'driver' => 'database',
+            'table' => 'jobs_customerorder_intgr',
+            'queue' => 'default',
+            'retry_after' => 90,
+            'after_commit' => false,
+            'timeout' => 600, // время в секундах
+        ],
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => 'localhost',
