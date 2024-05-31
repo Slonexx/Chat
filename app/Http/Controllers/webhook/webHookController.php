@@ -29,7 +29,7 @@ class webHookController extends Controller
     public function callbackUrls(Request $request, $accountId, $lineId, $messenger)
     {
         try {
-            
+
             if ($request->all() == []) return response()->json();
 
             $requestData = json_decode(json_encode($request->data));
@@ -196,7 +196,7 @@ class webHookController extends Controller
 
             $messages = $request->webhook->data;
             //проверить наличие доп поля в мс по переданному токену, если нет выдать ошибку
-            
+
 
             $msIntgrClient = new MoySkladIntgr($ms_token);
             foreach($messages as $itemData){
@@ -333,7 +333,7 @@ class webHookController extends Controller
             }
 
             $preparedLid = new stdClass();
-            
+
             $preparedLid->responsible = $lid->responsible;
             $preparedLid->responsible_uuid = $lid->responsible_uuid;
             $preparedLid->is_activity_order = $lid->is_activity_order;
@@ -343,7 +343,7 @@ class webHookController extends Controller
             $preparedLid->project_uid = $lid->project_uid;
             $preparedLid->states = $lid->states;
             $preparedLid->tasks = $lid->tasks;
-            
+
             $preparedBody->lid = $preparedLid;
 
             foreach($messengerAttribute as $attrItem){
@@ -352,7 +352,6 @@ class webHookController extends Controller
                 $item->attribute_id = $attrItem->attribute_id;
                 $preparedBody->messengerAttributes[] = $item;
             }
-            return response()->json($preparedBody);
             $params = [
                 "headers" => [
                     'Content-Type' => 'application/json'
@@ -522,5 +521,5 @@ class webHookController extends Controller
 
     }
 
-        
+
 }
