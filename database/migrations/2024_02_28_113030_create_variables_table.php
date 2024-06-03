@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreign('template_id')->references('id')->on('templates')->onDelete('cascade');
 
             $table->unsignedBigInteger('attribute_settings_id')->nullable();
-            $table->foreign('attribute_settings_id')->references('id')->on('attribute_settings');
+            $table->foreign('attribute_settings_id')->references('id')->on('attribute_settings')->onDelete('cascade');
 
             $table->timestamps();
         });

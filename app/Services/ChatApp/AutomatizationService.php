@@ -153,7 +153,8 @@ class AutomatizationService{
                 ];
                 $dbMessenger = $compliances[$messenger];
                 $messengerId = $messengerAttributes[$dbMessenger];
-                $findedAttribute = array_filter($agentAttributes, fn($val) => $val->id == $messengerId);
+                if ($agentAttributes === false) $findedAttribute = [];
+                else $findedAttribute = array_filter($agentAttributes, fn($val) => $val->id == $messengerId);
 
                 if(count($findedAttribute) == 0){
                     $chatId = 0;
