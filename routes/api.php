@@ -36,5 +36,5 @@ Route::post("integration/webhook/counterparty/notes/create", [webHookController:
 Route::post('integration/counterparty/notes/create', [webHookController::class, 'createCounterpartyNotesIntgr']);
 
 Route::post("integration/webhook/customerorder/create", [webHookController::class, "callbackUrlsCustomerorderIntrg"]);
-Route::post('integration/check/customerorder/create', [webHookController::class, 'createOrderIntgr']);
+Route::post('integration/customerorder/create', [webHookController::class, 'createOrderIntgr']);
 
