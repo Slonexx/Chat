@@ -131,7 +131,7 @@ class AutomatizationService{
             $messenger = $t->messenger;
 
             $body = new stdClass();
-            if(!$agentAttributes){
+            if(!$agentAttributes and $agentPhone === false and $agentEmail === false){
                 $messengerErr = "У данного $type у контрагента отсутствуют доп поля месседжеров";
                 if($desc == false)
                     $body->description = $messengerErr;
@@ -157,13 +157,15 @@ class AutomatizationService{
 
                 if(count($findedAttribute) == 0){
                     $chatId = 0;
-                    if($messenger == "whatsapp" || $messenger == "telegram"){
+                    if($messenger == "whatsapp" || $messenger == "telegram" || $messenger == "grWhatsApp"){
                         if($agentPhone)
                             $chatId = $agentPhone;
-                    } else if($messenger == "email"){
+                    }
+                    else if($messenger == "email"){
                         if($agentEmail)
                             $chatId = $agentEmail;
-                    } else {
+                    }
+                    else {
                         $messengerErr = "У данного $type у контрагента не заполнен email и phone";
                         $body->description = $messengerErr;
                         $this->msC->put($type, $body, $entityId);
@@ -178,9 +180,8 @@ class AutomatizationService{
                             $body->description .= PHP_EOL . $messengerErr;
                         }
                         $this->msC->put($type, $body, $entityId);
+                        continue;
                     }
-
-                    continue;
                 } else {
                     $firstAttr = array_shift($findedAttribute);
                     $chatId = $firstAttr->value;
