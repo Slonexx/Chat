@@ -75,8 +75,23 @@ class AutomatizationService{
         $desc = $docRes->data->description ?? false;
 
         if($employeeId == null){
-            $employeeId = $docRes->data->owner->id;
+            $employeeByDefault = MainSettings::join('chat_automations as a', "main_settings.accountId", "=", "a.accountId")
+                ->where("a.accountId", $this->accountId)
+                ->where("a.is_default", true)
+                ->select(
+                    "a.employee_id"
+                )->get();
+
+            if($employeeByDefault->isNotEmpty()){
+                $employeeFirst = $employeeByDefault->first();
+                $employeeId = $employeeFirst->employee_id;
+            } else {
+                $employeeId = $docRes->data->owner->id ?? null;
+            }
         }
+
+        if($employeeId == null)
+            return $this->res->error("Ошибка при получении employeeId");
 
         $autos = settingModel::join('scenario as scen', "setting_models.accountId", "=", "scen.accountId")
             ->leftJoin('templates as t', 'scen.template_id', "=", "t.id")

@@ -15,7 +15,6 @@ class sendTemplateController extends Controller{
     function sendTemplate(Request $request){
         try{
             $req = $request->all();
-            $handlerS = new HandlerService();
 
             $msUid = $req["auditContext"]["uid"];
             $spldUid = explode("@", $msUid);
@@ -58,20 +57,14 @@ class sendTemplateController extends Controller{
                     if (isset($res->message)) $obj->message = $res->message;
                     if (isset($res->data)) $obj->message = $res->data;
                     if(!$res->status)
-                        $messageStack[] = $obj;
-                    else
                         $errors[] = $obj;
+                    else
+                        $messageStack[] = $obj;
                 } else {
                     $obj->href = $href;
                     $obj->message = "Статус не был изменён";
                     $messageStack[] = $obj;
                 }
-            }
-            if(empty($errors)){
-                return response()->json($messageStack);
-            } else {
-                $mesAr = array_merge($messageStack, $errors);
-                return response()->json($mesAr, 400);
             }
             if(empty($errors)){
                 return response()->json($messageStack);
