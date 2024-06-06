@@ -216,6 +216,9 @@
         let accountId = '{{ $accountId }}'
         let deleteButtonBool = false
 
+        messageEmployee.style.display = 'none'
+        messageEmployee2.style.display = 'none'
+
        if (MyEmployee.length !== 0) {
 
            MyEmployee.forEach((item) => {
@@ -286,6 +289,8 @@
         }
 
         function showHideCreateEmployee(val) {
+            messageEmployee.style.display = 'none'
+            messageEmployee2.style.display = 'none'
             if (val === '1') {
                 $('#createEmployees').modal('toggle')
 

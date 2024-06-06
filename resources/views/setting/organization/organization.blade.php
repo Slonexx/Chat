@@ -235,13 +235,9 @@
 
                 if (MsOrgan.length > 0) {
                     let organization = window.document.getElementById('organizationSelect')
-                    while (organization.firstChild) { organization.removeChild(organization.firstChild); }
-                    MsOrgan.forEach((item) => {
-                        let option1 = document.createElement("option")
-                        option1.text = item.name
-                        option1.value = item.id
-                        organization.appendChild(option1)
-                    });
+                    clearOption(organization)
+                    createOptions(MsOrgan, organization)
+
                     window.document.getElementById('nameOrganization').innerText = organization.querySelector('option[value="' + organization.value + '"]').textContent
                     MyEmployee.forEach((item) => {
                         $('#createLineForEmployee').append(
@@ -313,13 +309,8 @@
             window.document.getElementById('LineForEmployee_'+employeeId).style.display = 'inline'
 
             let employee = window.document.getElementById('employeeSelect_'+employeeId)
-            while (employee.firstChild) { employee.removeChild(employee.firstChild); }
-            MyEmployee.forEach((item) => {
-                let option1 = document.createElement("option")
-                option1.text = item.employeeName
-                option1.value = item.employeeId
-                employee.appendChild(option1)
-            })
+            clearOption(employee)
+            createOptions(MyEmployee, employee, false)
 
             createLicensesHttp(employeeId, employee.value)
             onEmployee(true,'MyEmployee', employee.value)
@@ -460,7 +451,123 @@
 
 
 
+        function btnCreatingEmployeeForOrgan() {
+            if (MyEmployee.length > 0) createEmployeeForOrgan(MyEmployee[0].employeeId)
+            else {
+                messageViewAndHideText(true, 'К сожалению, в данный момент у вас нет доступных сотрудников. Пожалуйста, перейдите в раздел "Сотрудник и доступы" для добавления новых сотрудников.')
+            }
+        }
 
+
+        function displayNameForOrganName(id) {
+            let organization = window.document.getElementById('organizationSelect')
+            window.document.getElementById('nameOrganization').innerText = organization.querySelector('option[value="' + id + '"]').textContent
+        }
+
+
+        function onEmployee(status, object, id) {
+
+            switch (object) {
+                case 'MyEmployee': {
+                    if (status) {
+                        MyEmployee = MyEmployee.filter(employee => employee.employeeId !== id);
+                    } else {
+                        window.document.getElementById('LineForEmployee_' + id).style.display = 'none'
+
+                        let employeeS = document.getElementById('employeeSelect_' + id);
+                        let licenses_ = document.getElementById('licenses_' + id);
+                        while (employeeS.firstChild) {
+                            employeeS.removeChild(employeeS.firstChild)
+                        }
+                        while (licenses_.firstChild) {
+                            licenses_.removeChild(licenses_.firstChild)
+                        }
+
+                        MyEmployee = [].concat(MyEmployee, BaseMyEmployee.filter(employee => employee.employeeId === id))
+                    }
+                    break
+                }
+                case 'createMain': {
+
+                    if (deleteButtonBool) {
+
+                        let settings = ajax_settings(baseURL + 'Setting/organization/delete/Licenses/' + accountId, "GET", {organId: id});
+                        $.ajax(settings).done(function (json) {
+                            if (json.status){
+                                window.document.getElementById(id).remove();
+                                onEmployee(false, 'MsOrgan', id)
+                            } else {
+                                window.document.getElementById('sleepInfoDelete').style.display = 'block'
+                                window.document.getElementById('sleepInfoDelete').innerText = JSON.stringify(json.message)
+                            }
+
+                        })
+                    }
+
+                    break
+                }
+                case 'MsOrgan': {
+
+                    if (status) {
+
+                        if (id == '0') {
+                            MsOrgan = {}
+                        } else MsOrgan = MsOrgan.filter(employee => employee.id !== id);
+                    } else {
+                        if (id == '0') {
+                            MsOrgan = BaseMsOrgan
+                        } else MsOrgan = [].concat(MsOrgan, BaseMsOrgan.filter(employee => employee.id === id))
+                    }
+
+                    break
+                }
+
+            }
+
+        }
+
+        function activateCloseDelete(){
+            deleteButtonBool = false
+            window.document.getElementById('sleepInfoDelete').style.display = 'none'
+        }
+
+        function deleteAccount(id, name) {
+            deleteButtonBool = true
+            window.document.getElementById('sleepInfoDelete').style.display = 'block'
+            setTimeout(() => window.document.getElementById('messageInfoDelete').innerText = 'Удаление данных организации  ' + name + ' через ' + 5, 1000)
+
+            for (let i = 1; i < 7; i++) {
+                let time = 7 - i
+                setTimeout(() => window.document.getElementById('messageInfoDelete').innerText = 'Удаление данных организации ' + name + ' через ' + time, i * 1000)
+            }
+
+            setTimeout(() => window.document.getElementById('sleepInfoDelete').style.display = 'none', 8 * 1000)
+            setTimeout(() => onEmployee(true, 'createMain', id), 8 * 1000)
+        }
+
+
+
+
+
+        function createOptions(data, targetElement, is_employee = true) {
+            data.forEach((item) => {
+                let option = document.createElement("option");
+
+                if (is_employee){
+                    option.text = item.name
+                    option.value = item.id
+                } else {
+                    option.text = item.employeeName
+                    option.value = item.employeeId
+                }
+
+
+                targetElement.appendChild(option);
+            });
+        }
+        function clearOption(selected) {
+            while (selected.firstChild) selected.removeChild(selected.firstChild)
+        }
     </script>
 
 @endsection
