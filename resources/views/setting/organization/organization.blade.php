@@ -10,7 +10,8 @@
             <div class="col-3 d-flex justify-content-end ">
 
             </div>
-            <div class="col-3 text-right"><img src="{{  ( Config::get("Global") )['url'].'2logoHead.png' }}"  width="100%" alt=""></div>
+            <div class="col-3 text-right"><img src="{{  ( Config::get("Global") )['url'].'2logoHead.png' }}"
+                                               width="100%" alt=""></div>
         </div>
 
         @include('div.alert')
@@ -19,29 +20,31 @@
                 <script>alertViewByColorName("danger", "{{ $message }}")</script>
             @endif
         @endisset
-        <div id="sleepInfoDelete" class="mt-2 alert alert-info fade show in text-center text-black " style="display: none">
-                <div class="row">
-                    <div class="col-10 mt-1" id="messageInfoDelete"></div>
+        <div id="sleepInfoDelete" class="mt-2 alert alert-info fade show in text-center text-black "
+             style="display: none">
+            <div class="row">
+                <div class="col-10 mt-1" id="messageInfoDelete"></div>
 
-                    <div class='col d-flex justify-content-end text-black btnP' style="font-size: 14px">
-                        <button onclick="activateCloseDelete()" class="btn  gradient_focus"> отмена </button>
-                    </div>
+                <div class='col d-flex justify-content-end text-black btnP' style="font-size: 14px">
+                    <button onclick="activateCloseDelete()" class="btn  gradient_focus"> отмена</button>
                 </div>
-
             </div>
+
+        </div>
 
 
         <form class="mt-3"
-              action="/Setting/organization/{{ $accountId }}?isAdmin={{ $isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}" method="post">
+              action="/Setting/organization/{{ $accountId }}?isAdmin={{ $isAdmin }}&fullName={{ $fullName }}&uid={{ $uid }}"
+              method="post">
             @csrf <!-- {{ csrf_field() }} -->
 
             <div class="">
 
                 <div class="row bg-info rounded text-white">
-                    <div class="col-3 mx-3"> Название организации </div>
-                    <div class="col"> Линия </div>
+                    <div class="col-3 mx-3"> Название организации</div>
+                    <div class="col"> Линия</div>
                     <div class="col-1"></div>
-                    <div class="col-1"> Удалить </div>
+                    <div class="col-1"> Удалить</div>
                 </div>
 
                 <div id="main" class="mt-3"></div>
@@ -52,18 +55,19 @@
 
             <div class="row">
                 <div class="col">
-                    <div onclick="showHideCreate('1')" class="btn btn-outline-dark gradient_focus"> добавить </div>
+                    <div onclick="showHideCreate('1')" class="btn btn-outline-dark gradient_focus"> добавить</div>
                 </div>
                 <div class="col">
                     <div class='d-flex justify-content-end text-black btnP'>
-                        <button class="btn btn-outline-dark gradient_focus"> Дальше → </button>
+                        <button class="btn btn-outline-dark gradient_focus"> Дальше →</button>
                     </div>
                 </div>
             </div>
         </form>
 
 
-        <div id="createOrganization" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"  aria-labelledby="createOrganization" aria-hidden="true">
+        <div id="createOrganization" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+             aria-labelledby="createOrganization" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
 
@@ -93,24 +97,30 @@
 
                         <div class="mt-2 row">
                             <div class="col-4">Организация</div>
-                            <select onchange="displayNameForOrganName(this.value)" id="organizationSelect" name="employee" class="col form-select"></select>
+                            <select onchange="displayNameForOrganName(this.value)" id="organizationSelect"
+                                    name="employee" class="col form-select"></select>
                         </div>
                         <hr>
 
-                        <div id="createLineForEmployee" class="mt-2"> </div>
+                        <div id="createLineForEmployee" class="mt-2"></div>
 
                     </div>
 
                     <div class="modal-footer">
-                        <button onclick="btnCreatingEmployeeForOrgan()" type="button" class="btn btn-outline-dark gradient_focus"> Добавить сотрудника </button>
-                        <button id="btn_createOnClick" onclick="createOnClick()" type="button" class="btn btn-outline-dark gradient_focus">Сохранить</button>
+                        <button onclick="btnCreatingEmployeeForOrgan()" type="button"
+                                class="btn btn-outline-dark gradient_focus"> Добавить сотрудника
+                        </button>
+                        <button id="btn_createOnClick" onclick="createOnClick()" type="button"
+                                class="btn btn-outline-dark gradient_focus">Сохранить
+                        </button>
                     </div>
 
                 </div>
             </div>
         </div>
 
-        <div id="updateEmployees" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"  aria-labelledby="createEmployees" aria-hidden="true">
+        <div id="updateEmployees" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+             aria-labelledby="createEmployees" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
 
@@ -139,8 +149,10 @@
                         </div>
 
 
-                        <input class="form-control col" id="employee2" type="text" name="employee2" value="" style="display: none">
-                        <input class="form-control col" id="employeeName" type="text" name="employeeName" value="" style="display: none">
+                        <input class="form-control col" id="employee2" type="text" name="employee2" value=""
+                               style="display: none">
+                        <input class="form-control col" id="employeeName" type="text" name="employeeName" value=""
+                               style="display: none">
 
                         <div class="mt-2 row">
                             <div class="col-4">Электронная почта</div>
@@ -156,7 +168,8 @@
 
                         <div class="mt-2 row">
                             <div class="col-4">APP ID</div>
-                            <input class="form-control col" id="appId2" type="text" name="appId2" placeholder="app_1111_1"
+                            <input class="form-control col" id="appId2" type="text" name="appId2"
+                                   placeholder="app_1111_1"
                                    value="">
                         </div>
 
@@ -172,7 +185,9 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button onclick="updateEmployee()" type="button" class="btn btn-outline-dark gradient_focus"> Изменить </button>
+                        <button onclick="updateEmployee()" type="button" class="btn btn-outline-dark gradient_focus">
+                            Изменить
+                        </button>
                     </div>
 
                 </div>
@@ -223,12 +238,13 @@
         }
 
 
-
         function showHideCreate(val) {
             if (val === '1') {
                 $('#createOrganization').modal('toggle')
 
-                while (organizationSelect.firstChild) { organizationSelect.removeChild(organizationSelect.firstChild); }
+                while (organizationSelect.firstChild) {
+                    organizationSelect.removeChild(organizationSelect.firstChild);
+                }
                 createLineForEmployee.innerText = ''
                 messageEmployee.style.display = 'none'
 
@@ -241,19 +257,19 @@
                     window.document.getElementById('nameOrganization').innerText = organization.querySelector('option[value="' + organization.value + '"]').textContent
                     MyEmployee.forEach((item) => {
                         $('#createLineForEmployee').append(
-                            ' <div id="LineForEmployee_'+ item.employeeId +'" style="display:none;">' +
+                            ' <div id="LineForEmployee_' + item.employeeId + '" style="display:none;">' +
                             ' <div class="mt-2 row"> ' +
                             ' <div class="col-4">Сотрудник</div> ' +
-                            ' <select onchange="createLicensesHttp( \''+item.employeeId+'\', this.value)" id="employeeSelect_'+item.employeeId+'" class="col form-select"></select> ' +
+                            ' <select onchange="createLicensesHttp( \'' + item.employeeId + '\', this.value)" id="employeeSelect_' + item.employeeId + '" class="col form-select"></select> ' +
                             '</div> ' +
                             ' <div class="mt-2 row"> ' +
                             ' <div class="col-4">Линия</div> ' +
-                            ' <select onchange="SelectLicenses(this.value, \''+item.employeeId+'\')" id="licenses_'+ item.employeeId +'" class="col form-select"></select> ' +
+                            ' <select onchange="SelectLicenses(this.value, \'' + item.employeeId + '\')" id="licenses_' + item.employeeId + '" class="col form-select"></select> ' +
                             ' </div> ' +
                             ' <div class="mt-2 row"> ' +
                             ' <div class="col"></div> ' +
                             ' <div class="col"></div> ' +
-                            '<button onclick="onEmployee(false, \''+"MyEmployee"+'\', \''+item.employeeId+'\')" type="button" class="col btn btn-outline-dark gradient_focus">Удалить сотрудника</button>' +
+                            '<button onclick="onEmployee(false, \'' + "MyEmployee" + '\', \'' + item.employeeId + '\')" type="button" class="col btn btn-outline-dark gradient_focus">Удалить сотрудника</button>' +
                             ' </div> ' +
                             ' </div> '
                         )
@@ -264,7 +280,6 @@
                 }
 
 
-
             } else {
                 $('#createOrganization').modal('toggle')
             }
@@ -272,27 +287,26 @@
         }
 
 
-
-        function SelectLicenses(value, ChatAppliancesId){
-            animationLoadingGifOrImage(true,  window.document.getElementById('GifOrImageHide'),  window.document.getElementById('ImageOrGifHide'))
-            let data = { employeeId: ChatAppliancesId };
-            let settings = ajax_settings(baseURL + 'Setting/organization/get/Licenses/' + accountId , "GET", data);
+        function SelectLicenses(value, ChatAppliancesId) {
+            animationLoadingGifOrImage(true, window.document.getElementById('GifOrImageHide'), window.document.getElementById('ImageOrGifHide'))
+            let data = {employeeId: ChatAppliancesId};
+            let settings = ajax_settings(baseURL + 'Setting/organization/get/Licenses/' + accountId, "GET", data);
 
             $.ajax(settings).done(function (json) {
-                animationLoadingGifOrImage(false,  window.document.getElementById('GifOrImageHide'),  window.document.getElementById('ImageOrGifHide'))
+                animationLoadingGifOrImage(false, window.document.getElementById('GifOrImageHide'), window.document.getElementById('ImageOrGifHide'))
 
                 if (json.status) {
                     (json.data).forEach((item) => {
-                      if (item.licenseId == value) {
+                        if (item.licenseId == value) {
 
-                          const now = new Date(); // Создаем объект Date, представляющий текущую дату и время
-                          const unixTimestamp = Math.floor(now.getTime() / 1000); // Получаем текущий таймстамп (в секундах)
+                            const now = new Date(); // Создаем объект Date, представляющий текущую дату и время
+                            const unixTimestamp = Math.floor(now.getTime() / 1000); // Получаем текущий таймстамп (в секундах)
 
-                          if (item.licenseTo < unixTimestamp) {
-                              window.document.getElementById('messageEmployee').style.display = 'block'
-                              messageViewAndHideText(true, 'У данной линии просрочен срок действия')
-                          }
-                      }
+                            if (item.licenseTo < unixTimestamp) {
+                                window.document.getElementById('messageEmployee').style.display = 'block'
+                                messageViewAndHideText(true, 'У данной линии просрочен срок действия')
+                            }
+                        }
 
                     });
                 } else {
@@ -304,103 +318,111 @@
 
         }
 
-        function createEmployeeForOrgan(employeeId){
+        function createEmployeeForOrgan(employeeId) {
 
-            window.document.getElementById('LineForEmployee_'+employeeId).style.display = 'inline'
+            window.document.getElementById('LineForEmployee_' + employeeId).style.display = 'inline'
 
-            let employee = window.document.getElementById('employeeSelect_'+employeeId)
+            let employee = window.document.getElementById('employeeSelect_' + employeeId)
             clearOption(employee)
             createOptions(MyEmployee, employee, false)
 
             createLicensesHttp(employeeId, employee.value)
-            onEmployee(true,'MyEmployee', employee.value)
+            onEmployee(true, 'MyEmployee', employee.value)
 
-            BaseMyEmployee.forEach((item) => {
-               if (item.employeeId !== employeeId && window.document.getElementById('LineForEmployee_'+employeeId).style.display !== 'none' ) {
-                   $("#employeeSelect_" + item.employeeId + " option[value=" + employee.value + "]").remove();
-               }
-            })
+            /*BaseMyEmployee.forEach((item) => {
+                if (item.employeeId !== employeeId && window.document.getElementById('LineForEmployee_' + employeeId).style.display !== 'none') {
+                    $("#employeeSelect_" + item.employeeId + " option[value=" + employee.value + "]").remove();
+                }
+            })*/
 
 
         }
 
 
-
-       function createLicensesHttp(MsOrganValue, ChatAppliancesId){
-           animationLoadingGifOrImage(true,  window.document.getElementById('GifOrImageHide'),  window.document.getElementById('ImageOrGifHide'))
-
-
-           messageViewAndHideText(false, '')
-           let licenses = window.document.getElementById('licenses_' + MsOrganValue )
-           while (licenses.firstChild) { licenses.removeChild(licenses.firstChild); }
+        function createLicensesHttp(MsOrganValue, ChatAppliancesId) {
+            animationLoadingGifOrImage(true, window.document.getElementById('GifOrImageHide'), window.document.getElementById('ImageOrGifHide'))
 
 
-           let data = { employeeId: ChatAppliancesId };
-           let settings = ajax_settings(baseURL + 'Setting/organization/get/Licenses/' + accountId , "GET", data);
-
-           $.ajax(settings).done(function (json) {
-               animationLoadingGifOrImage(false,  window.document.getElementById('GifOrImageHide'),  window.document.getElementById('ImageOrGifHide'))
-
-               if (json.status) {
-                   (json.data).forEach((item) => {
-                       let option1 = document.createElement("option")
-                       let textLicense = item.licenseName
-
-                       if (textLicense == "") { textLicense = "Отсутствует название " }
-
-                       option1.text = item.licenseName + '#' +  item.licenseId
-                       option1.value = item.licenseId
-                       licenses.appendChild(option1)
-                   });
-               } else {
-                   messageViewAndHideText(true, json.data)
-               }
+            messageViewAndHideText(false, '')
+            let licenses = window.document.getElementById('licenses_' + MsOrganValue)
+            while (licenses.firstChild) {
+                licenses.removeChild(licenses.firstChild);
+            }
 
 
-           })
+            let data = {employeeId: ChatAppliancesId};
+            let settings = ajax_settings(baseURL + 'Setting/organization/get/Licenses/' + accountId, "GET", data);
 
-       }
+            $.ajax(settings).done(function (json) {
+                animationLoadingGifOrImage(false, window.document.getElementById('GifOrImageHide'), window.document.getElementById('ImageOrGifHide'))
+
+                if (json.status) {
+                    (json.data).forEach((item) => {
+                        let option1 = document.createElement("option")
+                        let textLicense = item.licenseName
+
+                        if (textLicense == "") {
+                            textLicense = "Отсутствует название "
+                        }
+
+                        option1.text = item.licenseName + '#' + item.licenseId
+                        option1.value = item.licenseId
+                        licenses.appendChild(option1)
+                    });
+                } else {
+                    messageViewAndHideText(true, json.data)
+                }
+
+
+            })
+
+        }
 
 
         function createOnClick() {
             messageViewAndHideText(false, '')
-            let organId =  window.document.getElementById('organizationSelect')
-            if (organId.value == '') { messageViewAndHideText(true, 'Отсутствуют данные по организации') }
+            let organId = window.document.getElementById('organizationSelect')
+            if (organId.value == '') {
+                messageViewAndHideText(true, 'Отсутствуют данные по организации')
+            }
 
             let elements = document.querySelectorAll('[id^="LineForEmployee_"]');
 
             let data = {}
 
-            elements.forEach(function(element, id) {
+            elements.forEach(function (element, id) {
 
 
                 if (element.style.display !== 'none') {
                     let employeeSelect = element.querySelector('select[id^="employeeSelect_"]');
                     let licensesSelect = element.querySelector('select[id^="licenses_"]');
 
-                    if (employeeSelect.value == '') { messageViewAndHideText(true, 'Отсутствуют данные по сотруднику') }
-                    if (licensesSelect.value == '') { messageViewAndHideText(true, 'Отсутствуют данные по линии') }
+                    if (employeeSelect.value == '') {
+                        messageViewAndHideText(true, 'Отсутствуют данные по сотруднику')
+                    }
+                    if (licensesSelect.value == '') {
+                        messageViewAndHideText(true, 'Отсутствуют данные по линии')
+                    }
 
                     data[id] = {
                         organId: organId.value,
-                        organName: organId.querySelector('option[value="' +  organId.value + '"]').textContent,
+                        organName: organId.querySelector('option[value="' + organId.value + '"]').textContent,
                         employeeId: employeeSelect.value,
-                        employeeName: employeeSelect.querySelector('option[value="' +  employeeSelect.value + '"]').textContent,
+                        employeeName: employeeSelect.querySelector('option[value="' + employeeSelect.value + '"]').textContent,
                         lineId: licensesSelect.value,
-                        lineName: licensesSelect.querySelector('option[value="' +  licensesSelect.value + '"]').textContent,
+                        lineName: licensesSelect.querySelector('option[value="' + licensesSelect.value + '"]').textContent,
                     };
                 }
 
             });
 
 
-
-            let settings = ajax_settings(baseURL + 'Setting/organization/create/Licenses/' + accountId , "GET", data);
+            let settings = ajax_settings(baseURL + 'Setting/organization/create/Licenses/' + accountId, "GET", data);
             console.log(settings)
             console.log(data)
 
             $.ajax(settings).done(function (json) {
-                animationLoadingGifOrImage(false,  window.document.getElementById('GifOrImageHide'),  window.document.getElementById('ImageOrGifHide'))
+                animationLoadingGifOrImage(false, window.document.getElementById('GifOrImageHide'), window.document.getElementById('ImageOrGifHide'))
 
                 if (json.status) {
 
@@ -421,22 +443,23 @@
         }
 
 
-
-        function createMainForOrgan(){
+        function createMainForOrgan() {
             createMain.forEach((item) => {
 
                 if (item.id == '0') {
                     let main = document.getElementById('main');
-                    while (main.firstChild) { main.removeChild(main.firstChild) }
+                    while (main.firstChild) {
+                        main.removeChild(main.firstChild)
+                    }
                 }
 
 
                 $('#main').append(
-                    ' <div id="'+item.id+'" class="row"> ' +
-                        ' <div class="col-3 mx-3"> '+item.name+' </div> ' +
-                        ' <div class="col"> '+item.line+' </div> ' +
-                        ' <div class="col-1"></div> ' +
-                        ' <div onclick="deleteAccount(\''+item.id+'\' , \''+item.name+'\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div>' +
+                    ' <div id="' + item.id + '" class="row"> ' +
+                    ' <div class="col-3 mx-3"> ' + item.name + ' </div> ' +
+                    ' <div class="col"> ' + item.line + ' </div> ' +
+                    ' <div class="col-1"></div> ' +
+                    ' <div onclick="deleteAccount(\'' + item.id + '\' , \'' + item.name + '\')"  class="col-1 btn gradient_focus"> Удалить <i class="fa-regular fa-circle-xmark"></i></div>' +
                     ' </div> '
                 )
             })
@@ -445,10 +468,6 @@
             createMain = [];
 
         }
-
-
-
-
 
 
         function btnCreatingEmployeeForOrgan() {
@@ -493,7 +512,7 @@
 
                         let settings = ajax_settings(baseURL + 'Setting/organization/delete/Licenses/' + accountId, "GET", {organId: id});
                         $.ajax(settings).done(function (json) {
-                            if (json.status){
+                            if (json.status) {
                                 window.document.getElementById(id).remove();
                                 onEmployee(false, 'MsOrgan', id)
                             } else {
@@ -526,7 +545,7 @@
 
         }
 
-        function activateCloseDelete(){
+        function activateCloseDelete() {
             deleteButtonBool = false
             window.document.getElementById('sleepInfoDelete').style.display = 'none'
         }
@@ -546,14 +565,11 @@
         }
 
 
-
-
-
         function createOptions(data, targetElement, is_employee = true) {
             data.forEach((item) => {
                 let option = document.createElement("option");
 
-                if (is_employee){
+                if (is_employee) {
                     option.text = item.name
                     option.value = item.id
                 } else {
@@ -565,6 +581,7 @@
                 targetElement.appendChild(option);
             });
         }
+
         function clearOption(selected) {
             while (selected.firstChild) selected.removeChild(selected.firstChild)
         }
