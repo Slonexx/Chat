@@ -18,14 +18,7 @@ class updateAccessToken
 
 
             $body = json_decode(($Client->createTokenMake($data['email'],$data['password'] ,$data['appId'] ))->getBody()->getContents());
-            $model = new employeeModel();
-            $existingRecords = employeeModel::where('employeeId', $data['employeeId'] )->get();
-
-            if (!$existingRecords->isEmpty()) {
-                foreach ($existingRecords as $record) {
-                    $record->delete();
-                }
-            }
+            $model = employeeModel::firstOrNew(['employeeId' => $data['employeeId']]);
 
             $model->accountId = $data['accountId'];
 

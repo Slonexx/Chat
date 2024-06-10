@@ -135,14 +135,7 @@ class CreateAuthTokenController extends Controller
         if ($email != "" and $password != "" and $appId != null and $access != "" and $employeeName != "") {
             try {
                 $body = json_decode(($Client->createTokenMake($email, $password, $appId))->getBody()->getContents());
-                $model = new employeeModel();
-                $existingRecords = employeeModel::where('employeeId', $employeeId)->get();
-
-                if (!$existingRecords->isEmpty()) {
-                    foreach ($existingRecords as $record) {
-                        $record->delete();
-                    }
-                }
+                $model = employeeModel::firstOrNew(['employeeId' => $employeeId]);
 
                 $model->accountId = $accountId;
 
