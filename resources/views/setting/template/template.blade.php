@@ -107,7 +107,8 @@
                         <div class="rounded row gradient">
                             <div class="col-11 mt-1">Основные поля</div>
                             <div class="col form-check form-switch">
-                                <input onchange="idCreatePoleChecked('idCreatePole', this.checked)" class="mt-2 form-check-input"
+                                <input id="idCreatePoleInput" onchange="idCreatePoleChecked('idCreatePole', this.checked)"
+                                       class="mt-2 form-check-input"
                                        type="checkbox" checked>
                             </div>
                         </div>
@@ -115,7 +116,8 @@
                         <div class="mt-1 rounded row gradient">
                             <div class="col-11 mt-1"> Дополнительные поля</div>
                             <div class="col form-check form-switch">
-                                <input id="idCreateAddPoleInput" onchange="idCreatePoleChecked('idCreateAddPole', this.checked)"
+                                <input id="idCreateAddPoleInput"
+                                       onchange="idCreatePoleChecked('idCreateAddPole', this.checked)"
                                        class="mt-2 form-check-input" type="checkbox">
                             </div>
                         </div>
@@ -190,7 +192,8 @@
                         <div class="rounded row gradient">
                             <div class="col-11 mt-1"> Основные поля</div>
                             <div class="col form-check form-switch">
-                                <input id="idCreatePoleInputUpdate" onchange="idCreatePoleChecked('idCreatePoleUpdate', this.checked)"
+                                <input id="idCreatePoleInputUpdate"
+                                       onchange="idCreatePoleChecked('idCreatePoleUpdate', this.checked)"
                                        class="mt-2 form-check-input" type="checkbox" checked>
                             </div>
                         </div>
@@ -199,7 +202,8 @@
                         <div class="mt-1 rounded row gradient">
                             <div class="col-11 mt-1"> Дополнительные поля</div>
                             <div class="col form-check form-switch">
-                                <input id="idCreateAddPoleInputUpdate" onchange="idCreatePoleChecked('idCreateAddPoleUpdate', this.checked)"
+                                <input id="idCreateAddPoleInputUpdate"
+                                       onchange="idCreatePoleChecked('idCreateAddPoleUpdate', this.checked)"
                                        class="mt-2 form-check-input" type="checkbox">
                             </div>
                         </div>
@@ -237,7 +241,7 @@
     @include('setting.template.lite')
     @include('setting.template.update_lite')
     @include('setting.template.logic')
-    
+
 
     <script>
         const baseURL = '{{  ( Config::get("Global") )['url'] }}'
@@ -271,6 +275,7 @@
             });
         }
         getInfoAndAppend()
+
         //getAttributes()
 
         function showHideCreate(val) {
@@ -281,8 +286,8 @@
                 messageEmployee.innerText = ''
                 nameTemplate.value = ''
                 messageTextArea.value = ''
-                //addPoles.click()
-                //pole_1.value = '1'
+
+
 
                 while (organizationSelect.firstChild) {
                     organizationSelect.removeChild(organizationSelect.firstChild);
@@ -330,9 +335,10 @@
                         }
                     });
                 }
-                
+
+
                 isLeading(true)
-        
+
             } else {
                 $("#idCreatePole").empty()
                 $('#createOrganization').modal('toggle')
@@ -393,14 +399,13 @@
                     });
                 }
                 getInfoAndAppendUpdate()
-                
+
                 isLeading(true)
             } else {
                 $('#updateOrganization').modal('toggle')
             }
         }
 
-        
 
     </script>
 

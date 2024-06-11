@@ -6,7 +6,13 @@
         idCreatePoleUpdate.innerText = ''
         idCreateAddPoleUpdate.innerText = ''
 
-        isLeading(false)
+
+        idCreatePoleInput.checked = false
+        idCreateAddPoleInput.checked = false
+        idCreatePoleChecked('idCreatePole', idCreatePoleInput.checked)
+        idCreatePoleChecked('idCreateAddPole', idCreateAddPoleInput.checked)
+
+
         let req = true
 
         let pole_ = document.getElementById('idCreatePole').querySelectorAll('[id^="pole_"]')
@@ -35,6 +41,7 @@
         }
 
         if (req) {
+            isLeading(false)
             let data = {
                 name:  nameTemplate.value,
                 organId: organizationSelect.value,
@@ -47,6 +54,8 @@
             $.ajax(settings).done(function (json) {
                 console.log(baseURL + 'Setting/template/create/poles/' + accountId   + ' response ↓ ')
                 console.log(json)
+                isLeading(true)
+
 
                 if (json.status) {
 
@@ -64,7 +73,7 @@
 
 
 
-                    isLeading(true)
+
                 }
                 else {
                     messageEmployee.style.display = 'block'
@@ -85,8 +94,12 @@
     }
 
     function createOnClickUpdate(){
-        isLeading(false)
+
         let req = true
+        idCreatePoleInputUpdate.checked = false
+        idCreateAddPoleInputUpdate.checked = false
+        idCreatePoleChecked('idCreatePoleUpdate', idCreatePoleInputUpdate.checked)
+        idCreatePoleChecked('idCreateAddPoleUpdate', idCreateAddPoleInputUpdate.checked)
 
         let pole_ = document.getElementById('idCreatePoleUpdate').querySelectorAll('[id^="pole_"]')
         let poles = {}
@@ -101,19 +114,21 @@
         }
 
         if (nameTemplateUpdate.value === '') {
-            messageEmployee.style.display = 'block'
-            messageEmployee.innerText = 'Отсутствует название шаблона'
+            messageEmployeeUpdate.style.display = 'block'
+            messageEmployeeUpdate.innerText = 'Отсутствует название шаблона'
             req = false
         }
 
 
         if (messageTextAreaUpdate.value === '') {
-            messageEmployee.style.display = 'block'
-            messageEmployee.innerText = 'Отсутствует сообщение'
+            messageEmployeeUpdate.style.display = 'block'
+            messageEmployeeUpdate.innerText = 'Отсутствует сообщение'
             req = false
         }
 
         if (req) {
+            isLeading(false)
+
             let templateId = document.getElementById("templateId").value;
             let data = {
                 uuid: templateId,
@@ -128,22 +143,22 @@
             $.ajax(settings).done(function (json) {
                 console.log(baseURL + 'Setting/template/' + accountId   + ' response ↓ ')
                 console.log(json)
+                isLeading(true)
 
                 if (json.status) {
                     showHideCreateUpdate('2')
-                    isLeading(true)
                 }
                 else {
                     messageEmployeeUpdate.style.display = 'block'
                     messageEmployeeUpdate.innerText = json.message
-                    isLeading(true)
                 }
 
             }).fail(function (res) {
-                if(res.status == 400)
-                messageEmployeeUpdate.style.display = 'block'
-                messageEmployeeUpdate.innerText = res.responseJSON.message
-                isLeading(true)
+                if(res.status == 400) {
+                    messageEmployeeUpdate.style.display = 'block'
+                    messageEmployeeUpdate.innerText = res.responseJSON.message
+                    isLeading(true)
+                }
             });
 
 
@@ -204,7 +219,7 @@
                 console.log(json)
 
             })
-        document.getElementById(uuid).remove() 
+        document.getElementById(uuid).remove()
     }
 
 
