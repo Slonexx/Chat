@@ -127,8 +127,10 @@ class AgentControllerLogicService
                 $preparedMetas->organization = $handlerS->FormationMeta($organMeta);
 
                 $preparedMetas->organizationAccount = $handlerS->FormationMeta($organAccountMeta);
-                $preparedMetas->project = $handlerS->FormationMeta($projectMeta);
-                $preparedMetas->salesChannel = $handlerS->FormationMeta($salesChannelMeta);
+                if ($project_uid)
+                    $preparedMetas->project = $handlerS->FormationMeta($projectMeta);
+                if ($sales_channel_uid)
+                    $preparedMetas->salesChannel = $handlerS->FormationMeta($salesChannelMeta);
                 $preparedMetas->state = $handlerS->FormationMeta($stateMeta);
 
                 if(property_exists($agent, 'owner'))

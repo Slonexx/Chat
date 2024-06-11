@@ -56,7 +56,7 @@ class HandleCustomerorder implements ShouldQueue
         $inputMessage = $data->errors[0]->error ?? false;
 
         if ($statusCode == 429 && $inputMessage == $msError) {
-            HandleWebhookAgent::dispatch($this->params, $this->url, $this->conn)->onConnection($this->conn)->onQueue($queue);
+            HandleCustomerorder::dispatch($this->params, $this->url, $this->conn)->onConnection($this->conn)->onQueue($queue);
         }
     }
 }
