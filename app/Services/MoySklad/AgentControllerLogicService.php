@@ -35,7 +35,7 @@ class AgentControllerLogicService
     /**
      * @throws AgentControllerLogicException
      */
-    function createOrderAndAttributes($orderDbSettings, $agent, CustomerorderCreateLogicService $customOrderS, $responsible, $responsibleUuid, $isCreateOrder, $infoForTask)
+    function createOrderAndAttributes($orderDbSettings, $agent, CustomerorderCreateLogicService $customOrderS, $responsible, $responsibleUuid, $isCreateOrder, $lineId)
     {
         $handlerS = new HandlerService();
         //agentId
@@ -131,8 +131,10 @@ class AgentControllerLogicService
                 $preparedMetas->organization = $handlerS->FormationMeta($organMeta);
 
                 $preparedMetas->organizationAccount = $handlerS->FormationMeta($organAccountMeta);
-                $preparedMetas->project = $handlerS->FormationMeta($projectMeta);
-                $preparedMetas->salesChannel = $handlerS->FormationMeta($salesChannelMeta);
+                if ($project_uid)
+                    $preparedMetas->project = $handlerS->FormationMeta($projectMeta);
+                if ($sales_channel_uid)
+                    $preparedMetas->salesChannel = $handlerS->FormationMeta($salesChannelMeta);
                 $preparedMetas->state = $handlerS->FormationMeta($stateMeta);
 
                 if(property_exists($agent, 'owner'))
@@ -140,9 +142,8 @@ class AgentControllerLogicService
                 else
                     $agentOwnerId = null;
 
-                $order = $customOrderS->createBySettings($agentId, $agentOwnerId, $preparedMetas, $responsible, $responsibleUuid, $attributes);
+                $order = $customOrderS->createBySettings($agentOwnerId, $preparedMetas, $responsible, $responsibleUuid, $attributes);
                 $tasks = $orderDbSettings->tasks;
-                $lid = $orderDbSettings->lid;
 
                 //create task
                 if ($tasks) {
@@ -155,11 +156,10 @@ class AgentControllerLogicService
                     if ($bool) {
                         $assignee = $handlerS->FormationMetaById("employee", "employee", $responsibleUuid);
                         $body->assignee = $handlerS->FormationMeta($assignee);
-                        $lineName = $infoForTask->lineName;
 
                         //prepareMessage
                         $message = "Клиент ожидает ответа ! " .
-                            PHP_EOL . "Линия: $lineName\r\n \r\n";
+                            PHP_EOL . "Линия: $lineId\r\n \r\n";
 
                         if ($agentPhone)
                             $message .= "Номер телефона: $agentPhone \r\n";

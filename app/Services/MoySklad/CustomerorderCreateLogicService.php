@@ -67,19 +67,19 @@ class CustomerorderCreateLogicService{
         $body->organization = $preparedMetas->organization;
         $body->attributes = $attributes->attributes;
 
-        $organizationAccount = $preparedMetas->organizationAccount;
+        $organizationAccount = $preparedMetas->organizationAccount ?? false;
         if($organizationAccount)
             $body->organizationAccount = $organizationAccount;
 
-        $project = $preparedMetas->project;
+        $project = $preparedMetas->project ?? false;
         if($project)
             $body->project = $project;
 
-        $salesChannel = $preparedMetas->salesChannel;
+        $salesChannel = $preparedMetas->salesChannel ?? false;
         if($salesChannel)
             $body->salesChannel = $salesChannel;
 
-        $state = $preparedMetas->state;
+        $state = $preparedMetas->state ?? false;
         if($state)
             $body->state = $state;
 

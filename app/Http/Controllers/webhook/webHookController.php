@@ -56,6 +56,7 @@ class webHookController extends Controller
                 ]);
             }
 
+            $preparedChats = [];
             $preparedMessages = [];
             foreach($requestData as $itemData){
                 $itemMessage = new stdClass();
@@ -65,14 +66,22 @@ class webHookController extends Controller
 
                 $userInfo = $itemData->chat;
 
-                $itemMessage->chat = new stdClass();
-                $itemMessage->chat->phone = $userInfo->phone;
-                $itemMessage->chat->username = $userInfo->username;
-                $itemMessage->chat->name = $userInfo->name;
-                $itemMessage->chat->id = $userInfo->id;
-                $itemMessage->chat->email = $userInfo->email;
+                $chatItem = new stdClass();
+
+                $chatItem->phone = $userInfo->phone;
+                $chatItem->username = $userInfo->username;
+                $chatItem->name = $userInfo->name;
+                $chatItem->id = $userInfo->id;
+                $chatItem->email = $userInfo->email;
+                $chatItem->unreadMessages = $userInfo->unreadMessages;
+
+                $itemMessage->chat = $chatItem;
                 $preparedMessages[] = $itemMessage;
+
+                $preparedChats[] = $chatItem;
             }
+
+            //send to agent
             $params = [
                 "headers" => [
                     'Content-Type' => 'application/json'
@@ -85,6 +94,12 @@ class webHookController extends Controller
             $preppedUrl = $appUrl . "api/counterparty/notes/create/$accountId/line/$lineId/messenger/$messenger";
             $connection = "webhook_agent";
             HandleWebhookAgent::dispatch($params, $preppedUrl, $connection)->onConnection($connection)->onQueue("high");
+            //send to customerorder
+            $params["json"] = $preparedChats;
+            $preppedUrl = $appUrl . "api/customerorder/create/$accountId/line/$lineId/messenger/$messenger";
+            $connection = "customerorder";
+            HandleCustomerorder::dispatch($params, $preppedUrl, $connection)->onConnection($connection)->onQueue("high");
+
             return response()->json((object)["status" => true]);
         } catch (Exception | Error $e){
             return response()->json($e->getMessage(), 500);

@@ -3,6 +3,7 @@ namespace App\DTO\MS\Documents;
 
 use DateTime;
 use Exception;
+use Faker\Core\Uuid;
 
 class CustomerorderException extends Exception {} 
 /**
@@ -28,6 +29,20 @@ class Customerorder{
 
     public string $name;
 
+    public bool $shared;
+
+    public string $shipmentAddress;
+
+    public object $shipmentAddressFull;
+
+    public string $syncId;
+
+    public string $taxSystem;
+
+    public string $vatEnabled;
+
+    public string $vatIncluded;
+
     /**
      * meta fields required
      */
@@ -44,11 +59,18 @@ class Customerorder{
     public $group;
     public $meta;
     public $organizationAccount;
-
+    public $owner;
+    public $project;
+    public $salesChannel;
+    public $state;
+    public $store;
+    
+    
     /**
      * array []
      */
     public $attributes;
+    public $positions;
 
 
 }
