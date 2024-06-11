@@ -175,7 +175,7 @@ class LidController extends Controller
                             foreach ($messengers as $messenger){
                                 $urlCallBack = 'https://smartchatapp.kz/api/webhook/'.$accountId.'/licenses/'.$licenses.'/messengers/'.$messenger;
                                 $res = $client->putCallbackUrls($urlCallBack, $licenses, $messenger);
-                                if ($accountId == '1dd5bd55-d141-11ec-0a80-055600047495') dd($res);
+                                if ($accountId == '1dd5bd55-d141-11ec-0a80-055600047495') dd($res, $model->toArray, );
                                 if (!$res->status and $res->statusCode == 403) break 2;
                             }
                         }
