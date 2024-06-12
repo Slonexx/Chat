@@ -24,12 +24,20 @@ use Error;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Laravel\Telescope\Telescope;
 use stdClass;
 
 class CounterpartyController extends Controller
 {
-    function create(string $accountId)
+    function massFindOrCreate(string $accountId)
     {
+        Telescope::tag(function () use ($accountId) {
+            return [
+                "accountId: $accountId", 
+                "typeEntity: counterparty",
+                "{$accountId}_counterparty"
+            ];
+        });
         $messageStack = [];
         try {
             $handlerS = new HandlerService();
@@ -164,6 +172,14 @@ class CounterpartyController extends Controller
     }
 
     public function createCounterpartyNotes(Request $request, $accountId, $lineId, $messenger){
+        Telescope::tag(function () use ($accountId) {
+            return [
+                "accountId: $accountId", 
+                "typeEntity: counterparty",
+                "{$accountId}_counterparty",
+                "fromWebhook"
+            ];
+        });
         $requestData = json_decode(json_encode($request->all()));
         $messageStack = [];
         try {

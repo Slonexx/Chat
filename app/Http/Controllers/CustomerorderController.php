@@ -22,11 +22,19 @@ use Error;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Laravel\Telescope\Telescope;
 use stdClass;
 
 class CustomerorderController extends Controller
 {
     function massFindOrCreate(Request $request, $accountId){
+        Telescope::tag(function () use ($accountId) {
+            return [
+                "accountId: $accountId", 
+                "typeEntity: customerorder",
+                "{$accountId}_customerorder"
+            ];
+        });
         set_time_limit(3600);
         $messageStack = [];
         try{
@@ -197,6 +205,14 @@ class CustomerorderController extends Controller
 
     function findOrCreate(webhookCustomerorder $request, string $accountId, string $lineId, string $messenger){
         $request->validated();
+        Telescope::tag(function () use ($accountId) {
+            return [
+                "accountId: $accountId", 
+                "typeEntity: customerorder",
+                "{$accountId}_customerorder",
+                "fromWebhook"
+            ];
+        });
         $chats = json_decode(json_encode($request->all()));
         $messageStack = [];
         $compliances = [
