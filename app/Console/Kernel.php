@@ -41,7 +41,8 @@ class Kernel extends ConsoleKernel
         $schedule->exec("php artisan queue:work webhook_agent_intgr --queue=high,low --max-time=1800")->cron('*/30 * * * *')->runInBackground();
         $schedule->exec("php artisan queue:work customerorder_intgr --queue=high,low --max-time=1800")->cron('*/30 * * * *')->runInBackground();
         $schedule->exec("php artisan queue:work customerorder --queue=high,low --max-time=1800")->cron('*/30 * * * *')->runInBackground();
-
+        $schedule->exec("php artisan queue:work template --queue=high,low --max-time=1800")->cron('*/30 * * * *')->runInBackground();
+        
         // Прочие задачи
         $schedule->exec("php artisan telescope:prune --hours=48")->daily()->runInBackground();
         $schedule->exec("php artisan route:cache")->hourly()->runInBackground();

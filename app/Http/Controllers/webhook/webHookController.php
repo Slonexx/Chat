@@ -7,8 +7,7 @@ use App\Exceptions\AgentFindLogicException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomerorderIntgr;
 use App\Http\Requests\WebhookAgentIntgr;
-use App\Jobs\HandleCustomerorder;
-use App\Jobs\HandleWebhookAgent;
+use App\Jobs\JobWithDelay;
 use App\Services\Intgr\ChatService;
 use App\Services\HandlerService;
 use App\Services\Intgr\AgentFindLogicService;
@@ -99,12 +98,20 @@ class webHookController extends Controller
                 throw new Error("url отсутствует или имеет некорректный формат");
             $preppedUrl = $appUrl . "api/counterparty/notes/create/$accountId/line/$lineId/messenger/$messenger";
             $connection = "webhook_agent";
-            HandleWebhookAgent::dispatch($params, $preppedUrl, $connection)->onConnection($connection)->onQueue("high");
+            $timeObj = new stdClass();
+            $timeObj->timeout = 1200;
+            $timeObj->min_us = 20000;
+            $timeObj->max_us = 500000;
+            JobWithDelay::dispatch($params, $preppedUrl, $connection, $timeObj)->onConnection($connection)->onQueue("high");
             //send to customerorder
             $params["json"] = $preparedChats;
             $preppedUrl = $appUrl . "api/customerorder/create/$accountId/line/$lineId/messenger/$messenger";
             $connection = "customerorder";
-            HandleCustomerorder::dispatch($params, $preppedUrl, $connection)->onConnection($connection)->onQueue("high");
+            $timeObj = new stdClass();
+            $timeObj->timeout = 1200;
+            $timeObj->min_us = 20000;
+            $timeObj->max_us = 500000;
+            JobWithDelay::dispatch($params, $preppedUrl, $connection, $timeObj)->onConnection($connection)->onQueue("high");
 
             return response()->json((object)["status" => true]);
         } catch (Exception | Error $e){
@@ -190,7 +197,11 @@ class webHookController extends Controller
                 throw new Error("url отсутствует или имеет некорректный формат");
             $preppedUrl = $appUrl . "api/integration/counterparty/notes/create";
             $connection = "webhook_agent_intgr";
-            HandleWebhookAgent::dispatch($params, $preppedUrl, $connection)->onConnection($connection)->onQueue("high");
+            $timeObj = new stdClass();
+            $timeObj->timeout = 1200;
+            $timeObj->min_us = 20000;
+            $timeObj->max_us = 500000;
+            JobWithDelay::dispatch($params, $preppedUrl, $connection, $timeObj)->onConnection($connection)->onQueue("high");
             return response()->json((object)["status" => true]);
         } catch(Exception $e){
             return response()->json($e->getMessage(), 400);
@@ -403,7 +414,11 @@ class webHookController extends Controller
                 throw new Error("url отсутствует или имеет некорректный формат");
             $preppedUrl = $appUrl . "api/integration/customerorder/create";
             $connection = "customerorder_intgr";
-            HandleCustomerorder::dispatch($params, $preppedUrl, $connection)->onConnection($connection)->onQueue("high");
+            $timeObj = new stdClass();
+            $timeObj->timeout = 1200;
+            $timeObj->min_us = 20000;
+            $timeObj->max_us = 500000;
+            JobWithDelay::dispatch($params, $preppedUrl, $connection, $timeObj)->onConnection($connection)->onQueue("high");
             return response()->json((object)["status" => true]);
         } catch(Exception $e){
             return response()->json($e->getMessage(), 400);

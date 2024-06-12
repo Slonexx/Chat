@@ -57,6 +57,15 @@ return [
             'timeout' => 600,
         ],
 
+        'template' => [
+            'driver' => 'database',
+            'table' => 'jobs_template',
+            'queue' => 'default',
+            'retry_after' => 90,
+            'after_commit' => false,
+            'timeout' => 600,
+        ],
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => 'localhost',

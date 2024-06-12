@@ -23,7 +23,9 @@ Route::middleware('api')->get('integration/entity/counterparty/all/metadata', [c
 //Route::post('counterparty/sendNotes/{accountId}', [CounterpartyController::class, 'sendNotes']);
 
 
-Route::post('/webhook', [sendTemplateController::class, 'sendTemplate']);
+Route::post('/webhook', [sendTemplateController::class, 'handleWebhook']);
+Route::post('automation/sendTemplate', [sendTemplateController::class, 'sendTemplate']);
+
 
 //massFindOrCreate
 Route::get('counterparty/create/{accountId}', [CounterpartyController::class, 'massFindOrCreate']);
