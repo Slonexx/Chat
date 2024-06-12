@@ -22,6 +22,7 @@ use Error;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Laravel\Telescope\Telescope;
 use stdClass;
 
 class webHookController extends Controller
@@ -29,7 +30,12 @@ class webHookController extends Controller
     public function callbackUrls(Request $request, $accountId, $lineId, $messenger)
     {
         try {
-
+            Telescope::tag(function () use ($accountId) {
+                return [
+                    "accountId: $accountId",
+                    "webhook_message",
+                ];
+            });
             if ($request->all() == []) return response()->json();
 
             $requestData = json_decode(json_encode($request->data));
@@ -108,6 +114,12 @@ class webHookController extends Controller
 
     public function callbackUrlsIntrg(Request $request)
     {
+        Telescope::tag(function ()  {
+            return [ 
+                "webhookForCounterparty",
+                "integration"
+            ];
+        });
         try {
             $requestData = $request->all();
             $request = json_decode(json_encode($requestData));
@@ -188,6 +200,13 @@ class webHookController extends Controller
     }
 
     public function createCounterpartyNotesIntgr(WebhookAgentIntgr $request){
+        Telescope::tag(function () {
+            return [
+                "typeEntity: counterparty",
+                "fromWebhook",
+                "integration"
+            ];
+        });
         $messageStack = [];
         $compliances = [
             "grWhatsApp" => "whatsapp",
@@ -327,6 +346,12 @@ class webHookController extends Controller
 
     public function callbackUrlsCustomerorderIntrg(Request $request)
     {
+        Telescope::tag(function ()  {
+            return [ 
+                "webhookForCustomerorder",
+                "integration"
+            ];
+        });
         try {
             $requestData = $request->all();
             $request = json_decode(json_encode($requestData));
@@ -388,6 +413,13 @@ class webHookController extends Controller
     }
 
     function createOrderIntgr(CustomerorderIntgr $request){
+        Telescope::tag(function () {
+            return [
+                "typeEntity: customerorder",
+                "fromWebhook",
+                "integration"
+            ];
+        });
         set_time_limit(3600);
         $messageStack = [];
         $request->validated();
