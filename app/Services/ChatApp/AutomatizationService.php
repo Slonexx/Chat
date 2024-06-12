@@ -137,6 +137,8 @@ class AutomatizationService{
             ->get()
             ->pluck("attribute_id", "name")
             ->all();
+
+        $responsesByAuto = [];
         foreach($filteredTemplatesAuto as $t){
             $template_uuid = $t->template_uuid;
             if($template_uuid == null)
@@ -215,13 +217,14 @@ class AutomatizationService{
 
             $newClient = new newClient($employeeId);
             try {
-                $newClient->sendMessage($lineId, $messenger, $chatId, $template);
+                $res = $newClient->sendMessage($lineId, $messenger, $chatId, $template);
+                $responsesByAuto[] = $newClient->ResponseHandler($res);
             } catch (BadResponseException $e) {
                 return $newClient->ResponseExceptionHandler($e);
             }
 
         }
-        return $this->res->success("Все шаблоны отправлены");
+        return $this->res->success($responsesByAuto, "Все шаблоны отправлены");
 
     }
 }
