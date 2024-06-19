@@ -8,6 +8,7 @@ use App\Models\employeeModel;
 use App\Models\settingModel;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class updateAccessTokenEmployeeChatApp extends Command
 {
@@ -21,20 +22,26 @@ class updateAccessTokenEmployeeChatApp extends Command
 
     public function handle(): void
     {
-        $allSettings = settingModel::all();
 
-        foreach ($allSettings as $settings) {
-            if (!$this->checkClient($settings->accountId)) {
-                continue;
+        $mutex = Cache::lock('lock_update', 21600);
+        if ($mutex->get()) {
+
+            $allSettings = settingModel::all();
+
+            foreach ($allSettings as $settings) {
+                if (!$this->checkClient($settings->accountId)) {
+                    continue;
+                }
+
+                $employees = employeeModel::where('accountId', $settings->accountId)->get();
+                foreach ($employees as $employee) {
+                    $this->updateEmployeeToken($employee);
+                }
             }
 
-            $employees = employeeModel::where('accountId', $settings->accountId)->get();
-            foreach ($employees as $employee) {
-                $this->updateEmployeeToken($employee);
-            }
+            $this->info('Command executed successfully.');
         }
-
-        $this->info('Command executed successfully.');
+        else $this->info('Уже был запущен');
     }
 
     private function checkClient(string $accountId): bool
