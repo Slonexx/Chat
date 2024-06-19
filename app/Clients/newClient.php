@@ -70,7 +70,7 @@ class newClient
         ]);
     }
 
-    public function createTokenMake(string $email, string $password, string $appId): ResponseInterface
+    public function createTokenMake(string $email, string $password, string $appId, $isRefersToken = null): ResponseInterface
     {
 
         $client = new Client();
@@ -86,7 +86,16 @@ class newClient
             ],
         ];
 
-        return $client->post($this->URL_->url_.'v1/tokens',$options);
+        if ($isRefersToken != null){
+            $options = [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Refresh' => $isRefersToken,
+                ],
+            ];
+            return $client->post($this->URL_->url_.'v1/tokens/refresh',$options);
+        }
+        else return $client->post($this->URL_->url_.'v1/tokens',$options);
     }
 
     public function checkToken(): ResponseInterface

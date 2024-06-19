@@ -8,6 +8,7 @@ use App\Clients\newClient;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\getBaseTableByAccountId\getMainSettingBD;
 use App\Models\employeeModel;
+use Firebase\JWT\BeforeValidException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -123,6 +124,8 @@ class CreateAuthTokenController extends Controller
     }
     public function createEmployee(Request $request, $accountId): JsonResponse
     {
+
+
         $employeeId = $request->employee ?? "";
         $employeeName = $request->employeeName ?? "";
         $email = $request->email ?? "";
@@ -130,8 +133,8 @@ class CreateAuthTokenController extends Controller
         $appId = $request->appId ?? "";
         $access = $request->access ?? "";
 
-        $Client = new newClient($accountId);
 
+        $Client = new newClient($accountId);
         if ($email != "" and $password != "" and $appId != null and $access != "" and $employeeName != "") {
             try {
                 $body = json_decode(($Client->createTokenMake($email, $password, $appId))->getBody()->getContents());
@@ -159,7 +162,8 @@ class CreateAuthTokenController extends Controller
                     'message' => 'Данный аккаунт есть в ChatApp, вы можете нажимать на кнопку "Добавить"',
                 ]);
 
-            } catch (BadResponseException $e) {
+            }
+            catch (BadResponseException $e) {
                 $getContents = json_decode($e->getResponse()->getBody()->getContents());
 
                 if ($getContents->error->message == 'The email must be a valid email address.') {
@@ -185,6 +189,41 @@ class CreateAuthTokenController extends Controller
                         'status' => 500,
                         'message' => 'Идентификатор приложения неверен (APP ID)',
                     ]);
+                }
+                elseif ($getContents->error->message == 'Too many requests') {
+                    try {
+                        $model = employeeModel::firstOrNew(['employeeId' => $employeeId]);
+                        $body = json_decode(($Client->createTokenMake($email, $password, $appId, $model->refreshToken))->getBody()->getContents());
+
+
+                        $model->accountId = $accountId;
+
+                        $model->employeeId = $employeeId;
+                        $model->employeeName = $employeeName;
+
+                        $model->email = $email;
+                        $model->password = $password;
+                        $model->appId = $appId;
+
+                        $model->access = $access;
+
+                        $model->cabinetUserId = $body->data->cabinetUserId;
+                        $model->accessToken = $body->data->accessToken;
+                        $model->refreshToken = $body->data->refreshToken;
+
+                        $model->save();
+
+                        return response()->json([
+                            'status' => 200,
+                            'message' => 'Данный аккаунт есть в ChatApp, вы можете нажимать на кнопку "Добавить"',
+                        ]);
+                    } catch (BadResponseException $e){
+                        $getContents = json_decode($e->getResponse()->getBody()->getContents());
+                        return response()->json([
+                            'status' => 500,
+                            'message' => $getContents->error->message,
+                        ]);
+                    }
                 }
                 else return response()->json([
                     'status' => 500,
