@@ -108,6 +108,8 @@
         let dialogIds = []
         let chatId = ''
 
+        let countTimerCycle = 0
+
         let arrayMessageTemplate
 
 
@@ -251,9 +253,11 @@
         }
 
         function getInformation(data) {
+            console.log(data.messenger)
             isViewImageOrGifHide(true)
-            if (data.messenger == '') {
+            if (data.messenger == '' && countTimerCycle > 5) {
                 setTimeout(function () {
+                    countTimerCycle++
                     getInformation(isSetData())
                 }, 500);
             } else {
@@ -265,7 +269,10 @@
                         window.document.getElementById('sendMessage').style.display = 'block'
                         chatId = json.data.chatId
                         if (json.hasOwnProperty('message')) isActiveInformation(JSON.stringify(json.message))
-                    } else isActiveInformation(JSON.stringify(json.message))
+                    }
+                    else {
+                        isActiveInformation(JSON.stringify(json.message))
+                    }
                 })
             }
         }
@@ -334,6 +341,8 @@
             /*ХЗ*/
             window.document.getElementById('notificationInContent').style.display = 'none'
             isViewImageOrGifHide(false)
+
+            countTimerCycle = 0
         }
 
 
