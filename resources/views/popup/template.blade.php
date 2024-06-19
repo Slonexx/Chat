@@ -13,7 +13,7 @@
             <div class="mt-3 mb-3 mx-1">
                 <div class="input-group">
                     <input type="search" id="search" oninput="search(this)" class="form-control"/>
-                    <button onclick="searchTemplate()" type="button" class="btn btn-primary">
+                    <button {{--onclick="searchTemplate()" --}}type="button" class="btn btn-primary">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
@@ -63,8 +63,8 @@
                             </select>
                         </div>
                         <div class="mt-2 row p-2">
-                            <div class="col-4">Аккаунте</div>
-                            <select id="linesId" class="col form-select">
+                            <div class="col-4">Линии</div>
+                            <select id="linesId" onchange="is_updateMessage(this.value)" class="col form-select">
 
                             </select>
                         </div>
@@ -113,19 +113,21 @@
         let arrayMessageTemplate
 
 
-       /* let receivedMessage = {
+        /*let receivedMessage = {
             "name": "OpenPopup",
             "messageId": 1,
             "popupName": "TemplateMessage",
             "popupParameters":
                 {
                     "accountId": "1dd5bd55-d141-11ec-0a80-055600047495",
-                    "object_Id": "5f3023e9-05b3-11ee-0a80-06f20001197a",
+                    "object_Id": "9d9c3e2e-27ea-11ef-0a80-043800274cc7",
                     "entity_type": "customerorder",
-                    "build_query": "api%5Baccess_token%5D=5a1ab57d8e258110ebc4f1ca8f151cebefe0f06be96d3772d074aac1f9f49c94&api%5Blicense_id%5D=36651&api%5Bcrm_domain%5D=smartchatapp.kz&api%5Bemployee_ext_code%5D=e793faeb-e63a-11ec-0a80-0b4800079eb3&crm%5Bphones%5D%5B0%5D=7750498821&crm%5BdialogIds%5D%5B0%5D=%40SergeiIOne&crm%5BdialogIds%5D%5B1%5D=77750498821%40c.us",
-                    "license_id": "36651",
-                    "license_full": "TestLine#36651",
-                    "employee": "e793faeb-e63a-11ec-0a80-0b4800079eb3",
+                    "build_query": "api%5Baccess_token%5D=b3ff9164dc2ea7ec380c7a7014b7abae5ff9f6412ab01009820f8e4bb757eca3&api%5Blicense_id%5D=30480&api%5Bcrm_domain%5D=smartchatapp.kz&api%5Bemployee_ext_code%5D=1e2d5dda-d141-11ec-0a80-075e00bbaad9&crm%5Bphones%5D%5B0%5D=7750498821&crm%5BdialogIds%5D%5B0%5D=%40SergeiIOne&crm%5BdialogIds%5D%5B1%5D=77750498821%40c.us",
+                    // "license_id": "30480",
+                    //"license_full": "null#30480",
+                    "license_id": "30668",
+                    "license_full": "NFR#30668",
+                    "employee": "1e2d5dda-d141-11ec-0a80-075e00bbaad9",
                     "nameAgent": "WR Ap21",
                     "phone": "7750498821",
                     "dialogIds": {
@@ -165,6 +167,7 @@
 
                 getTemplatesInformationAll(dataForTemplatesRequest);
 
+                getLines(isSetData())
                 getMessenger(isSetData())
                 getInformation(isSetData())
             }
@@ -172,6 +175,7 @@
 
 
         function onClickAttAgent(html) {
+            window.document.getElementById('notificationInContent').style.display = 'none'
             let compliances = {
                 "WhatsApp": "grWhatsApp",
                 "whatsapp": "grWhatsApp",
@@ -187,8 +191,12 @@
                 "Электронная почта": "email",
             }
             messenger.value = compliances[html.innerText]
-            phoneOrName.value = dialogIds[html.innerText]
-            getInformation(isSetData())
+            if (messenger.value == '') isActiveInformation('У данной линии отсутствуют данный мессенджер')
+            else {
+                phoneOrName.value = dialogIds[html.innerText]
+                getInformation(isSetData())
+            }
+
         }
 
     </script>
@@ -225,10 +233,6 @@
                         ul.appendChild(li);
                     });
 
-                    let option1 = document.createElement("option")
-                    option1.text = license_full
-                    option1.value = license_id
-                    linesId.appendChild(option1)
 
                 } else {
                     window.document.getElementById('mainsView').style.setProperty('display', '');
@@ -247,13 +251,28 @@
                     if ((json.data).length > 0) {
                         createOptions(json.data, messenger)
                         messengerName(messenger.value)
-                    } else isActiveInformation('У данной линии отсутствуют мессенджеры')
-                } else isActiveInformation(JSON.stringify(json.message))
+                    }
+                    else isActiveInformation('У данной линии отсутствуют мессенджеры')
+                }
+                else isActiveInformation(JSON.stringify(json.message))
+            })
+        }
+        function getLines(data) {
+            window.document.getElementById('notificationInContent').style.display = 'none'
+            let linesId = window.document.getElementById('linesId')
+            let settings = ajax_settings(url + "/get/information/lines", "GET", data);
+            $.ajax(settings).done(function (json) {
+                if (json.status) {
+                    if ((json.data).length > 0) {
+                        createOptions(json.data, linesId)
+                    }
+                    else isActiveInformation('У данного сотрудника отсутствуют линии')
+                }
+                else isActiveInformation(JSON.stringify(json.message))
             })
         }
 
         function getInformation(data) {
-            console.log(data.messenger)
             isViewImageOrGifHide(true)
             if (data.messenger == '' && countTimerCycle > 5) {
                 setTimeout(function () {
@@ -285,8 +304,9 @@
             window.document.getElementById('notificationInContent').style.display = 'none'
             if (textMessage.value == '') isActiveInformation('Отсутствует сообщение, пожалуйста введите сообщение или выберите из меню слева')
             if (chatId == '') isActiveInformation('Отсутствует данные для отправки, пожалуйста нажмите на кнопку "проверить".')
+            if (messenger.value == '') isActiveInformation('Отсутствует данные информация в поле мессенджер, пожалуйста выберите его".')
 
-            if (textMessage.value != '' && chatId != '') {
+            if (textMessage.value != '' && messenger.value != '' && chatId != '' ) {
                 let data = {
                     accountId: accountId,
                     object_Id: object_Id,
@@ -313,6 +333,12 @@
             for (let key in dialog) {
                 $('#is_dialogIds_a').append(`<a class="m-1 box column addStyleColumns" onclick="onClickAttAgent(this)"> ${key}</a>`);
             }
+        }
+        function is_updateMessage(value) {
+            clearOption(messenger)
+            license_id = value
+            getMessenger(isSetData())
+            getInformation(isSetData())
         }
     </script>
 
@@ -509,33 +535,6 @@
                 if (text.startsWith(searchValue)) element.style.display = 'block';
                 else element.style.display = 'none';
             });
-        }
-
-        function searchTemplate() {
-            let data = {
-                accountId: accountId,
-                object_Id: object_Id,
-                entity_type: entity_type,
-
-                name: search.value
-            };
-
-            let settings = ajax_settings(url + "/get/where/name", "GET", data);
-            $.ajax(settings).done(function (json) {
-                if (json.status) {
-                    arrayMessageTemplate = json.data;
-                    window.document.getElementById('phoneOrName').value = phone;
-
-                    let option1 = document.createElement("option")
-                    option1.text = license_full
-                    option1.value = license_id
-                    linesId.appendChild(option1)
-
-                } else {
-                    mainsView.style.display = 'none'
-                    isErrorMessage(JSON.stringify(json.data))
-                }
-            })
         }
 
         function innerTemplateMessage(e) {

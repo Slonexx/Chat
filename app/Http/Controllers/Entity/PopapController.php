@@ -95,7 +95,6 @@ class PopapController extends Controller
         $newClient = new newClient($data->employee);
         $messenger = [];
 
-
         try {
             $linesChatApp = json_decode($newClient->licenses()->getBody()->getContents());
         } catch (BadResponseException $e) {
@@ -113,7 +112,6 @@ class PopapController extends Controller
             }
         }
 
-
         foreach ($linesChatApp->data as $item) {
             if ($item->licenseId == $data->license_id) {
                 foreach ($item->messenger as $messengerItem) {
@@ -127,7 +125,50 @@ class PopapController extends Controller
 
         return response()->json([
             'status' => true,
-            'data' => $messenger
+            'data' => $messenger,
+        ]);
+
+    }
+    public function lines(Request $request): JsonResponse
+    {
+        $employee = $request->employee ?? '';
+
+
+        $newClient = new newClient($employee);
+        $lines = [];
+
+
+        try {
+            $linesChatApp = json_decode($newClient->licenses()->getBody()->getContents());
+        }
+        catch (BadResponseException $e) {
+            if ($e->getCode() == 403) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Ошибка токена сотрудника, просьба зайти в приложение в раздел " Сотрудники и доступы ", напротив сотрудника нажмите на кнопку "изменить", после в всплывающем окне нажмите на кнопку "изменить"',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Ошибка получение линий в chatApp в шаблоне сообщений, просьба сообщить разработчиком',
+                    'data' => $e->getResponse()->getBody()->getContents(),
+                ]);
+            }
+        }
+
+
+        foreach ($linesChatApp->data as $item) {
+            $time = $item->licenseName ?? 'null';
+            if ($item->licenseTo > time())
+            $lines[] = [
+                'name' => $time . '#'.$item->licenseId,
+                'value' => $item->licenseId
+            ];
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $lines,
         ]);
 
     }

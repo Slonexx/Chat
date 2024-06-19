@@ -124,6 +124,7 @@ Route::group(["prefix" => "Popup"], function () {
     Route::get('/template/message/get/All', [templateController::class, 'getTemplates']);
     Route::get('/template/message/get/where/name', [PopapController::class, 'searchTemplate']);
     Route::get('/template/message/get/information/messenger', [PopapController::class, 'messenger']);
+    Route::get('/template/message/get/information/lines', [PopapController::class, 'lines']);
     Route::get('/template/message/get/information/chatapp', [PopapController::class, 'information']);
     Route::get('/template/message/get/send/message', [PopapController::class, 'sendMessage']);
 });
