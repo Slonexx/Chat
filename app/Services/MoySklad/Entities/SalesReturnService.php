@@ -64,7 +64,7 @@ class SalesReturnService {
 
             $preppedChangeList["{name}"] = $objectMs->name;
             $preppedChangeList["{organization}"] = $objectMs->organization->name;
-            
+
             $salesChannel = $objectMs->salesChannel ?? false;
             if(!empty($salesChannel))
                 $preppedChangeList["{salesChannel}"] = $salesChannel;
@@ -87,7 +87,9 @@ class SalesReturnService {
             if(!empty($state))
                 $preppedChangeList["{state}"] = $state->name;
 
-            $preppedChangeList["{sum}"] = $objectMs->sum;
+            if (property_exists($objectMs, 'sum')) {
+                $preppedChangeList["{sum}"] = $objectMs->sum > 0 ? $objectMs->sum/100 : 0;
+            } else  $preppedChangeList["{sum}"] = 0;
 
             $arrayPositions = $objectMs->positions->rows;
 
