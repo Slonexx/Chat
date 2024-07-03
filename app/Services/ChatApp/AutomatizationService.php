@@ -3,6 +3,7 @@ namespace App\Services\ChatApp;
 
 use App\Clients\oldMoySklad;
 use App\Clients\newClient;
+use App\Models\employeeModel;
 use App\Models\MainSettings;
 use App\Models\settingModel;
 use App\Services\MoySklad\Entities\oldCounterpartyService;
@@ -84,7 +85,10 @@ class AutomatizationService{
 
             if($employeeByDefault->isNotEmpty()){
                 $employeeFirst = $employeeByDefault->first();
-                $employeeId = $employeeFirst->employee_id;
+                if (!empty($employeeFirst)) {
+                    $model = employeeModel::find($employeeFirst->employee_id);
+                    $employeeId = $model->employeeId;
+                }
             } else {
                 $employeeId = $docRes->data->owner->id ?? null;
             }

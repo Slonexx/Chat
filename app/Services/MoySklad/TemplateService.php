@@ -121,6 +121,27 @@ class TemplateService {
                         return in_array($value->id, $templateAttributeValues);
                     }
                 );
+
+                if(count($findedAttribute) > 0){
+                    foreach ($findedAttribute as $item) {
+                        if($item->type == "customentity")
+                            $templateAttributeValues[$key] = $item->value->name;
+                        else
+                            $templateAttributeValues[$key] = $item->value;
+                    }
+
+                }
+            }
+
+            $readyTemplate = $templateLogicS->insertIn($readyTemplate, $templateAttributeValues);
+
+            /*foreach($templateAttributeValues as $key => $_){
+                $findedAttribute = array_filter(
+                    $resAttributes,
+                    function ($value) use ($templateAttributeValues) {
+                        return in_array($value->id, $templateAttributeValues);
+                    }
+                );
                 if(count($findedAttribute) > 0){
                     $firstAttributeById = array_shift($findedAttribute);
                     if($firstAttributeById->type == "customentity")
@@ -132,7 +153,7 @@ class TemplateService {
                     $readyTemplate = $templateLogicS->insertIn($readyTemplate, $templateAttributeValues);
                 }
 
-            }
+            }*/
 
         }
 
