@@ -56,9 +56,8 @@ class CustomEntityService {
             throw new Error("url отсутствует или имеет некорректный формат");
         try{
             $res = $this->msClient->get($url);
-            $customEntitiesRes = $resHandler->handleOK($res);
-            if (property_exists($customEntitiesRes->data, 'customEntities')) $rows = (array) $customEntitiesRes->data->customEntities ?? [];
-            else $rows = [];
+            $customEntitiesRes = $resHandler->handleOK($res); 
+            $rows = $customEntitiesRes->data->customEntities ?? [];
             return $rows;
         } catch(RequestException $e){
             if($e->hasResponse()){
